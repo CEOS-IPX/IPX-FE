@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IPX Frontend
 
-## Getting Started
+변리사를 위한 AI 기반 선행특허 조사·분석 플랫폼 **IPX**의 프론트엔드 레포지토리입니다.
 
-First, run the development server:
+---
+
+## 서비스 소개
+
+IPX는 변리사가 특허 출원 전 수행하는 선행기술 조사 업무를 AI로 자동화하는 SaaS 플랫폼입니다.  
+발명 내용을 자연어로 입력하면 구성요소 분해 → 유사특허 탐색 → 신규성·진보성 분석 → 리포트 생성까지의 전 과정을 지원합니다.
+
+---
+
+## 주요 기능
+
+**사건 관리**
+
+- 사건 생성/수정/삭제 및 단계별 상태 추적 (선행조사중 / 분석중 / 완료 / 검토대기)
+- 사건당 선행문헌함 1:1 자동 생성 및 Cascade 삭제
+
+**STEP 1 — 구성요소 분해**
+
+- 발명 기술 설명 자유 형식 입력
+- 변리사 핵심 인터뷰 6개 항목 구조화 입력
+- LLM 기반 구성요소 A·B·C·D 자동 분해 + 수동 편집
+
+**STEP 2 — 신규성 분석**
+
+- Kipris API + Vector DB 기반 유사특허 자동 탐색 (최대 D50)
+- 구성요소 × 선행문헌 Claim Chart 자동 생성 (✓/✗)
+- 호버 팝오버로 원문 인용 / AI 해설 구분 표시
+- 변리사 직접 수정 및 수정 이력 저장
+- 신규성 포인트 도출 + 독립항 초안 자동 생성
+
+**STEP 3 — 진보성 분석**
+
+- 4가지 논리 유형 멀티칩 선택 (주지관용기술 / 단순설계변경 / 수치한정 / 복수인용발명결합)
+- 유형별 동적 입력 섹션 및 LLM 초안 생성
+- 선택 유형 기준 종합 진보성 근거 문서 합성
+
+**기술비교 & 리포트**
+
+- 신규성(제29조1항) + 진보성(제29조2항) 분석 결과 PDF 리포트 생성
+
+**공통**
+
+- 구성요소 수정 → 재탐색 → 재분석 반복 루프의 회차별 이력 관리
+- 특허 상세 페이지 (3줄 요약, 외부 원문 이동)
+
+---
+
+## 기술 스택
+
+| 분류            | 기술                                   |
+| --------------- | -------------------------------------- |
+| Framework       | Next.js 15 (App Router)                |
+| Language        | TypeScript                             |
+| Styling         | Tailwind CSS v4                        |
+| State           | Zustand                                |
+| Form            | react-hook-form + Zod                  |
+| Auth            | Google OAuth (Authorization Code Flow) |
+| Multi-step flow | @use-funnel/next                       |
+| Package manager | pnpm                                   |
+| Deployment      | Vercel                                 |
+
+---
+
+## 시작하기
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# 패키지 설치
+pnpm install
+
+# 개발 서버 실행
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 브랜치 전략
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+feat/* → dev → main
+```
 
-## Learn More
+- `feat/*` : 기능 단위 개발
+- `dev` : 통합 및 QA
+- `main` : 배포 브랜치 (Vercel 연동)
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 환경 변수
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```env
+NEXT_PUBLIC_API_BASE_URL=
+NEXT_PUBLIC_GOOGLE_CLIENT_ID=
+```
