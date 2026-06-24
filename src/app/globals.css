@@ -1,15 +1,236 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-pretendard: "Pretendard", sans-serif;
+
+  /* =========================================
+     Text Color
+  ========================================= */
+
+  /* Primary */
+  --color-primary-emphasized: #143ac5; /* Primary-30 */
+  --color-primary-default: #2152e5; /* Primary-40 */
+  --color-primary-sub: #4478f0; /* Primary-50 */
+
+  /* Error */
+  --color-error-emphasized: #d91007; /* Error-10 */
+  --color-error-default: #e7453e; /* Error-20 */
+  --color-error-sub: #f67a74; /* Error-30 */
+
+  /* Neutral */
+  --color-title-primary: #1a1a1a; /* BK */
+  --color-title-secondary: #2a2d35; /* Gray-10 */
+  --color-body-primary: #3b4148; /* Gray-20 */
+  --color-body-secondary: #5a636b; /* Gray-30 */
+  --color-body-disabled: #77818b; /* Gray-40 */
+  --color-caption-label: #909ba5; /* Gray-50 */
+  --color-inverse-on-primary: #ffffff;
+  --color-inverse-on-primary-2: #bcd5ff; /* Primary-80 */
+
+  /* =========================================
+     Background Color (BG)
+  ========================================= */
+
+  /* Primary */
+  --color-bg-primary-tint: #f5f9ff; /* Primary-120 */
+  --color-bg-primary-light: #eef5ff; /* Primary-110 */
+
+  /* Primary-light */
+  --color-bg-primary: #4478f0; /* Primary-50 */
+  --color-bg-primary-hover: #2152e5; /* Primary-40 */
+  --color-bg-primary-pressed: #143ac5; /* Primary-30 */
+
+  /* Error */
+  --color-bg-error: #e7453e; /* Error-20 */
+  --color-bg-error-pressed: #d91007; /* Error-10 */
+
+  /* Neutral */
+  --color-bg-surface: #ffffff; /* WH */
+  --color-bg-neutral-hover: #f8fafb; /* Gray-100 */
+  --color-bg-neutral-subtle: #f2f6f9; /* Gray-90 */
+  --color-bg-neutral-strong: #e4e9ee; /* Gray-80 */
+
+  /* =========================================
+     Icon & Stroke Color
+  ========================================= */
+
+  /* Icon Neutral grayscale*/
+  --color-icon-neutral-emphasize: #5a636b; /* Gray-30 */
+  --color-icon-neutral-default: #77818b; /* Gray-40 */
+  --color-icon-neutral-subtle: #909ba6; /* Gray-50 */
+
+  /* Stroke */
+  --color-divider: #f2f6f9; /* Gray-90 */
+  --color-outline-selected: #909ba6; /* Gray-50 */
+  --color-outline-default: #d3dbe2; /* Gray-70 */
+  --color-outline-sub: #e4e9ee; /* Gray-80 */
+  --color-stroke-primary: #2152e5; /* Primary-40 */
+  --color-stroke-error: #e7453e; /* Error-20 */
+
+  /* =========================================
+     BG Alpha Color (Opacity)
+  ========================================= */
+  /* Scrim */
+  --color-scrim-1: rgba(59, 65, 72, 0.50); /* #3B4148 50% */
+  --color-scrim-2: rgba(59, 65, 72, 0.16); /* #3B4148 16% */
+
+  /* Tooltip */
+  --color-bg-tooltip: rgba(42, 45, 53, 0.85); /* #2A2D35 85% */
+  --color-bg-tooltip-2: rgba(255, 255, 255, 0.85); /* #FFFFFF 85% */
+  --color-bg-tooltip-3: rgba(255, 255, 255, 0.10); /* #FFFFFF 10% */
+
+  /* Badge (Semantic) */
+  --color-bg-semantic-1: rgba(0, 167, 83, 0.10); /* #00A753 10% */
+  --color-bg-semantic-2: rgba(99, 197, 0, 0.10); /* #63C500 10% */
+  --color-bg-semantic-3: rgba(255, 159, 24, 0.10); /* #FF9F18 10% */
+  --color-bg-semantic-4: rgba(231, 69, 62, 0.10); /* #E7453E 10% */
+  --color-bg-semantic-5: rgba(144, 155, 166, 0.10); /* #909BA6 10% */
+
+  /* =========================================
+     Text Font
+  ========================================= */
+
+  /* Display */
+  --text-display-40: 2.5rem;
+  --text-display-40--line-height: 130%;
+  --text-display-40--letter-spacing: -0.02em;
+  --text-display-40--font-weight: 700;
+
+  /* Headline Base */
+  --text-headline-32: 2rem;
+  --text-headline-32--line-height: 130%;
+  --text-headline-32--letter-spacing: -0.02em;
+  --text-headline-32--font-weight: 500;
+
+  --text-headline-28: 1.75rem;
+  --text-headline-28--line-height: 130%;
+  --text-headline-28--letter-spacing: -0.02em;
+  --text-headline-28--font-weight: 500;
+
+  --text-headline-24: 1.5rem;
+  --text-headline-24--line-height: 130%;
+  --text-headline-24--letter-spacing: -0.02em;
+  --text-headline-24--font-weight: 500;
+
+  /* Headline Emphasis */
+  --text-headline-emphasis-32: 2rem;
+  --text-headline-emphasis-32--line-height: 130%;
+  --text-headline-emphasis-32--letter-spacing: -0.02em;
+  --text-headline-emphasis-32--font-weight: 600;
+
+  --text-headline-emphasis-28: 1.75rem;
+  --text-headline-emphasis-28--line-height: 130%;
+  --text-headline-emphasis-28--letter-spacing: -0.02em;
+  --text-headline-emphasis-28--font-weight: 600;
+
+  --text-headline-emphasis-24: 1.5rem;
+  --text-headline-emphasis-24--line-height: 130%;
+  --text-headline-emphasis-24--letter-spacing: -0.02em;
+  --text-headline-emphasis-24--font-weight: 600;
+
+  /* Title Base */
+  --text-title-22: 1.375rem;
+  --text-title-22--line-height: 140%;
+  --text-title-22--letter-spacing: -0.02em;
+  --text-title-22--font-weight: 500;
+
+  --text-title-20: 1.25rem;
+  --text-title-20--line-height: 140%;
+  --text-title-20--letter-spacing: -0.02em;
+  --text-title-20--font-weight: 500;
+
+  --text-title-18: 1.125rem;
+  --text-title-18--line-height: 140%;
+  --text-title-18--letter-spacing: -0.02em;
+  --text-title-18--font-weight: 500;
+
+  /* Title Emphasis */
+  --text-title-emphasis-22: 1.375rem;
+  --text-title-emphasis-22--line-height: 140%;
+  --text-title-emphasis-22--letter-spacing: -0.02em;
+  --text-title-emphasis-22--font-weight: 600;
+
+  --text-title-emphasis-20: 1.25rem;
+  --text-title-emphasis-20--line-height: 140%;
+  --text-title-emphasis-20--letter-spacing: -0.02em;
+  --text-title-emphasis-20--font-weight: 600;
+
+  --text-title-emphasis-18: 1.125rem;
+  --text-title-emphasis-18--line-height: 140%;
+  --text-title-emphasis-18--letter-spacing: -0.02em;
+  --text-title-emphasis-18--font-weight: 600;
+
+  /* Body Base */
+  --text-body-19: 1.1875rem;
+  --text-body-19--line-height: 150%;
+  --text-body-19--letter-spacing: -0.02em;
+  --text-body-19--font-weight: 400;
+
+  --text-body-17: 1.0625rem;
+  --text-body-17--line-height: 150%;
+  --text-body-17--letter-spacing: -0.02em;
+  --text-body-17--font-weight: 400;
+
+  --text-body-15: 0.9375rem;
+  --text-body-15--line-height: 150%;
+  --text-body-15--letter-spacing: -0.02em;
+  --text-body-15--font-weight: 400;
+
+  /* Body Emphasis */
+  --text-body-emphasis-19: 1.1875rem;
+  --text-body-emphasis-19--line-height: 150%;
+  --text-body-emphasis-19--letter-spacing: -0.02em;
+  --text-body-emphasis-19--font-weight: 500;
+
+  --text-body-emphasis-17: 1.0625rem;
+  --text-body-emphasis-17--line-height: 150%;
+  --text-body-emphasis-17--letter-spacing: -0.02em;
+  --text-body-emphasis-17--font-weight: 500;
+
+  --text-body-emphasis-15: 0.9375rem;
+  --text-body-emphasis-15--line-height: 150%;
+  --text-body-emphasis-15--letter-spacing: -0.02em;
+  --text-body-emphasis-15--font-weight: 500;
+
+  /* Label Base */
+  --text-label-17: 1.0625rem;
+  --text-label-17--line-height: 140%;
+  --text-label-17--letter-spacing: -0.02em;
+  --text-label-17--font-weight: 500;
+
+  --text-label-15: 0.9375rem;
+  --text-label-15--line-height: 140%;
+  --text-label-15--letter-spacing: -0.02em;
+  --text-label-15--font-weight: 500;
+
+  --text-label-13: 0.8125rem;
+  --text-label-13--line-height: 140%;
+  --text-label-13--letter-spacing: -0.02em;
+  --text-label-13--font-weight: 500;
+
+  /* Label Emphasis */
+  --text-label-emphasis-17: 1.0625rem;
+  --text-label-emphasis-17--line-height: 140%;
+  --text-label-emphasis-17--letter-spacing: -0.02em;
+  --text-label-emphasis-17--font-weight: 600;
+
+  --text-label-emphasis-15: 0.9375rem;
+  --text-label-emphasis-15--line-height: 140%;
+  --text-label-emphasis-15--letter-spacing: -0.02em;
+  --text-label-emphasis-15--font-weight: 600;
+
+  --text-label-emphasis-13: 0.8125rem;
+  --text-label-emphasis-13--line-height: 140%;
+  --text-label-emphasis-13--letter-spacing: -0.02em;
+  --text-label-emphasis-13--font-weight: 600;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +240,25 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-pretendard);
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
