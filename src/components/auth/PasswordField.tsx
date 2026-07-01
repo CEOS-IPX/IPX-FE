@@ -2,7 +2,7 @@
 
 import { useId, useState } from "react";
 import EyeIcon from "@/components/icons/icon-eye.svg";
-import EyeOffIcon from "@/components/icons/icon-eye-x.svg";
+import EyeOffIcon from "@/components/icons/icon-eye_x.svg";
 import { cn } from "@/lib/cn";
 
 type PasswordFieldProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size"> & {

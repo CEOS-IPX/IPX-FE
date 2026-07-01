@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import LogoIpxFigure from "@/components/icons/logo-ipx-figure.svg";
-import LogoIpxChar from "@/components/icons/logo-ipx-char.svg";
+import LogoIpxFigure from "@/components/logo/logo-ipx-figure-auth.svg";
+import LogoIpxChar from "@/components/logo/logo-ipx-char.svg";
 
 export const metadata: Metadata = {
   robots: {
@@ -15,7 +15,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="flex h-screen w-full">
       <div className="relative w-1/2 overflow-hidden rounded-xl my-5 ml-5">
         <Image
-          src="/img/img-auth-graphic.png"
+          src="/images/img-auth-graphic.png"
           alt="auth graphic"
           fill
           className="object-cover"

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import IconViewSidebar from "@/components/icons/icon-view_sidebar.svg";
-import IPXLogo from "@/components/icons/logo-ipx-char.svg";
+import IPXLogo from "@/components/logo/logo-ipx-char.svg";
 import NewSearch from "@/components/icons/icon-create.svg";
 import Search from "@/components/icons/icon-search.svg";
 import MyProject from "@/components/icons/icon-folder.svg";
@@ -15,9 +15,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
 
   const PAGE_LABELS: Record<string, string> = {
-    "/search": "새로 탐색하기",
-    "/project": "내 프로젝트",
-    "/history": "탐색 내역 찾기",
+    "/history": "내 활동 기록",
+    "/search": "선행기술 탐색",
+    "/analysis": "기술 분석",
   };
 
   const pageLabel = PAGE_LABELS[pathname] ?? "";
@@ -48,21 +48,21 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
         <nav className="flex flex-col gap-2 pb-5 border-b border-gray-100">
           <SidebarNavItem
-            href="/search"
-            icon={<NewSearch width={20} height={20} />}
-            label="새로 탐색하기"
-            open={openSidebar}
-          />
-          <SidebarNavItem
-            href="#"
+            href="/history"
             icon={<MyProject width={20} height={20} />}
-            label="내 프로젝트"
+            label="내 활동 기록"
             open={openSidebar}
           />
           <SidebarNavItem
-            href="#"
+            href="/search"
             icon={<Search width={20} height={20} />}
-            label="탐색 내역 찾기"
+            label="선행기술 탐색"
+            open={openSidebar}
+          />
+          <SidebarNavItem
+            href="/analysis"
+            icon={<NewSearch width={20} height={20} />}
+            label="기술 분석"
             open={openSidebar}
           />
         </nav>
