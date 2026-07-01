@@ -71,8 +71,9 @@ export default function Login() {
               />
             </div>
             <div className="w-full flex flex-row justify-between">
+              {/* 로그인 유지 기능은 api 연동 이후 추가 예정 */}
               <label className="flex items-center gap-2 text-label-15 text-title-secondary">
-                <Radio /> {/* 로그인 유지 기능은 api 연동 이후 추가 예정 */}
+                <Radio />
                 로그인 유지
               </label>
               <Link href="/reset-password" className="text-body-15 text-body-disabled underline">

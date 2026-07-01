@@ -68,7 +68,7 @@
   --color-icon-neutral-subtle: #909ba6; /* Gray-50 */
 
   /* Stroke */
-  --color-divider: #f2f6f9; /* Gray-90 */
+  --color-stroke-divider: #f2f6f9; /* Gray-90 */
   --color-outline-selected: #909ba6; /* Gray-50 */
   --color-outline-default: #d3dbe2; /* Gray-70 */
   --color-outline-sub: #e4e9ee; /* Gray-80 */

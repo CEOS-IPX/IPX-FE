@@ -7,8 +7,8 @@ const sidebarNavItemVariants = cva(
   {
     variants: {
       active: {
-        true: "rounded-lg bg-primary-120 text-primary-50",
-        false: "text-gray-20 hover:rounded-lg hover:bg-gray-90",
+        true: "rounded-lg bg-bg-primary-tint text-primary-default text-body-15",
+        false: "text-body-primary text-body-15 hover:rounded-lg hover:bg-bg-neutral-subtle",
       },
     },
     defaultVariants: { active: false },
@@ -36,8 +36,24 @@ export function SidebarNavItem({
       href={href}
       className={cn(sidebarNavItemVariants({ active }), !open && "justify-center", className)}
     >
-      <div className="flex shrink-0 items-center justify-center">{icon}</div>
-      {open && <span className="text-label-15">{label}</span>}
+      <div
+        className={cn(
+          "flex shrink-0 items-center justify-center",
+          active ? "text-primary-default" : "text-body-primary"
+        )}
+      >
+        {icon}
+      </div>
+      {open && (
+        <span
+          className={cn(
+            "text-label-15",
+            active === true ? "text-primary-default" : "text-body-primary"
+          )}
+        >
+          {label}
+        </span>
+      )}
     </Link>
   );
 }
