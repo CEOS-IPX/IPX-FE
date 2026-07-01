@@ -34,7 +34,7 @@ export const EmailInputStep = ({ email: initialEmail = "", onNext }: EmailInputS
 
   return (
     <div className="flex max-w-125 flex-1 flex-col items-start justify-center gap-10 self-stretch">
-      <h1 className="text-headline-emphasis-28 text-gray-10">회원가입</h1>
+      <h1 className="text-headline-emphasis-28 text-title-primary">회원가입</h1>
       <div className="flex w-full flex-col items-start gap-6">
         <div className="flex w-full flex-col items-start gap-7">
           <form className="flex w-full flex-col gap-6" onSubmit={handleSubmit(onNext)} noValidate>
@@ -51,8 +51,8 @@ export const EmailInputStep = ({ email: initialEmail = "", onNext }: EmailInputS
           <GoogleButton>Google 계정으로 시작</GoogleButton>
         </div>
         <div className="flex h-6 w-full items-center justify-center gap-2">
-          <span className="text-label-15 text-gray-50">이미 계정이 있으신가요?</span>
-          <Link href="/login" className="text-label-15 font-normal text-gray-30 underline">
+          <span className="text-label-15 text-body-disabled">이미 계정이 있으신가요?</span>
+          <Link href="/login" className="text-label-15 font-normal text-body-disabled underline">
             로그인하기
           </Link>
         </div>

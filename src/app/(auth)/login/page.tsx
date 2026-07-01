@@ -43,7 +43,7 @@ export default function Login() {
 
   return (
     <div className="flex max-w-125 flex-1 flex-col items-start justify-center gap-10 self-stretch">
-      <h1 className="text-headline-emphasis-28 text-gray-10">로그인</h1>
+      <h1 className="text-headline-emphasis-28 text-title-primary">로그인</h1>
       <div className="flex w-full flex-col items-start gap-6">
         <div className="flex w-full flex-col items-start gap-7">
           <form className="flex w-full flex-col gap-6" onSubmit={handleSubmit} noValidate>
@@ -71,11 +71,11 @@ export default function Login() {
               />
             </div>
             <div className="w-full flex flex-row justify-between">
-              <label className="flex items-center gap-2 text-label-17 text-gray-30">
+              <label className="flex items-center gap-2 text-label-15 text-title-secondary">
                 <Radio /> {/* 로그인 유지 기능은 api 연동 이후 추가 예정 */}
                 로그인 유지
               </label>
-              <Link href="/reset-password" className="text-body-15 text-gray-30 underline">
+              <Link href="/reset-password" className="text-body-15 text-body-disabled underline">
                 비밀번호를 잊으셨나요?
               </Link>
             </div>
@@ -87,8 +87,8 @@ export default function Login() {
           <GoogleButton>Google 계정으로 로그인</GoogleButton>
         </div>
         <div className="flex h-6 w-full items-center justify-center gap-2">
-          <span className="text-label-15 text-gray-50">계정이 없으신가요?</span>
-          <Link href="/signup" className="text-label-15 font-normal text-gray-30 underline">
+          <span className="text-label-15 text-body-disabled">계정이 없으신가요?</span>
+          <Link href="/signup" className="text-label-15 font-normal text-body-disabled underline">
             회원가입하기
           </Link>
         </div>

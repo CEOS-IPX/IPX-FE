@@ -58,7 +58,7 @@ export const ProfileStep = ({ onSubmit, onBack }: ProfileStepProps) => {
       onSubmit={handleSubmit(onSubmit)}
       className="flex max-w-125 flex-1 flex-col items-start justify-center gap-10 self-stretch"
     >
-      <h1 className="text-headline-emphasis-28 text-gray-10">회원 정보</h1>
+      <h1 className="text-headline-emphasis-28 text-title-primary">회원 정보</h1>
       <div className="flex w-full flex-col items-start gap-4">
         <TextField
           label="이름"
@@ -86,12 +86,12 @@ export const ProfileStep = ({ onSubmit, onBack }: ProfileStepProps) => {
       </div>
       <div className="flex w-full flex-col items-start gap-3">
         <div className="flex h-5 items-center gap-2">
-          <p className="text-label-13 text-gray-10">가입 약관 동의</p>
+          <p className="text-label-13 text-title-secondary">가입 약관 동의</p>
           {agreementError && (
-            <p className="text-label-13 text-error-20">{agreementError.message}</p>
+            <p className="text-label-13 text-error-default">{agreementError.message}</p>
           )}
         </div>
-        <hr className="h-px w-full border-0 bg-gray-80" />
+        <hr className="h-px w-full border-0 bg-outline-sub" />
         <Controller
           control={control}
           name="agreedTerms"
