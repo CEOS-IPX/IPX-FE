@@ -26,12 +26,15 @@ export default function Signup() {
       EmailInput={({ context, history }) => (
         <EmailInputStep
           email={context.email}
-          onNext={({ email }) => history.push(SIGNUP_STEPS.EMAIL_SENT, { email })}
+          onNext={({ email, expiresIn, resendAvailableIn }) =>
+            history.push(SIGNUP_STEPS.EMAIL_SENT, { email, expiresIn, resendAvailableIn })
+          }
         />
       )}
       EmailSent={({ context, history }) => (
         <EmailSentStep
           email={context.email}
+          expiresIn={context.expiresIn}
           onNext={() => history.push(SIGNUP_STEPS.PROFILE, { email: context.email })}
           onBack={() => history.back()}
         />

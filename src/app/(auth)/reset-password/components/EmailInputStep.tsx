@@ -21,12 +21,15 @@ export function EmailInputStep({ onNext, onPrev }: Props) {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: "" },
     mode: "onSubmit",
   });
+
+  const email = watch("email");
 
   return (
     <div className="flex max-w-125 flex-1 flex-col items-start justify-center gap-10 self-stretch">
@@ -52,7 +55,9 @@ export function EmailInputStep({ onNext, onPrev }: Props) {
           <Button type="button" variant="secondary" onClick={onPrev}>
             이전
           </Button>
-          <Button type="submit">다음</Button>
+          <Button type="submit" disabled={!email}>
+            다음
+          </Button>
         </div>
       </form>
     </div>

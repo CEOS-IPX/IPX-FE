@@ -32,12 +32,15 @@ export function NewPasswordStep({ onNext, onPrev, passwordError }: Props) {
     register,
     handleSubmit,
     setError,
+    watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { password: "", passwordConfirm: "" },
     mode: "onSubmit",
   });
+
+  const { password, passwordConfirm } = watch();
 
   useEffect(() => {
     if (passwordError) {
@@ -74,7 +77,7 @@ export function NewPasswordStep({ onNext, onPrev, passwordError }: Props) {
           <Button type="button" variant="secondary" onClick={onPrev}>
             이전
           </Button>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="primary" disabled={!password || !passwordConfirm}>
             재설정
           </Button>
         </div>

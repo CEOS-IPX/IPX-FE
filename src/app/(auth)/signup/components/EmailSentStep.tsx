@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import { CodeInput } from "@/components/auth/CodeInput";
 import { Button } from "@/components/ui/Button";
 
-const INITIAL_SECONDS = 5 * 60;
-
 function formatTime(seconds: number) {
   const m = String(Math.floor(seconds / 60)).padStart(2, "0");
   const s = String(seconds % 60).padStart(2, "0");
@@ -15,12 +13,13 @@ function formatTime(seconds: number) {
 
 type EmailSentStepProps = {
   email: string;
+  expiresIn: number;
   onNext: () => void;
   onBack: () => void;
 };
 
-export const EmailSentStep = ({ email, onNext, onBack }: EmailSentStepProps) => {
-  const [secondsLeft, setSecondsLeft] = useState(INITIAL_SECONDS);
+export const EmailSentStep = ({ email, expiresIn, onNext, onBack }: EmailSentStepProps) => {
+  const [secondsLeft, setSecondsLeft] = useState(expiresIn);
   const [code, setCode] = useState("");
 
   useEffect(() => {
@@ -60,10 +59,10 @@ export const EmailSentStep = ({ email, onNext, onBack }: EmailSentStepProps) => 
           </Button>
         </div>
         <div className="flex h-6 w-full items-center justify-center gap-2">
-          <span className="text-label-15 text-body-disabled">
+          <span className="text-body-15 text-body-disabled">
             {expired ? "코드를 다시 전송할까요?" : "코드를 받지 못하셨나요?"}
           </span>
-          <Link href="#" className="text-label-15 font-normal text-body-disabled underline">
+          <Link href="#" className="text-body-15 font-normal text-body-disabled underline">
             새 코드 받기
           </Link>
         </div>

@@ -24,8 +24,8 @@ function Cell({ index, value, error, ref, ...handlers }: CellProps) {
       value={value}
       aria-label={`인증코드 ${index + 1}번째 자리`}
       className={cn(
-        "h-20.5 w-[73.333px] rounded border border-outline-default bg-bg-neutral-hover text-center text-headline-emphasis-32 text-title-secondary focus:outline-none",
-        error && "border-[1.5px] border-stroke-error"
+        "h-20.5 w-[73.333px] rounded-md border-[1.5px] border-outline-default bg-bg-surface text-center text-headline-emphasis-32 text-title-secondary focus:outline-none",
+        error && "border-stroke-error"
       )}
       {...handlers}
     />

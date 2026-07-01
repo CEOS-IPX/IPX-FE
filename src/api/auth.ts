@@ -1,4 +1,3 @@
-import axios from "axios";
 //로그인 관련 api 모음
 
 type LoginRequest = {
@@ -36,13 +35,24 @@ type ReissueResponse = {
 };
 
 export async function login(body: LoginRequest): Promise<AuthResponse> {
-  const { data } = await axios.post("/api/auth/login", body, {
-    withCredentials: true,
+  const res = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(body),
   });
-  return data;
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(errorData.message ?? res.statusText);
+  }
+  return res.json();
 }
 
 export async function reissue(): Promise<ReissueResponse> {
-  const { data } = await axios.post("/api/auth/reissue", {}, { withCredentials: true });
-  return data;
+  const res = await fetch("/api/auth/reissue", {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!res.ok) throw new Error("Reissue failed");
+  return res.json();
 }

@@ -6,6 +6,8 @@ type EmailInputContext = {
 
 type EmailSentContext = {
   email: string;
+  expiresIn: number;
+  resendAvailableIn: number;
 };
 
 type ProfileContext = {
