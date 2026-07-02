@@ -61,7 +61,7 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
       </nav>
 
       {open && (
-        <div className="flex flex-1 flex-col gap-1 overflow-y-auto">
+        <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto">
           <span className="px-3 text-label-13 text-title-primary">최근 탐색</span>
           <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
           <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
