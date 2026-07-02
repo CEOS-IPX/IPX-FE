@@ -38,11 +38,11 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
 
       <nav className="flex flex-col gap-1 pb-5 border-b border-stroke-divider">
         <SidebarNavItem
-          href="/history"
+          href="/myhistory"
           icon={<MyHistory width={20} height={20} />}
           label="내 활동 기록"
           open={open}
-          active={pathname === "/history"}
+          active={pathname === "/myhistory"}
         />
         <SidebarNavItem
           href="/search"
