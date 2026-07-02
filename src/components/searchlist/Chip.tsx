@@ -7,8 +7,9 @@ const chipVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-bg-primary-light text-primary-default border border-bg-primary-light",
-        default: "bg-bg-surface text-body-secondary border border-outline-default",
+        primary:
+          "text-label-13 bg-bg-primary-light text-primary-default border border-bg-primary-light",
+        default: "text-label-13 bg-bg-surface text-body-secondary border border-outline-default",
       },
     },
     defaultVariants: { variant: "default" },

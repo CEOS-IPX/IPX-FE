@@ -15,6 +15,7 @@ import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SaveButton } from "@/components/searchlist/SaveButton";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { StatusBadge } from "@/components/searchlist/StatusBadge";
+import { ProjectCard } from "@/components/myhistory/ProjectCard";
 
 type SectionProps = {
   title: string;
@@ -145,6 +146,31 @@ export default function PlaygroundPage() {
 
       <Section title="Pagination" description="페이지 이동 · 양 끝에서 비활성화">
         <Pagination page={page} totalPages={5} onChange={setPage} />
+      </Section>
+
+      <Section title="ProjectCard" description="상태 chip · 제목 · 회사/담당자 · 이미지 그리드">
+        <ProjectCard
+          id="demo-1"
+          status="선행 조사 중"
+          title="프로젝트명 프로젝트명 프로젝트명 프로젝트명 프로젝트명 프로젝트명"
+          company="그린폴리머(주)"
+          manager="김도현"
+          patents={[]}
+        />
+        <ProjectCard
+          id="demo-2"
+          status="완료"
+          title="이미지가 있는 프로젝트"
+          company="그린폴리머(주)"
+          manager="김도현"
+          patents={[
+            { id: "p1", thumbnailUrl: "https://picsum.photos/seed/a/200" },
+            { id: "p2", thumbnailUrl: "https://picsum.photos/seed/b/200" },
+            { id: "p3", thumbnailUrl: "https://picsum.photos/seed/c/200" },
+            { id: "p4", thumbnailUrl: "https://picsum.photos/seed/d/200" },
+            { id: "p5", thumbnailUrl: "https://picsum.photos/seed/e/200" },
+          ]}
+        />
       </Section>
 
       <Section title="ResultListHeader" description="전체선택 체크박스 · indeterminate">
