@@ -39,7 +39,7 @@ export function SidebarNavItem({
       <div
         className={cn(
           "flex shrink-0 items-center justify-center",
-          active ? "text-primary-default" : "text-body-primary"
+          active ? "text-icon-primary-default" : "text-body-primary"
         )}
       >
         {icon}

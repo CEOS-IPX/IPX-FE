@@ -67,6 +67,8 @@
   --color-icon-neutral-default: #77818b; /* Gray-40 */
   --color-icon-neutral-subtle: #909ba6; /* Gray-50 */
 
+  --color-icon-primary-default: #4478F0;
+
   /* Stroke */
   --color-stroke-divider: #f2f6f9; /* Gray-90 */
   --color-outline-selected: #909ba6; /* Gray-50 */
@@ -93,6 +95,13 @@
   --color-bg-semantic-3: rgba(255, 159, 24, 0.10); /* #FF9F18 10% */
   --color-bg-semantic-4: rgba(231, 69, 62, 0.10); /* #E7453E 10% */
   --color-bg-semantic-5: rgba(144, 155, 166, 0.10); /* #909BA6 10% */
+
+  /* Caption Semantic text color */
+  --color-caption-semantic-1: #00A753;
+  --color-caption-semantic-2: #63C500;
+  --color-caption-semantic-3: #FF9F18;
+  --color-caption-semantic-4: #E7453E;
+  --color-caption-semantic-5: #909BA6;
 
   /* =========================================
      Text Font

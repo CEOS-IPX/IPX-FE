@@ -28,11 +28,7 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
       >
         {open && <IPXLogo width={57} height={20} />}
         <button className="ml-auto cursor-pointer text-icon-neutral-default" onClick={onToggle}>
-          <IconViewSidebar
-            width={20}
-            height={20}
-            className={open ? "fill-gray-80" : "fill-gray-30"}
-          />
+          <IconViewSidebar width={20} height={20} className="fill-icon-neutral-default" />
         </button>
       </div>
 

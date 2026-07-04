@@ -34,7 +34,7 @@ export function PreviousSearchItem({
       {open && (
         <span
           className={cn(
-            "text-label-15",
+            "text-label-15 truncate",
             active === true ? "text-primary-default" : "text-body-primary"
           )}
         >
