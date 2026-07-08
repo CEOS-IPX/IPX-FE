@@ -19,7 +19,7 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className={`flex flex-col gap-5 px-3 py-5 border-r border-outline-sub transition-all duration-500 ${
+      className={`flex h-full flex-col gap-5 border-r border-outline-sub px-3 py-5 transition-all duration-500 ${
         open ? "w-72" : "w-15"
       }`}
     >
