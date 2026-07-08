@@ -19,20 +19,26 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
 
   return (
     <aside
-      className={`flex h-full flex-col gap-5 border-r border-outline-sub px-3 py-5 transition-all duration-500 ${
-        open ? "w-72" : "w-15"
+      className={`flex h-full flex-col gap-5 overflow-hidden border-r border-outline-sub py-5 transition-all duration-500 ${
+        open ? "w-72 px-3" : "w-15 px-2" // 닫혔을 때 padding을 살짝 줄여주면 좁은 공간에서 밸런스가 더 좋습니다.
       }`}
     >
-      <div
-        className={`flex py-2 px-3 h-14 shrink-0 items-center ${open ? "justify-between" : "justify-center"}`}
-      >
-        {open && <IPXLogo width={57} height={20} />}
-        <button className="ml-auto cursor-pointer text-icon-neutral-default" onClick={onToggle}>
+      <div className={`flex h-14 shrink-0 items-center py-2 ${open ? "px-3" : "justify-center"}`}>
+        <div
+          className={`overflow-hidden transition-all ${open ? "w-14.25 opacity-100 duration-500 delay-200" : "w-0 opacity-0 duration-500"}`}
+        >
+          <IPXLogo width={57} height={20} className="shrink-0" />
+        </div>
+
+        <button
+          className={`cursor-pointer text-icon-neutral-default transition-transform duration-500 ${open ? "ml-auto" : ""}`}
+          onClick={onToggle}
+        >
           <IconViewSidebar width={20} height={20} className="fill-icon-neutral-default" />
         </button>
       </div>
 
-      <nav className="flex flex-col gap-1 pb-5 border-b border-stroke-divider">
+      <nav className="flex flex-col gap-1 border-b border-stroke-divider pb-5">
         <SidebarNavItem
           href="/myhistory"
           icon={<MyHistory width={20} height={20} />}
@@ -56,14 +62,13 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
         />
       </nav>
 
-      {open && (
-        <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto">
-          <span className="px-3 text-label-13 text-title-primary">최근 탐색</span>
-          <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
-          <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
-          <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
-        </div> //이후 api 연동시 map 이용해서 무한 스크롤 형식으로 변경 예정(지금은 위 3개만 봐주세용..)
-      )}
+      <div
+        className={`flex flex-1 flex-col gap-1.5 overflow-y-auto transition-opacity ${open ? "opacity-100 duration-300 delay-200" : "pointer-events-none opacity-0 duration-500"}`}
+      >
+        <span className="px-3 text-label-13 text-title-primary">최근 탐색</span>
+        <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
+        {/* ... */}
+      </div>
     </aside>
   );
 }

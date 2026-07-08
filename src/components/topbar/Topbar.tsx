@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 
 const PAGE_LABELS: Record<string, string> = {
-  "/history": "내 활동 기록",
+  "/myhistory": "내 활동 기록",
   "/search": "선행기술 탐색",
   "/analysis": "기술 분석",
 };
