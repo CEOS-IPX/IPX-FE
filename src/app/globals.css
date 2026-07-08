@@ -42,6 +42,7 @@
   /* Primary */
   --color-bg-primary-tint: #f5f9ff; /* Primary-120 */
   --color-bg-primary-light: #eef5ff; /* Primary-110 */
+  --color-bg-elementlist: #E4EFFF;  /* Primary-100 */
 
   /* Primary-light */
   --color-bg-primary: #4478f0; /* Primary-50 */
@@ -68,6 +69,8 @@
   --color-icon-neutral-subtle: #909ba6; /* Gray-50 */
 
   --color-icon-primary-default: #4478F0;
+  --color-icon-primary-emphasize: #2152E5;
+
 
   /* Stroke */
   --color-stroke-divider: #f2f6f9; /* Gray-90 */
