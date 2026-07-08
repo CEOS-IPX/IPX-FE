@@ -9,7 +9,7 @@ export function Checklist() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
 
   return (
-    <div className="flex items-center gap-8">
+    <div className="flex items-center gap-8 pl-10">
       {ITEMS.map((label, index) => {
         const uniqueId = `checklist-${index}`;
 

@@ -1,23 +1,33 @@
 import { useId } from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
-type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  label: string;
-  error?: string;
-  ref?: React.Ref<HTMLTextAreaElement>;
-};
+const labelVariants = cva("flex items-center text-title-secondary", {
+  variants: {
+    labelSize: {
+      13: "h-5 text-label-13",
+      15: "h-5 text-label-15",
+      17: "h-6 text-label-17",
+    },
+  },
+  defaultVariants: { labelSize: 13 },
+});
 
-export function TextArea({ label, error, className, id, ref, ...props }: TextAreaProps) {
+type TextAreaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement> &
+  VariantProps<typeof labelVariants> & {
+    label: string;
+    error?: string;
+    ref?: React.Ref<HTMLTextAreaElement>;
+  };
+
+export function TextArea({ label, labelSize, error, className, id, ref, ...props }: TextAreaProps) {
   const autoId = useId();
   const textareaId = id ?? autoId;
   const errorId = `${textareaId}-error`;
 
   return (
-    <div className="flex w-full flex-col items-start gap-1">
-      <label
-        htmlFor={textareaId}
-        className="flex h-5 items-center text-label-13 text-title-secondary"
-      >
+    <div className="flex w-full flex-col items-start gap-1.5">
+      <label htmlFor={textareaId} className={labelVariants({ labelSize })}>
         {label}
       </label>
       <textarea

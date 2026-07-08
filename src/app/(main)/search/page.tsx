@@ -61,7 +61,7 @@ export default function SearchPage() {
 
   return (
     <div className="flex flex-col gap-13 px-20 pb-5">
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-7">
         <div className="flex justify-between">
           <Title stepnum={1} title="발명 정보" />
           <Button variant="secondary" size="sm" onClick={() => setIsModalOpen(true)}>
@@ -69,13 +69,26 @@ export default function SearchPage() {
           </Button>
         </div>
 
-        <div className="flex flex-col gap-4">
-          <TextField label="발명의 명칭" placeholder="EX) 생분해성 고분자 코팅 조성물" />
+        <div className="flex flex-col gap-4 pl-10">
+          <TextField
+            labelSize={17}
+            label="발명의 명칭"
+            placeholder="EX) 생분해성 고분자 코팅 조성물"
+            gap={1.5}
+          />
+
           <div className="flex flex-row gap-3">
-            <TextField label="기술 분야" placeholder="EX) 고분자 화학 코팅" />
-            <TextField label="IPC 분류" placeholder="EX) C09D 5/00" />
+            <TextField
+              labelSize={17}
+              label="기술 분야"
+              placeholder="EX) 고분자 화학 코팅"
+              gap={1.5}
+            />
+            <TextField labelSize={17} label="IPC 분류" placeholder="EX) C09D 5/00" gap={1.5} />
           </div>
+
           <TextArea
+            labelSize={17}
             label="핵심 기술 설명"
             placeholder="발명의 핵심 구성과 작동 방식을 간단히 설명해주세요"
             rows={4}
@@ -83,11 +96,22 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-7">
         <Title stepnum={2} title="출원인 정보" />
-        <div className="flex flex-row gap-3">
-          <TextField label="사명 (선택)" placeholder="EX) 그린폴리머(주)" />
-          <TextField label="의뢰인 (선택)" placeholder="담당자 또는 발명자 성명을 입력해주세요" />
+
+        <div className="flex flex-row gap-3 pl-10">
+          <TextField
+            labelSize={17}
+            label="사명 (선택)"
+            placeholder="EX) 그린폴리머(주)"
+            gap={1.5}
+          />
+          <TextField
+            labelSize={17}
+            label="의뢰인 (선택)"
+            placeholder="담당자 또는 발명자 성명을 입력해주세요"
+            gap={1.5}
+          />
         </div>
       </div>
 
@@ -98,10 +122,11 @@ export default function SearchPage() {
             title="구성요소 분석"
             label="청구항을 구성요소 단위로 분해해 판단의 정밀성을 높힙니다."
           />
+
           <AICreationButton onClick={handleAICreate} />
         </div>
 
-        <div className="overflow-hidden border-y border-outline-default">
+        <div className="overflow-hidden border-y border-outline-default ml-10">
           <ElementList
             elements={elements}
             isLoading={isLoading}
