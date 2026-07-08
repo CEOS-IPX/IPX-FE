@@ -22,18 +22,22 @@ export function ElementRow({
     <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 px-4 py-3">
       <ElementTitle index={index} value={name} onChange={onChangeName} />
 
-      <input
-        type="text"
+      <textarea
         value={description}
-        onChange={(e) => onChangeDescription(e.target.value)}
+        onChange={(e) => {
+          onChangeDescription(e.target.value);
+          e.target.style.height = "auto";
+          e.target.style.height = `${e.target.scrollHeight}px`;
+        }}
         placeholder="구성요소 설명"
-        className="w-full bg-transparent text-label-17 text-body-secondary placeholder:text-caption-labe placeholder:text-label-17 focus:outline-none"
+        rows={1}
+        className="w-full resize-none overflow-hidden bg-transparent text-label-17 text-body-secondary placeholder:text-caption-label placeholder:text-label-17 focus:outline-none"
       />
 
       <button
         type="button"
         onClick={onDelete}
-        className="text-icon-neutral-subtle transition-colors p-2.5 hover:text-error-default"
+        className="p-2.5 text-icon-neutral-subtle transition-colors hover:text-error-default"
       >
         <TrashIcon className="h-6 w-6 [&_path]:fill-current" />
       </button>

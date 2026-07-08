@@ -52,9 +52,9 @@ export function ElementList({
           <button
             type="button"
             onClick={onAdd}
-            className="flex items-center gap-1 px-4 py-3 text-label-17 text-primary-default transition-opacity cursor-pointer"
+            className="flex w-full items-center gap-1 px-4 py-3 text-label-17 text-primary-default transition-opacity cursor-pointer bg-bg-surface hover:bg-bg-neutral-hover active:bg-bg-neutral-subtle"
           >
-            <PlusIcon className="h-5 w-5 text-icon-primary-emphasize [&_path]:fill-current" />
+            <PlusIcon className=" m-2 h-5 w-5 text-icon-primary-emphasize [&_path]:fill-current" />
             구성요소 추가
           </button>
         </>
