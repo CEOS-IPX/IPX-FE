@@ -11,6 +11,22 @@ interface AnalysisProjectCardProps {
   manager: string;
   patents: Patent[];
   isAnalysisDone?: boolean;
+  highlight?: string;
+}
+
+function HighlightedTitle({ title, highlight }: { title: string; highlight?: string }) {
+  if (!highlight) return <>{title}</>;
+
+  const index = title.toLowerCase().indexOf(highlight.toLowerCase());
+  if (index === -1) return <>{title}</>;
+
+  return (
+    <>
+      {title.slice(0, index)}
+      <span className="text-primary-default">{title.slice(index, index + highlight.length)}</span>
+      {title.slice(index + highlight.length)}
+    </>
+  );
 }
 
 export function AnalysisProjectCard({
@@ -20,6 +36,7 @@ export function AnalysisProjectCard({
   manager,
   patents,
   isAnalysisDone = false,
+  highlight,
 }: AnalysisProjectCardProps) {
   return (
     <Link
@@ -29,7 +46,7 @@ export function AnalysisProjectCard({
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">
           <p className="line-clamp-1 min-w-0 flex-1 text-title-emphasis-20 text-title-primary">
-            {title}
+            <HighlightedTitle title={title} highlight={highlight} />
           </p>
           <Chip variant="primary" className={isAnalysisDone ? "" : "invisible"}>
             분석 완료
