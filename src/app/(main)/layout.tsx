@@ -1,19 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import { Topbar } from "@/components/topbar/Topbar";
+import { useSidebarStore } from "@/store/sidebarStore";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  const [openSidebar, setOpenSidebar] = useState(true);
+  const { open: openSidebar, setOpen } = useSidebarStore();
+  const pathname = usePathname();
+  const isAnalysis = pathname.startsWith("/analysis");
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
-      <Sidebar open={openSidebar} onToggle={() => setOpenSidebar((prev) => !prev)} />
+      <Sidebar open={openSidebar} onToggle={() => setOpen(!openSidebar)} />
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar />
-        <main className="flex-1 overflow-auto p-10 scrollbar-hide">{children}</main>
+        <main className={`flex-1 overflow-auto scrollbar-hide ${isAnalysis ? "" : "p-10"}`}>
+          {children}
+        </main>
       </div>
     </div>
   );
