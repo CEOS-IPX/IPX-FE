@@ -10,6 +10,8 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
     <div className="w-90 h-10 px-3 py-2.5 flex flex-row gap-2 bg-bg-neutral-hover rounded-md">
       <Search className="shrink-0 text-icon-neutral-default" />
       <input
+        type="search"
+        aria-label="프로젝트 검색"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="프로젝트 내 검색"
