@@ -16,6 +16,37 @@ import { SaveButton } from "@/components/searchlist/SaveButton";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { StatusBadge } from "@/components/searchlist/StatusBadge";
 import { ProjectCard } from "@/components/myhistory/ProjectCard";
+import ComparisionPatentBox from "@/components/analysis/InventiveStep/Comparision/ComparisionPatentBox";
+import { AIChip } from "@/components/analysis/InventiveStep/InventiveLogics/AIChip";
+import { InventiveStepCard } from "@/components/analysis/InventiveStep/InventiveLogics/InventiveStepCard";
+import { Tooltip } from "@/components/analysis/InventiveStep/InventiveLogics/Tooltip";
+import {
+  INVENTIVE_STEP_LOGIC_TYPES,
+  type InventiveStepLogicKey,
+} from "@/constants/analysis/inventiveStep";
+
+// 추후 api 연동 시 교체 (진보성 논리 유형 4개는 고정, AI 추천 여부/근거는 분석마다 달라짐)
+const INVENTIVE_STEP_DEMO_DATA: Record<
+  InventiveStepLogicKey,
+  { aiRecommended: boolean; tooltipText: string }
+> = {
+  numericLimitation: {
+    aiRecommended: true,
+    tooltipText: "정량 데이터 확보로 효과의 현저성 주장",
+  },
+  multiReferenceCombination: {
+    aiRecommended: true,
+    tooltipText: "D1·D2 결합 거절 예상으로 Teaching Away 논증 필요",
+  },
+  commonKnowledge: {
+    aiRecommended: false,
+    tooltipText: "심사관의 주지관용기술 주장 징후가 없음",
+  },
+  simpleDesignChange: {
+    aiRecommended: false,
+    tooltipText: "구성요소 변경이 단순 설계변경 범주에 해당하지 않음",
+  },
+};
 
 type SectionProps = {
   title: string;
@@ -41,9 +72,10 @@ export default function PlaygroundPage() {
   const [page, setPage] = useState(1);
   const [headerChecked, setHeaderChecked] = useState(false);
   const [headerIndeterminate, setHeaderIndeterminate] = useState(false);
+  const [selectedStep, setSelectedStep] = useState<InventiveStepLogicKey>("numericLimitation");
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 py-12">
+    <main className="flex h-full w-full flex-col gap-10 overflow-y-auto px-6 py-12">
       <header className="flex flex-col gap-2">
         <h1 className="text-headline-emphasis-32 text-black">Component Playground</h1>
         <p className="text-body-15 text-gray-40">컴포넌트 동작/스타일 확인용 페이지입니다.</p>
@@ -171,6 +203,60 @@ export default function PlaygroundPage() {
             { id: "p5", thumbnailUrl: "https://picsum.photos/seed/e/200" },
           ]}
         />
+      </Section>
+
+      <Section title="ComparisionPatentBox" description="주인용 / 부인용 특허 비교 박스">
+        <ComparisionPatentBox
+          primaryReference={{
+            patentNumber: "KR 10-2023-0145XXX",
+            title: "저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+            organization: "한국지질자원연구원",
+            year: 2024,
+          }}
+          secondaryReference={{
+            patentNumber: "KR 10-2023-0145XXX",
+            title:
+              "저온 황산침출 기반 니켈·코발트 동시 회수 공정KR 10-2023-0145XXX 저온 황산침출 기...",
+            organization: "한국지질자원연구원",
+            year: 2024,
+          }}
+        />
+      </Section>
+
+      <Section title="AIChip" description="recommended / selected / none">
+        <div className="flex flex-wrap items-center gap-3">
+          <AIChip variant="recommended">AI 추천</AIChip>
+          <AIChip variant="none">해당 없음</AIChip>
+          <AIChip variant="selected">AI 추천</AIChip>
+        </div>
+      </Section>
+
+      <Section
+        title="InventiveStepCard"
+        description="클릭하면 선택 상태 토글 · AI 비추천이면 '해당 없음'"
+      >
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {INVENTIVE_STEP_LOGIC_TYPES.map((logic) => (
+            <InventiveStepCard
+              key={logic.key}
+              title={logic.title}
+              description={logic.description}
+              aiRecommended={INVENTIVE_STEP_DEMO_DATA[logic.key].aiRecommended}
+              selected={selectedStep === logic.key}
+              onClick={() => setSelectedStep(logic.key)}
+              tooltipText={INVENTIVE_STEP_DEMO_DATA[logic.key].tooltipText}
+            />
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Tooltip" description="AI 추천/비추천 근거 한 줄">
+        <div className="flex flex-col gap-2">
+          <Tooltip text="정량 데이터 확보로 효과의 현저성 주장" />
+          <Tooltip text="D1·D2 결합 거절 예상으로 Teaching Away 논증 필요" />
+          <Tooltip text="심사관의 주지관용기술 주장 징후가 없음" />
+          <Tooltip text="구성요소 변경이 단순 설계변경 범주에 해당하지 않음" />
+        </div>
       </Section>
 
       <Section title="ResultListHeader" description="전체선택 체크박스 · indeterminate">
