@@ -47,7 +47,7 @@ export function InventiveStepCard({
             </AIChip>
 
             {tooltipText && (
-              <div className="absolute right-0 top-full z-10 hidden pt-2 group-hover:block">
+              <div className="pointer-events-none absolute right-0 top-full z-10 translate-y-1 pt-2 opacity-0 transition-all duration-150 ease-out group-hover:translate-y-0 group-hover:opacity-100">
                 <Tooltip text={tooltipText} className="shadow-lg" />
               </div>
             )}

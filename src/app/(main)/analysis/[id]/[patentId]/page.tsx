@@ -3,10 +3,22 @@
 import { useState } from "react";
 import ComparisionPatentBox from "@/components/analysis/InventiveStep/Comparision/ComparisionPatentBox";
 import { InventiveStepCard } from "@/components/analysis/InventiveStep/InventiveLogics/InventiveStepCard";
+import ArgumentFormA from "@/components/analysis/InventiveStep/LogicCards/ArgumentForm_A";
+import ArgumentFormB from "@/components/analysis/InventiveStep/LogicCards/ArgumentForm_B";
+import ArgumentFormC from "@/components/analysis/InventiveStep/LogicCards/ArgumentForm_C";
+import ArgumentFormD from "@/components/analysis/InventiveStep/LogicCards/ArgumentForm_D";
 import {
   INVENTIVE_STEP_LOGIC_TYPES,
   type InventiveStepLogicKey,
 } from "@/constants/analysis/inventiveStep";
+import { Button } from "@/components/ui/Button";
+
+const ARGUMENT_FORM_BY_LOGIC: Record<InventiveStepLogicKey, React.ComponentType> = {
+  numericLimitation: ArgumentFormA,
+  multiReferenceCombination: ArgumentFormB,
+  commonKnowledge: ArgumentFormC,
+  simpleDesignChange: ArgumentFormD,
+};
 
 // 추후 api 연동 시 교체
 const MOCK_PRIMARY_REFERENCE = {
@@ -93,8 +105,23 @@ export default function AnalysisReportPage({
           ))}
         </div>
 
-        <div className="mt-3"></div>
+        <div className="mt-3 flex flex-col gap-3">
+          {selectedLogics.size === 0 ? (
+            <p className="py-20 text-center text-body-emphasis-17 text-caption-label">
+              진보성 논리 유형을 선택하면 입력 섹션이 나타납니다
+            </p>
+          ) : (
+            INVENTIVE_STEP_LOGIC_TYPES.filter((logic) => selectedLogics.has(logic.key)).map(
+              (logic) => {
+                const ArgumentForm = ARGUMENT_FORM_BY_LOGIC[logic.key];
+                return <ArgumentForm key={logic.key} />;
+              }
+            )
+          )}
+        </div>
       </div>
+
+      <Button variant="secondary">저장 후 목록으로</Button>
     </div>
   );
 }
