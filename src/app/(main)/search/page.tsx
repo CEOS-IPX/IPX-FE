@@ -6,10 +6,11 @@ import { TextField } from "@/components/ui/TextField";
 import { TextArea } from "@/components/ui/TextArea";
 import { AICreationButton } from "@/components/ui/AI_Creation_Button";
 import { ElementList, type Element } from "@/components/search/ElementList/ElementList";
-import { Checklist } from "@/components/search/Checklist";
 import { Footer } from "@/components/search/Footer";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { Button } from "@/components/ui/Button";
+import { MoreInfoA } from "@/components/search/MoreInfo/MoreInfoA";
+import { MoreInfoB } from "@/components/search/MoreInfo/MoreInfoB";
 
 export default function SearchPage() {
   const [elements, setElements] = useState<Element[]>([
@@ -60,8 +61,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex flex-col gap-13 px-20 pb-5">
-      <div className="flex flex-col gap-7">
+    <div className="flex flex-col gap-15 px-20 py-5">
+      <h1 className="text-headline-28 text-title-primary">새로운 선행 기술 탐색하기</h1>
+
+      <div className="flex flex-col gap-5">
         <div className="flex justify-between">
           <Title stepnum={1} title="발명 정보" />
           <Button variant="secondary" size="sm" onClick={() => setIsModalOpen(true)}>
@@ -96,7 +99,7 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-7">
+      <div className="flex flex-col gap-5">
         <Title stepnum={2} title="출원인 정보" />
 
         <div className="flex flex-row gap-3 pl-10">
@@ -135,8 +138,19 @@ export default function SearchPage() {
             onChange={handleChange}
           />
         </div>
+      </div>
 
-        <Checklist />
+      <div className="flex flex-col gap-5">
+        <Title
+          stepnum={4}
+          title="추가 정보 입력하기 (선택)"
+          label="알고 있는 정보가 있다면 입력해주세요. 작성 시 분석 결과 향상에 도움이 될 수 있어요"
+        />
+
+        <div className="flex flex-col gap-2 pl-10">
+          <MoreInfoA label="타 선행기술 대비 차별점" />
+          <MoreInfoB label="관련 데이터 수치" />
+        </div>
       </div>
 
       <Footer />
