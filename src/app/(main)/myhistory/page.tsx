@@ -53,7 +53,7 @@ export default function MyHistoryPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 py-4">
       <Tab active={activeTab} counts={counts} onChange={setActiveTab} />
 
       <div className="grid grid-cols-2 gap-4">
