@@ -62,7 +62,7 @@ export function TextField({
             placeholder={placeholder}
             autoFocus
             className={cn(
-              "w-full text-body-17 text-body-primary placeholder:text-caption-label outline-none focus:border-stroke-primary",
+              "w-full text-body-17 text-body-primary placeholder:text-caption-label outline-none",
               className
             )}
             {...props}
