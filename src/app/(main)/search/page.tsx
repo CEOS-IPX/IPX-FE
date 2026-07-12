@@ -60,7 +60,8 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="flex flex-col gap-13 px-20 pb-5">
+    <div className="flex flex-col gap-15 px-20 py-5">
+      <h1 className="text-headline-28 text-title-primary">새로운 선행 기술 탐색하기</h1>
       <div className="flex flex-col gap-7">
         <div className="flex justify-between">
           <Title stepnum={1} title="발명 정보" />
@@ -137,6 +138,29 @@ export default function SearchPage() {
         </div>
 
         <Checklist />
+      </div>
+
+      <div className="flex flex-col gap-7">
+        <Title
+          stepnum={4}
+          title="추가 정보 입력하기 (선택)"
+          label="알고 있는 정보가 있다면 입력해주세요. 작성 시 분석 결과 향상에 도움이 될 수 있어요"
+        />
+
+        <div className="flex flex-row gap-3 pl-10">
+          <TextField
+            labelSize={17}
+            label="사명 (선택)"
+            placeholder="EX) 그린폴리머(주)"
+            gap={1.5}
+          />
+          <TextField
+            labelSize={17}
+            label="의뢰인 (선택)"
+            placeholder="담당자 또는 발명자 성명을 입력해주세요"
+            gap={1.5}
+          />
+        </div>
       </div>
 
       <Footer />
