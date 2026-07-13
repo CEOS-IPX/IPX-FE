@@ -1,10 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AgreementItem } from "@/components/auth/AgreementItem";
+import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 
 export default function GoogleSignupPage() {
+  const router = useRouter();
   const [agreedTerms, setAgreedTerms] = useState(false);
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
 
@@ -38,6 +41,13 @@ export default function GoogleSignupPage() {
           checked={agreedPrivacy}
           onToggle={() => setAgreedPrivacy((checked) => !checked)}
         />
+      </div>
+
+      <div className="flex w-full gap-3">
+        <Button variant="secondary" onClick={() => router.back()}>
+          이전
+        </Button>
+        <Button variant="primary">가입</Button>
       </div>
     </div>
   );
