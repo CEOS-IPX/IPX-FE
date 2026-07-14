@@ -1,5 +1,14 @@
 import Link from "next/link";
 import BackIcon from "@/components/icons/icon-back.svg";
+import { Chip } from "@/components/myhistory/ProjectCardChip";
+import { SelectableItemGroup } from "@/components/myhistory/SelectableItem";
+
+const MOCK_PROJECT = {
+  title: "생분해성 고분자 코팅 조성물",
+  status: "선행 조사 중",
+  company: "그린폴리머(주)",
+  manager: "김도현",
+};
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -16,6 +25,26 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           aria-hidden
         />
       </Link>
+
+      <header className="flex w-full min-w-[63.3125rem] items-end justify-between">
+        <div className="flex w-119 max-w-full flex-col items-start gap-2">
+          <div className="flex w-full items-center gap-3">
+            <h1 className="min-w-0 line-clamp-1 text-headline-emphasis-28 text-title-primary">
+              {MOCK_PROJECT.title}
+            </h1>
+            <Chip variant="primary" className="flex h-auto shrink-0 rounded-[6.25rem] py-1">
+              {MOCK_PROJECT.status}
+            </Chip>
+          </div>
+          <div className="flex items-center gap-1 text-body-17 text-caption-label">
+            <span>{MOCK_PROJECT.company}</span>
+            <span className="size-0.75 shrink-0 rounded-full bg-icon-neutral-subtle" aria-hidden />
+            <span>{MOCK_PROJECT.manager}</span>
+          </div>
+        </div>
+
+        <SelectableItemGroup />
+      </header>
     </div>
   );
 }
