@@ -5,6 +5,7 @@ import { AnalysisNotice } from "@/components/myhistory/AnalysisNotice";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
 import { SelectableItemGroup } from "@/components/myhistory/SelectableItem";
 import { ListSearchField } from "@/components/searchlist/ListSearchField";
+import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 
@@ -13,7 +14,44 @@ const MOCK_PROJECT = {
   status: "선행 조사 중",
   company: "그린폴리머(주)",
   manager: "김도현",
+  step: "기술 분석" as const,
 };
+
+const MOCK_RESULTS = [
+  {
+    id: "patent-1",
+    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+    organization: "한국지질자원연구원",
+    year: 2024,
+    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
+    status: "등록",
+    relevanceLabel: "매우 높음",
+    recommendationReason:
+      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
+  },
+  {
+    id: "patent-2",
+    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+    organization: "한국지질자원연구원",
+    year: 2024,
+    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
+    status: "등록",
+    relevanceLabel: "매우 높음",
+    recommendationReason:
+      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
+  },
+  {
+    id: "patent-3",
+    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+    organization: "한국지질자원연구원",
+    year: 2024,
+    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
+    status: "등록",
+    relevanceLabel: "매우 높음",
+    recommendationReason:
+      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
+  },
+];
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -48,17 +86,36 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        <SelectableItemGroup />
+        <SelectableItemGroup currentStep={MOCK_PROJECT.step} />
       </header>
 
       <div className="flex w-full items-start gap-4 self-stretch">
         <section className="flex min-h-[30rem] min-w-0 flex-1 flex-col items-start gap-3 self-stretch rounded-[0.5rem] border border-outline-sub bg-bg-surface p-4">
           <div className="flex w-full items-start justify-between">
             <SortingTag label="적합도 순" className="rounded-[0.375rem]" />
-            <ListSearchField aria-label="결과 내 검색" defaultValue="회수 공정" />
+            <ListSearchField aria-label="프로젝트 내 검색" placeholder="프로젝트 내 검색" />
           </div>
 
-          <ResultListHeader variant="readonly" className="w-full" />
+          <div className="flex w-full flex-col gap-4">
+            <ResultListHeader variant="readonly" className="w-full" />
+
+            {MOCK_RESULTS.map((result) => (
+              <ProjectList
+                key={result.id}
+                showCheckbox={false}
+                className="w-full"
+                title={result.title}
+                organization={result.organization}
+                year={result.year}
+                tags={result.tags}
+                status={result.status}
+                relevanceLabel={result.relevanceLabel}
+                relevanceVariant="verygood"
+                recommendationReason={result.recommendationReason}
+                thumbnailAlt={`${result.title} 대표 이미지`}
+              />
+            ))}
+          </div>
         </section>
 
         <div className="flex w-[17.5rem] shrink-0 flex-col gap-3">
