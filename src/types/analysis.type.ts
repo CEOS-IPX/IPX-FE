@@ -7,6 +7,7 @@ export type SelectedPatent = {
   registrationDate: string;
   applicationPeriod: string;
   currentStatus: string;
+  expirationDate?: string;
   summary: string;
   purpose: string;
   mainFeatures: string;
