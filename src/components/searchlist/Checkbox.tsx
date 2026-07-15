@@ -30,7 +30,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     return (
       <label
         className={cn(
-          "inline-flex h-6 w-6 items-center justify-center",
+          "relative inline-flex h-6 w-6 items-center justify-center",
           disabled ? "cursor-not-allowed" : "cursor-pointer",
           className
         )}
@@ -50,9 +50,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         />
         <span
           className={cn(
-            "flex h-4 w-4 items-center justify-center rounded-[1px] border-2",
+            "flex h-4 w-4 items-center justify-center rounded-[1px] border-[1.5px]",
             isFilled
-              ? "border-primary-default bg-primary-default"
+              ? "border-icon-primary-default bg-icon-primary-default rounded-[1px]"
               : "border-outline-selected bg-bg-surface"
           )}
         >

@@ -15,7 +15,7 @@ export function Menu({ onEdit, onDelete }: MenuProps) {
           e.preventDefault();
           onEdit?.();
         }}
-        className="flex items-center gap-2 py-2.5 text-label-15 text-body-secondary hover:text-primary-default cursor-pointer"
+        className="flex items-center gap-2 py-2.5 text-label-15 text-body-secondary hover:text-icon-primary-default cursor-pointer"
       >
         <EditIcon className="h-5 w-5 [&_path]:fill-current" aria-hidden />
         수정하기

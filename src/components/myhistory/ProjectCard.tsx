@@ -48,8 +48,10 @@ export function ProjectCard({
   return (
     <Link
       href={`/myhistory/${id}`}
-      className="border border-outline-sub relative flex w-131 flex-col rounded-lg bg-bg-surface p-6 hover:bg-bg-neutral-hover"
+      className="border border-outline-sub relative flex w-full flex-col rounded-lg bg-bg-surface p-6 hover:bg-bg-neutral-hover"
     >
+      {" "}
+      {/* w-131에서 full로 수정 */}
       <div className="flex h-6.5 mb-4 items-center justify-between">
         <Chip variant={status === "선행 조사 중" ? "primary" : "secondary"}>{status}</Chip>
 
@@ -80,7 +82,6 @@ export function ProjectCard({
           )}
         </div>
       </div>
-
       <div className="flex flex-col gap-1 mb-6">
         <p className="text-title-emphasis-20 line-clamp-1 text-title-primary">{title}</p>
         <div className="flex flex-row gap-1 text-body-15 text-caption-label">
@@ -89,7 +90,6 @@ export function ProjectCard({
           <p>{manager}</p>
         </div>
       </div>
-
       <Thumbnail patents={patents} />
     </Link>
   );

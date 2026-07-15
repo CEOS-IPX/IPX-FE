@@ -35,7 +35,7 @@ export function PasswordField({ label, error, className, id, ref, ...props }: Pa
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "flex-1 bg-transparent text-body-17 text-body-primary placeholder:text-gray-50 focus:outline-none",
+            "flex-1 bg-transparent text-body-17 text-body-primary placeholder:text-caption-label focus:outline-none",
             className
           )}
           {...props}
