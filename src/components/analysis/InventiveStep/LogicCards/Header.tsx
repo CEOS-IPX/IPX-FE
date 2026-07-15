@@ -1,6 +1,6 @@
-import { AICreationButton } from "@/components/ui/AI_Creation_Button";
 import { Button } from "@/components/ui/Button";
 import Edit from "@/components/icons/icon-edit.svg";
+import CircleCheck from "@/components/icons/icon-check_filled.svg";
 
 type ArgumentHeaderProps = {
   title: string;
@@ -25,9 +25,17 @@ export default function ArgumentFormHeader({
         <p className="text-label-13 text-caption-label">{description}</p>
       </div>
 
-      <Button className="h-10 w-fit py-2.5 pl-3 pr-4" onClick={onToggleEdit}>
-        <Edit className="w-5 h-5 text-icon-neutral-inverse [&_path]:fill-current" />
-        {isEditing ? "완료" : "직접 수정"}
+      <Button
+        variant={isEditing ? "secondary" : "primary"}
+        className="h-10 w-fit py-2.5 pl-3 pr-4"
+        onClick={onToggleEdit}
+      >
+        {isEditing ? (
+          <CircleCheck className="h-5 w-5 text-icon-neutral-subtle [&_path]:fill-current" />
+        ) : (
+          <Edit className="h-5 w-5 text-icon-neutral-inverse [&_path]:fill-current" />
+        )}
+        {isEditing ? "수정 완료" : "직접 수정"}
       </Button>
     </div>
   );
