@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { Pagination } from "@/components/searchlist/Pagination";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
@@ -19,6 +23,8 @@ const MOCK_RESULTS = Array.from({ length: 10 }, (_, index) => ({
 }));
 
 export default function SearchResultPage() {
+  const [isPatentImportModalOpen, setIsPatentImportModalOpen] = useState(false);
+
   return (
     <div className="flex min-h-full w-full flex-col gap-6" aria-label="선행기술 탐색 결과">
       <div className="flex flex-col items-start gap-4">
@@ -32,7 +38,12 @@ export default function SearchResultPage() {
       <section className="flex h-[158.625rem] w-full flex-col items-center gap-4 self-stretch">
         <div className="flex w-full items-end justify-between self-stretch">
           <SortingTag label="관련도 순" options={["관련도 순", "최신순"]} />
-          <Button size="sm" variant="primary" className="h-[2.3125rem] rounded-[0.375rem]">
+          <Button
+            size="sm"
+            variant="primary"
+            className="h-[2.3125rem] rounded-[0.375rem]"
+            onClick={() => setIsPatentImportModalOpen(true)}
+          >
             특허번호로 불러오기
           </Button>
         </div>
@@ -62,6 +73,14 @@ export default function SearchResultPage() {
           <Pagination page={1} totalPages={4} />
         </div>
       </section>
+
+      {isPatentImportModalOpen && (
+        <PatentImportModal
+          initialPatentNumber=""
+          onClose={() => setIsPatentImportModalOpen(false)}
+          onSubmit={() => setIsPatentImportModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
