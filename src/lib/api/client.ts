@@ -8,6 +8,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
 async function doFetch(url: string, init: RequestInit, token?: string): Promise<Response> {
   return fetch(url, {
     ...init,
+
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -36,9 +37,11 @@ export async function apiRequest<T>(
         method: "POST",
         credentials: "include",
       });
+
       if (!reissueRes.ok) throw new Error();
       const reissueJson: ApiResponse<{ accessToken: string }> = await reissueRes.json();
       if (!reissueJson.success || !reissueJson.data) throw new Error();
+
       useAuthStore.getState().setAccessToken(reissueJson.data.accessToken);
       res = await doFetch(`${API_BASE_URL}/api${url}`, init, reissueJson.data.accessToken);
     } catch {

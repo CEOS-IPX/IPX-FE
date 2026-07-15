@@ -11,6 +11,7 @@ import type { ApiResponse } from "@/types/api.type";
 import { API_BASE_URL, apiRequest } from "./client";
 import { ApiError } from "./error";
 
+//이메일 인증코드
 export function sendEmailCode(body: SendEmailCodeRequest) {
   return apiRequest<SendEmailCodeResponse>("/auth/email/send", {
     method: "POST",
@@ -18,6 +19,7 @@ export function sendEmailCode(body: SendEmailCodeRequest) {
   });
 }
 
+//구글 로그인
 export function exchangeGoogleOAuthCode(body: GoogleOAuthTokenRequest) {
   return apiRequest<GoogleOAuthTokenResponse>("/auth/oauth/token", {
     method: "POST",
