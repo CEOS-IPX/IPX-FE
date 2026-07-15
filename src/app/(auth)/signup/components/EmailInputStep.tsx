@@ -10,7 +10,7 @@ import { GoogleButton } from "@/components/auth/GoogleButton";
 import { Button } from "@/components/ui/Button";
 import { Divider } from "@/components/ui/Divider";
 import { TextField } from "@/components/ui/TextField";
-import { sendEmailCode } from "@/lib/api/auth";
+import { getGoogleLoginUrl, sendEmailCode } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/error";
 import { EMAIL_VERIFICATION_PURPOSE } from "@/types/auth.type";
 
@@ -38,6 +38,11 @@ export const EmailInputStep = ({ email: initialEmail = "", onNext }: EmailInputS
   });
 
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleGoogleSignup = () => {
+    const callbackUrl = `${window.location.origin}/oauth/google/callback`;
+    window.location.href = getGoogleLoginUrl(callbackUrl);
+  };
 
   const onSubmit = handleSubmit(async ({ email }) => {
     setSubmitError(null);
@@ -91,7 +96,7 @@ export const EmailInputStep = ({ email: initialEmail = "", onNext }: EmailInputS
             </Button>
           </form>
           <Divider>또는</Divider>
-          <GoogleButton>Google 계정으로 시작</GoogleButton>
+          <GoogleButton onClick={handleGoogleSignup}>Google 계정으로 시작</GoogleButton>
         </div>
         <div className="flex h-6 w-full items-center justify-center gap-2">
           <span className="text-body-15 text-body-disabled">이미 계정이 있으신가요?</span>
