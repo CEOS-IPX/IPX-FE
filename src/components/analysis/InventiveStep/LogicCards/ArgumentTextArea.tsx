@@ -9,6 +9,7 @@ interface ArgumentTextAreaProps {
   onChange: (value: string) => void;
   placeholder: string;
   isEditing: boolean;
+  className?: string;
 }
 
 export function ArgumentTextArea({
@@ -17,6 +18,7 @@ export function ArgumentTextArea({
   onChange,
   placeholder,
   isEditing,
+  className,
 }: ArgumentTextAreaProps) {
   const textareaId = useId();
 
@@ -38,7 +40,10 @@ export function ArgumentTextArea({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className=" w-full resize-none scrollbar-hide rounded-md border border-outline-default bg-bg-surface p-4 text-body-15 text-body-primary placeholder:text-caption-label outline-none"
+          className={cn(
+            "w-full resize-none scrollbar-hide rounded-md border border-outline-default bg-bg-surface p-4 text-body-15 text-body-primary placeholder:text-caption-label outline-none",
+            className
+          )}
         />
       ) : (
         <p className="w-full text-body-17 text-body-primary">{value}</p>

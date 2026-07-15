@@ -29,6 +29,7 @@ export default function ArgumentFormC() {
           placeholder="EX) 구성요소 B(표면개질 나노 충진제)를 단순 주지관용기술로 봄."
           isEditing={isEditing}
         />
+
         <ArgumentTextArea
           label="주지관용기술이 아님을 입증하는 반박 논리"
           value={counterArgument}
