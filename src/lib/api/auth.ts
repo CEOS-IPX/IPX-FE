@@ -8,6 +8,8 @@ import type {
   ReissueResponse,
   MeResponse,
   LogoutResponse,
+  VerifyEmailCodeRequest,
+  VerifyEmailCodeResponse,
 } from "@/types/auth.type";
 
 import type { ApiResponse } from "@/types/api.type";
@@ -17,6 +19,14 @@ import { ApiError } from "./error";
 //이메일 인증코드
 export function sendEmailCode(body: SendEmailCodeRequest) {
   return apiRequest<SendEmailCodeResponse>("/auth/email/send", {
+    method: "POST",
+    body,
+  });
+}
+
+//이메일 인증코드 검증
+export function verifyEmailCode(body: VerifyEmailCodeRequest) {
+  return apiRequest<VerifyEmailCodeResponse>("/auth/email/verify", {
     method: "POST",
     body,
   });

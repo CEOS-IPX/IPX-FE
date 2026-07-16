@@ -15,8 +15,22 @@ export type SendEmailCodeRequest = {
 
 export type SendEmailCodeResponse = {
   email: string;
+  purpose: string;
   expiresIn: number;
   resendAvailableIn: number;
+};
+
+export type VerifyEmailCodeRequest = {
+  email: string;
+  code: string;
+  purpose: EmailVerificationPurpose;
+};
+
+export type VerifyEmailCodeResponse = {
+  email: string;
+  purpose: string;
+  verified: boolean;
+  verificationToken: string;
 };
 
 //구글 로그인 관련 타입 정리~

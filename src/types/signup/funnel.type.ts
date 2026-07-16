@@ -12,10 +12,12 @@ type EmailSentContext = {
 
 type ProfileContext = {
   email: string;
+  verificationToken: string;
 };
 
 type CompleteContext = {
   email: string;
+  verificationToken: string;
 };
 
 export type SignupFunnelSteps = {
