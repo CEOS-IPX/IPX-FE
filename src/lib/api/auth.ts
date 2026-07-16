@@ -44,6 +44,14 @@ export function signup(body: SignupRequest) {
   });
 }
 
+//일반 로그인
+export function login(body: LoginRequest) {
+  return apiRequest<LoginResponse>("/auth/login", {
+    method: "POST",
+    body,
+  });
+}
+
 //구글 로그인
 export function exchangeGoogleOAuthCode(body: GoogleOAuthTokenRequest) {
   return apiRequest<GoogleOAuthTokenResponse>("/auth/oauth/token", {
