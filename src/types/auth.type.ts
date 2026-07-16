@@ -2,7 +2,7 @@ import type { User } from "@/store/authStore";
 
 export const EMAIL_VERIFICATION_PURPOSE = {
   SIGNUP: "SIGNUP",
-  RESET_PASSWORD: "RESET_PASSWORD",
+  RESET_PASSWORD: "PASSWORD_RESET",
 } as const;
 
 export type EmailVerificationPurpose =
@@ -29,9 +29,19 @@ export type VerifyEmailCodeRequest = {
 export type VerifyEmailCodeResponse = {
   email: string;
   purpose: string;
-  verified: boolean;
+  verified?: boolean;
   verificationToken: string;
+  expiresIn?: number;
 };
+
+//새 비밀번호 설정 관련 타입~
+export type SetNewPasswordRequest = {
+  verificationToken: string;
+  newPassword: string;
+  newPasswordConfirm: string;
+};
+
+export type SetNewPasswordResponse = Record<string, never>;
 
 //일반 회원가입 관련 타입~
 export type SignupRequest = {

@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CodeInput } from "@/components/auth/CodeInput";
 import { Button } from "@/components/ui/Button";
-
-const INITIAL_SECONDS = 5 * 60;
+import { verifyEmailCode } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/error";
+import { EMAIL_VERIFICATION_PURPOSE } from "@/types/auth.type";
 
 function formatTime(seconds: number) {
   const m = String(Math.floor(seconds / 60)).padStart(2, "0");
@@ -13,15 +14,30 @@ function formatTime(seconds: number) {
   return `${m}분 ${s}초`;
 }
 
+// error.code 기준으로 분기 (message 기준 아님)
+const ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  AU010: "잘못된 이메일 인증 목적입니다.",
+  AU011: "인증 코드가 일치하지 않습니다.",
+  AU012: "인증 코드가 만료되었거나 존재하지 않습니다.",
+  AU004: "존재하지 않는 사용자입니다.",
+  AU013: "소셜 로그인 계정은 비밀번호를 재설정할 수 없습니다.",
+  AU014: "이미 사용된 인증 코드입니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
 interface Props {
   email: string;
-  onNext: () => void;
+  expiresIn: number;
+  onNext: (verificationToken: string) => void;
   onPrev: () => void;
 }
 
-export function VerifyStep({ email, onNext, onPrev }: Props) {
-  const [secondsLeft, setSecondsLeft] = useState(INITIAL_SECONDS);
+export function VerifyStep({ email, expiresIn, onNext, onPrev }: Props) {
+  const [secondsLeft, setSecondsLeft] = useState(expiresIn);
   const [code, setCode] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -30,6 +46,27 @@ export function VerifyStep({ email, onNext, onPrev }: Props) {
   }, [secondsLeft]);
 
   const expired = secondsLeft <= 0;
+
+  const handleVerify = async () => {
+    setVerifyError(null);
+    setIsVerifying(true);
+    try {
+      const data = await verifyEmailCode({
+        email,
+        code,
+        purpose: EMAIL_VERIFICATION_PURPOSE.RESET_PASSWORD,
+      });
+      onNext(data.verificationToken);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setVerifyError(ERROR_MESSAGES[err.errorCode] ?? err.message);
+      } else {
+        setVerifyError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   return (
     <div className="flex max-w-125 flex-1 flex-col items-start justify-center gap-10 self-stretch">
@@ -43,11 +80,14 @@ export function VerifyStep({ email, onNext, onPrev }: Props) {
         </p>
       </div>
       <div className="flex w-full flex-col items-start gap-2">
-        <CodeInput value={code} onChange={setCode} autoFocus error={expired} />
+        <CodeInput value={code} onChange={setCode} autoFocus error={expired || !!verifyError} />
         {expired && (
           <p className="text-label-13 text-error-default">
             인증 시간이 지났습니다. 인증코드 재전송 후 다시 인증해주세요
           </p>
+        )}
+        {!expired && verifyError && (
+          <p className="text-label-13 text-error-default">{verifyError}</p>
         )}
       </div>
       <div className="flex w-full flex-col items-start gap-6">
@@ -55,7 +95,11 @@ export function VerifyStep({ email, onNext, onPrev }: Props) {
           <Button variant="secondary" onClick={onPrev}>
             이전
           </Button>
-          <Button variant="primary" disabled={code.length < 6 || expired} onClick={onNext}>
+          <Button
+            variant="primary"
+            disabled={code.length < 6 || expired || isVerifying}
+            onClick={handleVerify}
+          >
             인증
           </Button>
         </div>

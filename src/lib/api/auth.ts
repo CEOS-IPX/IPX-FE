@@ -14,6 +14,8 @@ import type {
   SignupResponse,
   LoginRequest,
   LoginResponse,
+  SetNewPasswordRequest,
+  SetNewPasswordResponse,
 } from "@/types/auth.type";
 
 import type { ApiResponse } from "@/types/api.type";
@@ -47,6 +49,14 @@ export function signup(body: SignupRequest) {
 //일반 로그인
 export function login(body: LoginRequest) {
   return apiRequest<LoginResponse>("/auth/login", {
+    method: "POST",
+    body,
+  });
+}
+
+//새 비밀번호 설정
+export function resetPassword(body: SetNewPasswordRequest) {
+  return apiRequest<SetNewPasswordResponse>("/auth/password/reset", {
     method: "POST",
     body,
   });
