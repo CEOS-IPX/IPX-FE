@@ -1,7 +1,6 @@
 "use client";
 
 import CancelIcon from "@/components/icons/icon-cancel.svg";
-import EditIcon from "@/components/icons/icon-edit.svg";
 import { TextField } from "@/components/account/AccountTextField";
 
 interface AccountSettingModalProps {
@@ -22,10 +21,9 @@ export function AccountSettingModal({
   onClose,
   onSaveName,
   onSaveCompany,
-  onEditAvatar,
   onDeleteAccount,
 }: AccountSettingModalProps) {
-  const initial = name.charAt(0);
+  const initial = name.trim().charAt(0);
 
   return (
     <div
