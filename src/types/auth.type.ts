@@ -62,6 +62,12 @@ export type ReissueResponse = {
   expiresIn: number;
 };
 
+//내 정보 조회 관련 타입~
+export type MeResponse = User;
+
+//로그아웃 관련 타입~
+export type LogoutResponse = Record<string, never>;
+
 //약관 동의 관련 타입~
 export const TERMS_TYPE = {
   SERVICE_TERMS: "SERVICE_TERMS",

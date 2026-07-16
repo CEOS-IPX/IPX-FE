@@ -6,7 +6,10 @@ import type {
   GoogleSignupRequest,
   GoogleSignupResponse,
   ReissueResponse,
+  MeResponse,
+  LogoutResponse,
 } from "@/types/auth.type";
+
 import type { ApiResponse } from "@/types/api.type";
 import { API_BASE_URL, apiRequest } from "./client";
 import { ApiError } from "./error";
@@ -66,4 +69,14 @@ export async function reissue(): Promise<ReissueResponse> {
   }
 
   return json.data as ReissueResponse;
+}
+
+//내 정보 조회 (로그인 성공 후 사용자 정보 확인, 새로고침 후 상태 복구용)
+export function getMe() {
+  return apiRequest<MeResponse>("/users/me");
+}
+
+//로그아웃
+export function logout() {
+  return apiRequest<LogoutResponse>("/auth/logout", { method: "POST" });
 }
