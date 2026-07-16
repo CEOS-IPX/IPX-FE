@@ -17,14 +17,32 @@ async function doFetch(url: string, init: RequestInit, token?: string): Promise<
   });
 }
 
+// api 연동 상태 -> 콘솔 로그 남기도록(공통화)
+export function logApiSuccess(method: string, url: string, data: unknown) {
+  console.log(`[API] ${method} ${url} 성공`, data);
+}
+
+export function logApiError(
+  method: string,
+  url: string,
+  status: number,
+  errorCode: string,
+  message: string
+) {
+  console.error(
+    `[API] ${method} ${url} 실패 - status: ${status}, code: ${errorCode}, message: ${message}`
+  );
+}
+
 export async function apiRequest<T>(
   url: string,
   options: { method?: string; body?: unknown } = {}
 ): Promise<T> {
+  const method = options.method ?? "GET";
   const token = useAuthStore.getState().accessToken ?? undefined;
 
   const init: RequestInit = {
-    method: options.method ?? "GET",
+    method,
     credentials: "include",
     ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
   };
@@ -47,7 +65,13 @@ export async function apiRequest<T>(
     } catch {
       useAuthStore.getState().clearAuth();
       window.location.href = "/login";
-      throw new ApiError({ status: 401, errorCode: "AUTH_001", message: "인증이 만료되었습니다." });
+      const error = new ApiError({
+        status: 401,
+        errorCode: "AUTH_001",
+        message: "인증이 만료되었습니다.",
+      });
+      logApiError(method, url, error.status, error.errorCode, error.message);
+      throw error;
     }
   }
 
@@ -58,13 +82,16 @@ export async function apiRequest<T>(
   }));
 
   if (!res.ok || !json.success || json.error) {
-    throw new ApiError({
+    const error = new ApiError({
       status: json.error?.status ?? res.status,
       errorCode: json.error?.code ?? "COMMON_001",
       message: json.error?.message ?? res.statusText,
       errors: json.error?.errors,
     });
+    logApiError(method, url, error.status, error.errorCode, error.message);
+    throw error;
   }
 
+  logApiSuccess(method, url, json.data);
   return json.data as T;
 }

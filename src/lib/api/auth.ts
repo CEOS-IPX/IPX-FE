@@ -13,7 +13,7 @@ import type {
 } from "@/types/auth.type";
 
 import type { ApiResponse } from "@/types/api.type";
-import { API_BASE_URL, apiRequest } from "./client";
+import { API_BASE_URL, apiRequest, logApiError, logApiSuccess } from "./client";
 import { ApiError } from "./error";
 
 //이메일 인증코드
@@ -58,7 +58,8 @@ export function getGoogleLoginUrl(redirectUri?: string) {
 // 강제 이동시키는 로직이 같이 딸려오므로(비로그인 사용자까지 튕겨나감), 여기서는
 // 실패해도 조용히 넘어가도록 apiRequest를 거치지 않고 직접 호출한다.
 export async function reissue(): Promise<ReissueResponse> {
-  const res = await fetch(`${API_BASE_URL}/api/auth/reissue`, {
+  const url = "/auth/reissue";
+  const res = await fetch(`${API_BASE_URL}/api${url}`, {
     method: "POST",
     credentials: "include",
   });
@@ -70,14 +71,17 @@ export async function reissue(): Promise<ReissueResponse> {
   }));
 
   if (!res.ok || !json.success || json.error) {
-    throw new ApiError({
+    const error = new ApiError({
       status: json.error?.status ?? res.status,
       errorCode: json.error?.code ?? "COMMON_001",
       message: json.error?.message ?? res.statusText,
       errors: json.error?.errors,
     });
+    logApiError("POST", url, error.status, error.errorCode, error.message);
+    throw error;
   }
 
+  logApiSuccess("POST", url, json.data);
   return json.data as ReissueResponse;
 }
 
