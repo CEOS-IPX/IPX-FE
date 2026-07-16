@@ -10,6 +10,10 @@ import type {
   LogoutResponse,
   VerifyEmailCodeRequest,
   VerifyEmailCodeResponse,
+  SignupRequest,
+  SignupResponse,
+  LoginRequest,
+  LoginResponse,
 } from "@/types/auth.type";
 
 import type { ApiResponse } from "@/types/api.type";
@@ -27,6 +31,14 @@ export function sendEmailCode(body: SendEmailCodeRequest) {
 //이메일 인증코드 검증
 export function verifyEmailCode(body: VerifyEmailCodeRequest) {
   return apiRequest<VerifyEmailCodeResponse>("/auth/email/verify", {
+    method: "POST",
+    body,
+  });
+}
+
+//일반 회원가입
+export function signup(body: SignupRequest) {
+  return apiRequest<SignupResponse>("/auth/signup", {
     method: "POST",
     body,
   });

@@ -33,6 +33,26 @@ export type VerifyEmailCodeResponse = {
   verificationToken: string;
 };
 
+//일반 회원가입 관련 타입~
+export type SignupRequest = {
+  email: string;
+  verificationToken: string;
+  name: string;
+  password: string;
+  passwordConfirm: string;
+  company?: string;
+  termsAgreements: TermsAgreement[];
+};
+
+export type SignupResponse = {
+  userId: number;
+  email: string;
+  name: string;
+  company?: string;
+  provider: string;
+  profileCompleted: boolean;
+};
+
 //구글 로그인 관련 타입 정리~
 export type GoogleOAuthTokenRequest = {
   code: string;
@@ -63,6 +83,20 @@ export type GoogleSignupRequest = {
 };
 
 export type GoogleSignupResponse = {
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;
+  user: User;
+};
+
+//일반 로그인 관련 타입~
+export type LoginRequest = {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+};
+
+export type LoginResponse = {
   accessToken: string;
   tokenType: string;
   expiresIn: number;

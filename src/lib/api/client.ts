@@ -30,7 +30,7 @@ export function logApiError(
   message: string
 ) {
   console.error(
-    `[API] ${method} ${url} 실패 - status: ${status}, code: ${errorCode}, message: ${message}`
+    `[API] ${method} ${url} 실패, status: ${status}, code: ${errorCode}, message: ${message}`
   );
 }
 
