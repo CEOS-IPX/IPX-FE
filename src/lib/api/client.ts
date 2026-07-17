@@ -29,7 +29,7 @@ export function logApiError(
   errorCode: string,
   message: string
 ) {
-  console.error(
+  console.warn(
     `[API] ${method} ${url} 실패, status: ${status}, code: ${errorCode}, message: ${message}`
   );
 }
@@ -49,7 +49,9 @@ export async function apiRequest<T>(
 
   let res = await doFetch(`${API_BASE_URL}/api${url}`, init, token);
 
-  if (res.status === 401) {
+  // 처음부터 AccessToken을 안 보낸 요청(로그인/회원가입 등 인증 불필요 엔드포인트)의 401은
+  // "세션 만료"가 아니라 그 API 자체의 도메인 에러(비밀번호 불일치 등)이므로 재발급/강제 로그아웃 대상이 아니다.
+  if (res.status === 401 && token) {
     try {
       const reissueRes = await fetch(`${API_BASE_URL}/api/auth/reissue`, {
         method: "POST",

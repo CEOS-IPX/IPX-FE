@@ -18,14 +18,18 @@ type AuthState = {
   clearAuth: () => void;
 };
 
-// 백엔드가 내려주는 name/company가 한글 NFD(자모 분해형)로 오는 경우가 있어
-// (macOS에서 입력된 값 등) NFC(완성형)로 정규화해서 저장한다. 안 하면
-// charAt(0) 등으로 초성만 떼어낼 때 조합이 안 돼 빈 글자처럼 보인다.
+function cleanText(text: string): string {
+  return text
+    .normalize("NFC")
+    .replace(/\p{Cf}/gu, "")
+    .trim();
+}
+
 function normalizeUser(user: User): User {
   return {
     ...user,
-    name: user.name.normalize("NFC"),
-    company: user.company?.normalize("NFC"),
+    name: cleanText(user.name),
+    company: user.company ? cleanText(user.company) : user.company,
   };
 }
 
