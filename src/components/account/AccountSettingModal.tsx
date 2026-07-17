@@ -1,7 +1,6 @@
 "use client";
 
 import CancelIcon from "@/components/icons/icon-cancel.svg";
-import EditIcon from "@/components/icons/icon-edit.svg";
 import { TextField } from "@/components/account/AccountTextField";
 
 interface AccountSettingModalProps {
@@ -22,10 +21,9 @@ export function AccountSettingModal({
   onClose,
   onSaveName,
   onSaveCompany,
-  onEditAvatar,
   onDeleteAccount,
 }: AccountSettingModalProps) {
-  const initial = name.charAt(0);
+  const initial = name.trim().charAt(0);
 
   return (
     <div
@@ -77,13 +75,15 @@ export function AccountSettingModal({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onDeleteAccount}
-          className="w-fit cursor-pointer py-2 text-body-15 text-error-emphasized"
-        >
-          계정 삭제
-        </button>
+        {onDeleteAccount && (
+          <button
+            type="button"
+            onClick={onDeleteAccount}
+            className="w-fit cursor-pointer py-2 text-body-15 text-error-emphasized"
+          >
+            계정 삭제
+          </button>
+        )}
       </div>
     </div>
   );

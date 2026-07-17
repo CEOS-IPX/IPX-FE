@@ -19,33 +19,17 @@ import { ProjectCard } from "@/components/myhistory/ProjectCard";
 import ComparisionPatentBox from "@/components/analysis/InventiveStep/Comparision/ComparisionPatentBox";
 import { AIChip } from "@/components/analysis/InventiveStep/InventiveLogics/AIChip";
 import { InventiveStepCard } from "@/components/analysis/InventiveStep/InventiveLogics/InventiveStepCard";
-import { Tooltip } from "@/components/analysis/InventiveStep/InventiveLogics/Tooltip";
 import {
   INVENTIVE_STEP_LOGIC_TYPES,
   type InventiveStepLogicKey,
 } from "@/constants/analysis/inventiveStep";
 
-// 추후 api 연동 시 교체 (진보성 논리 유형 4개는 고정, AI 추천 여부/근거는 분석마다 달라짐)
-const INVENTIVE_STEP_DEMO_DATA: Record<
-  InventiveStepLogicKey,
-  { aiRecommended: boolean; tooltipText: string }
-> = {
-  numericLimitation: {
-    aiRecommended: true,
-    tooltipText: "정량 데이터 확보로 효과의 현저성 주장",
-  },
-  multiReferenceCombination: {
-    aiRecommended: true,
-    tooltipText: "D1·D2 결합 거절 예상으로 Teaching Away 논증 필요",
-  },
-  commonKnowledge: {
-    aiRecommended: false,
-    tooltipText: "심사관의 주지관용기술 주장 징후가 없음",
-  },
-  simpleDesignChange: {
-    aiRecommended: false,
-    tooltipText: "구성요소 변경이 단순 설계변경 범주에 해당하지 않음",
-  },
+// 추후 api 연동 시 교체 (진보성 논리 유형 4개는 고정, AI 추천 여부는 분석마다 달라짐)
+const INVENTIVE_STEP_DEMO_DATA: Record<InventiveStepLogicKey, { aiRecommended: boolean }> = {
+  numericLimitation: { aiRecommended: true },
+  multiReferenceCombination: { aiRecommended: true },
+  commonKnowledge: { aiRecommended: false },
+  simpleDesignChange: { aiRecommended: false },
 };
 
 type SectionProps = {
@@ -244,18 +228,8 @@ export default function PlaygroundPage() {
               aiRecommended={INVENTIVE_STEP_DEMO_DATA[logic.key].aiRecommended}
               selected={selectedStep === logic.key}
               onClick={() => setSelectedStep(logic.key)}
-              tooltipText={INVENTIVE_STEP_DEMO_DATA[logic.key].tooltipText}
             />
           ))}
-        </div>
-      </Section>
-
-      <Section title="Tooltip" description="AI 추천/비추천 근거 한 줄">
-        <div className="flex flex-col gap-2">
-          <Tooltip text="정량 데이터 확보로 효과의 현저성 주장" />
-          <Tooltip text="D1·D2 결합 거절 예상으로 Teaching Away 논증 필요" />
-          <Tooltip text="심사관의 주지관용기술 주장 징후가 없음" />
-          <Tooltip text="구성요소 변경이 단순 설계변경 범주에 해당하지 않음" />
         </div>
       </Section>
 

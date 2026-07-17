@@ -20,7 +20,7 @@ export function UserProfileChip({
 }: UserProfileChipProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const initial = name.charAt(0);
+  const initial = name.trim().charAt(0);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

@@ -9,8 +9,8 @@ import { VerifyStep } from "./components/VerifyStep";
 
 type ResetPasswordFunnel = {
   EmailInput: { email?: string };
-  Verify: { email: string };
-  NewPassword: { email: string };
+  Verify: { email: string; expiresIn: number; resendAvailableIn: number };
+  NewPassword: { email: string; verificationToken: string };
   Complete: { email: string };
 };
 
@@ -27,20 +27,27 @@ function ResetPasswordContent() {
     <funnel.Render
       EmailInput={({ history }) => (
         <EmailInputStep
-          onNext={(email) => history.push("Verify", { email })}
+          onNext={(email, expiresIn, resendAvailableIn) =>
+            history.push("Verify", { email, expiresIn, resendAvailableIn })
+          }
           onPrev={() => history.go(-1)}
         />
       )}
       Verify={({ context, history }) => (
         <VerifyStep
           email={context.email}
-          onNext={() => history.push("NewPassword", (prev) => ({ ...prev }))}
+          expiresIn={context.expiresIn}
+          resendAvailableIn={context.resendAvailableIn}
+          onNext={(verificationToken) =>
+            history.push("NewPassword", { email: context.email, verificationToken })
+          }
           onPrev={() => history.go(-1)}
         />
       )}
-      NewPassword={({ history }) => (
+      NewPassword={({ context, history }) => (
         <NewPasswordStep
-          onNext={() => history.push("Complete", (prev) => ({ ...prev }))}
+          verificationToken={context.verificationToken}
+          onNext={() => history.push("Complete", { email: context.email })}
           onPrev={() => history.go(-1)}
         />
       )}

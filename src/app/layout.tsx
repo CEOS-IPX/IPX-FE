@@ -14,6 +14,7 @@ import {
   TWITTER_DESCRIPTION,
   TWITTER_TITLE,
 } from "@/constants/common/site";
+import { Providers } from "@/app/providers";
 
 import "./globals.css";
 
@@ -88,7 +89,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="h-full overflow-hidden">{children}</body>
+      <body className="h-full overflow-hidden">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
