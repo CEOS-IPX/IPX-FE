@@ -52,6 +52,7 @@ export default function Login() {
       setErrors(fieldErrors);
       return;
     }
+
     setErrors({});
     setSubmitError(null);
     setIsSubmitting(true);
@@ -61,11 +62,15 @@ export default function Login() {
       setAuth(data.accessToken, data.user);
       router.replace("/search");
     } catch (err) {
-      setSubmitError(
-        err instanceof ApiError
-          ? (STATUS_MESSAGES[err.status] ?? err.message)
-          : "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
-      );
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          setErrors({ email: STATUS_MESSAGES[401], password: STATUS_MESSAGES[401] });
+          return;
+        }
+        setSubmitError(STATUS_MESSAGES[err.status] ?? err.message);
+        return;
+      }
+      setSubmitError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
