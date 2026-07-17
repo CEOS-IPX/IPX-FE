@@ -21,7 +21,7 @@ export function ProfileMenu({
   onChangePassword,
   onLogout,
 }: ProfileMenuProps) {
-  const initial = name.charAt(0);
+  const initial = name.trim().charAt(0);
   const router = useRouter();
 
   return (

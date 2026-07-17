@@ -35,13 +35,22 @@ export default function Signup() {
         <EmailSentStep
           email={context.email}
           expiresIn={context.expiresIn}
-          onNext={() => history.push(SIGNUP_STEPS.PROFILE, { email: context.email })}
+          onNext={(verificationToken) =>
+            history.push(SIGNUP_STEPS.PROFILE, { email: context.email, verificationToken })
+          }
           onBack={() => history.back()}
         />
       )}
       Profile={({ context, history }) => (
         <ProfileStep
-          onSubmit={() => history.push(SIGNUP_STEPS.COMPLETE, { email: context.email })}
+          email={context.email}
+          verificationToken={context.verificationToken}
+          onSubmit={() =>
+            history.push(SIGNUP_STEPS.COMPLETE, {
+              email: context.email,
+              verificationToken: context.verificationToken,
+            })
+          }
           onBack={() => history.back()}
         />
       )}
