@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CodeInput } from "@/components/auth/CodeInput";
 import { Button } from "@/components/ui/Button";
-import { verifyEmailCode } from "@/lib/api/auth";
+import { sendEmailCode, verifyEmailCode } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/error";
 import { EMAIL_VERIFICATION_PURPOSE } from "@/types/auth.type";
 
@@ -26,24 +25,44 @@ const ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
+// 재전송(email/send)은 별도 error.code 체계를 쓴다 (EmailInputStep과 동일)
+const RESEND_ERROR_MESSAGES: Record<string, string> = {
+  C001: "이메일 형식을 다시 확인해주세요.",
+  A001: "가입되지 않은 이메일입니다.",
+  A016: "소셜 로그인 계정은 비밀번호 재설정이 불가능합니다.",
+  A011: "잠시 후 다시 시도해주세요.",
+  A012: "이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.",
+  C003: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+};
+
 interface Props {
   email: string;
   expiresIn: number;
+  resendAvailableIn: number;
   onNext: (verificationToken: string) => void;
   onPrev: () => void;
 }
 
-export function VerifyStep({ email, expiresIn, onNext, onPrev }: Props) {
+export function VerifyStep({ email, expiresIn, resendAvailableIn, onNext, onPrev }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(expiresIn);
+  const [resendCooldown, setResendCooldown] = useState(resendAvailableIn);
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const [resendError, setResendError] = useState<string | null>(null);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
     const id = setInterval(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearInterval(id);
   }, [secondsLeft]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const id = setInterval(() => setResendCooldown((s) => s - 1), 1000);
+    return () => clearInterval(id);
+  }, [resendCooldown]);
 
   const expired = secondsLeft <= 0;
 
@@ -65,6 +84,29 @@ export function VerifyStep({ email, expiresIn, onNext, onPrev }: Props) {
       }
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setResendError(null);
+    setIsResending(true);
+    try {
+      const result = await sendEmailCode({
+        email,
+        purpose: EMAIL_VERIFICATION_PURPOSE.RESET_PASSWORD,
+      });
+      setCode("");
+      setVerifyError(null);
+      setSecondsLeft(result.expiresIn);
+      setResendCooldown(result.resendAvailableIn);
+    } catch (err) {
+      setResendError(
+        err instanceof ApiError
+          ? (RESEND_ERROR_MESSAGES[err.errorCode] ?? err.message)
+          : "네트워크 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+      );
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -103,11 +145,19 @@ export function VerifyStep({ email, expiresIn, onNext, onPrev }: Props) {
             인증
           </Button>
         </div>
-        <div className="flex h-6 w-full items-center justify-center gap-2">
-          <span className="text-label-15 text-body-disabled">코드를 다시 전송할까요?</span>
-          <Link href="#" className="text-label-15 font-normal text-body-disabled underline">
-            새 코드 받기
-          </Link>
+        <div className="flex w-full flex-col items-center gap-1">
+          <div className="flex h-6 w-full items-center justify-center gap-2">
+            <span className="text-label-15 text-body-disabled">코드를 다시 전송할까요?</span>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || isResending}
+              className="text-label-15 font-normal text-body-disabled underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+            >
+              새 코드 받기
+            </button>
+          </div>
+          {resendError && <p className="text-label-13 text-error-default">{resendError}</p>}
         </div>
       </div>
     </div>

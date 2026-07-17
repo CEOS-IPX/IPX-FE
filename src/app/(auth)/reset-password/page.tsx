@@ -11,7 +11,7 @@ type ResetPasswordFunnel = {
   EmailInput: { email?: string };
   Verify: { email: string; expiresIn: number; resendAvailableIn: number };
   NewPassword: { email: string; verificationToken: string };
-  Complete: { email: string; verificationToken: string };
+  Complete: { email: string };
 };
 
 function ResetPasswordContent() {
@@ -37,6 +37,7 @@ function ResetPasswordContent() {
         <VerifyStep
           email={context.email}
           expiresIn={context.expiresIn}
+          resendAvailableIn={context.resendAvailableIn}
           onNext={(verificationToken) =>
             history.push("NewPassword", { email: context.email, verificationToken })
           }
@@ -46,12 +47,7 @@ function ResetPasswordContent() {
       NewPassword={({ context, history }) => (
         <NewPasswordStep
           verificationToken={context.verificationToken}
-          onNext={() =>
-            history.push("Complete", {
-              email: context.email,
-              verificationToken: context.verificationToken,
-            })
-          }
+          onNext={() => history.push("Complete", { email: context.email })}
           onPrev={() => history.go(-1)}
         />
       )}

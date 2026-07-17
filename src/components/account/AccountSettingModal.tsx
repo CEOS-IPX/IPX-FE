@@ -75,13 +75,15 @@ export function AccountSettingModal({
           />
         </div>
 
-        <button
-          type="button"
-          onClick={onDeleteAccount}
-          className="w-fit cursor-pointer py-2 text-body-15 text-error-emphasized"
-        >
-          계정 삭제
-        </button>
+        {onDeleteAccount && (
+          <button
+            type="button"
+            onClick={onDeleteAccount}
+            className="w-fit cursor-pointer py-2 text-body-15 text-error-emphasized"
+          >
+            계정 삭제
+          </button>
+        )}
       </div>
     </div>
   );

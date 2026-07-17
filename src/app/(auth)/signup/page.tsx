@@ -45,12 +45,7 @@ export default function Signup() {
         <ProfileStep
           email={context.email}
           verificationToken={context.verificationToken}
-          onSubmit={() =>
-            history.push(SIGNUP_STEPS.COMPLETE, {
-              email: context.email,
-              verificationToken: context.verificationToken,
-            })
-          }
+          onSubmit={() => history.push(SIGNUP_STEPS.COMPLETE, { email: context.email })}
           onBack={() => history.back()}
         />
       )}

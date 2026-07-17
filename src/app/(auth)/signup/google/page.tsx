@@ -48,7 +48,7 @@ function GoogleSignupForm() {
     try {
       const data = await signupWithGoogle({
         oauthSignupToken: token,
-        company: company || undefined,
+        company: company.trim() || undefined,
         termsAgreements: [
           { type: TERMS_TYPE.SERVICE_TERMS, agreed: agreedTerms },
           { type: TERMS_TYPE.PRIVACY_POLICY, agreed: agreedPrivacy },

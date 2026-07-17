@@ -17,7 +17,6 @@ type ProfileContext = {
 
 type CompleteContext = {
   email: string;
-  verificationToken: string;
 };
 
 export type SignupFunnelSteps = {
