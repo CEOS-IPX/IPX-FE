@@ -9,6 +9,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   const { open: openSidebar, setOpen } = useSidebarStore();
   const pathname = usePathname();
   const isAnalysis = pathname.startsWith("/analysis");
+  const isTechDetail = pathname.startsWith("/tech/");
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
@@ -16,7 +17,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <Topbar />
-        <main className={`flex-1 overflow-auto scrollbar-hide ${isAnalysis ? "" : "px-10 py-6"}`}>
+        <main
+          className={`min-h-0 flex-1 overflow-auto scrollbar-hide ${
+            isAnalysis || isTechDetail ? "" : "px-10 py-6"
+          } ${isTechDetail ? "flex flex-col" : ""}`}
+        >
           {children}
         </main>
       </div>

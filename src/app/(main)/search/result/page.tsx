@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { Pagination } from "@/components/searchlist/Pagination";
@@ -53,20 +54,21 @@ export default function SearchResultPage() {
             <ResultListHeader variant="readonly" className="w-full" />
 
             {MOCK_RESULTS.map((result, index) => (
-              <ProjectList
-                key={result.id}
-                showCheckbox={false}
-                className="w-full"
-                title={result.title}
-                organization={result.organization}
-                year={result.year}
-                tags={result.tags}
-                status={result.status}
-                relevanceLabel={index === 0 ? "매우 높음" : "높음"}
-                relevanceVariant={index === 0 ? "verygood" : "good"}
-                recommendationReason={result.recommendationReason}
-                thumbnailAlt={`${result.title} 대표 이미지`}
-              />
+              <Link key={result.id} href={`/tech/${result.id}`} className="block w-full">
+                <ProjectList
+                  showCheckbox={false}
+                  className="w-full cursor-pointer"
+                  title={result.title}
+                  organization={result.organization}
+                  year={result.year}
+                  tags={result.tags}
+                  status={result.status}
+                  relevanceLabel={index === 0 ? "매우 높음" : "높음"}
+                  relevanceVariant={index === 0 ? "verygood" : "good"}
+                  recommendationReason={result.recommendationReason}
+                  thumbnailAlt={`${result.title} 대표 이미지`}
+                />
+              </Link>
             ))}
           </div>
 

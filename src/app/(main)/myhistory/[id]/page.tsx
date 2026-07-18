@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BackButton } from "@/components/ui/BackButton";
 import { AnalysisMenu } from "@/components/myhistory/AnalysisMenu";
 import { AnalysisNotice } from "@/components/myhistory/AnalysisNotice";
@@ -90,20 +91,21 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <ResultListHeader variant="readonly" className="w-full" />
 
             {MOCK_RESULTS.map((result) => (
-              <ProjectList
-                key={result.id}
-                showCheckbox={false}
-                className="w-full"
-                title={result.title}
-                organization={result.organization}
-                year={result.year}
-                tags={result.tags}
-                status={result.status}
-                relevanceLabel={result.relevanceLabel}
-                relevanceVariant="verygood"
-                recommendationReason={result.recommendationReason}
-                thumbnailAlt={`${result.title} 대표 이미지`}
-              />
+              <Link key={result.id} href={`/tech/${result.id}`} className="block w-full">
+                <ProjectList
+                  showCheckbox={false}
+                  className="w-full cursor-pointer"
+                  title={result.title}
+                  organization={result.organization}
+                  year={result.year}
+                  tags={result.tags}
+                  status={result.status}
+                  relevanceLabel={result.relevanceLabel}
+                  relevanceVariant="verygood"
+                  recommendationReason={result.recommendationReason}
+                  thumbnailAlt={`${result.title} 대표 이미지`}
+                />
+              </Link>
             ))}
           </div>
         </section>
