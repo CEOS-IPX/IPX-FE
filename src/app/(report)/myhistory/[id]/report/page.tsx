@@ -1,12 +1,6 @@
 import Link from "next/link";
 import BackIcon from "@/components/icons/icon-back.svg";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
-import { UserProfileChip } from "@/components/account/UserProfileChip";
-
-// 추후 api 연동 시 교체
-const MOCK_PROJECT = {
-  title: "생분해성 고분자 코팅 조성물",
-};
 
 // 추후 report API(GET) 연동 시 교체
 const MOCK_REPORT = {
@@ -59,16 +53,6 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
   return (
     <div data-project-id={id} className="flex min-h-full w-full flex-col items-center">
-      <header className="print:hidden flex w-full items-center justify-between border-b border-outline-sub bg-bg-surface px-10 py-4">
-        <div className="flex items-center gap-1 text-body-15 text-caption-label">
-          <span>{MOCK_PROJECT.title}</span>
-          <span>&gt;</span>
-          <span className="text-title-secondary">분석 리포트</span>
-        </div>
-
-        <UserProfileChip name="김기획" email="abcd@gmail.com" />
-      </header>
-
       <div className="print:hidden flex w-full max-w-210 items-center justify-between px-10 pt-6">
         <Link
           href={`/myhistory/${id}`}

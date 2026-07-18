@@ -17,10 +17,13 @@ const PAGE_LABELS: Record<string, string> = {
   "/analysis": "기술 분석",
 };
 
+const REPORT_PATH_PATTERN = /^\/myhistory\/[^/]+\/report$/;
+
 function TopbarLabel() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const pageLabel = PAGE_LABELS[pathname] ?? "";
+  const pageLabel =
+    PAGE_LABELS[pathname] ?? (REPORT_PATH_PATTERN.test(pathname) ? "분석 리포트" : "");
   const searchTitle =
     pathname === "/search/result" ? searchParams.get("title")?.trim() || MOCK_SEARCH_TITLE : null;
 
@@ -59,7 +62,7 @@ export function Topbar() {
   };
 
   return (
-    <header className="flex h-16 shrink-0 flex-row items-center justify-between border-b border-outline-sub px-6 py-2">
+    <header className="flex h-16 shrink-0 flex-row items-center justify-between bg-bg-surface border-b border-outline-sub px-6 py-2">
       <Suspense fallback={null}>
         <TopbarLabel />
       </Suspense>
