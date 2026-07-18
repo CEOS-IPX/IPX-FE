@@ -12,6 +12,7 @@ type EmailSentContext = {
 
 type ProfileContext = {
   email: string;
+  verificationToken: string;
 };
 
 type CompleteContext = {

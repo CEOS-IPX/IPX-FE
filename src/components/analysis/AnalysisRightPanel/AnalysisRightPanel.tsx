@@ -38,27 +38,32 @@ function PatentDetailPanel({
 }) {
   return (
     <div className="flex h-full flex-col">
-      {/* 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto p-9 scrollbar-hide">
-        <div className="flex flex-col gap-9">
-          <div className="flex flex-col gap-1">
-            <p className="text-title-emphasis-22 text-title-primary">{patent.title}</p>
+        <div className="flex w-full flex-col items-start gap-9 self-stretch">
+          <div className="flex w-full flex-col items-start gap-1 self-stretch">
+            <p className="w-full line-clamp-1 text-title-emphasis-22 text-title-primary">
+              {patent.title}
+            </p>
 
-            <div className="flex flex-row gap-3 text-title-18 text-body-disabled">
-              <p>{patent.patentNumber}</p>
-              <p>|</p>
-              <p>{patent.organization}</p>
+            <div className="flex items-center gap-3 text-title-18 text-body-disabled">
+              <p className="shrink-0">{patent.patentNumber}</p>
+              <span aria-hidden>|</span>
+              <p className="min-w-0 truncate">{patent.organization}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid w-full grid-cols-2 gap-2 self-stretch">
             <InfoCard label="출원" value={patent.applicationDate} />
             <InfoCard label="등록" value={patent.registrationDate} />
             <InfoCard label="출원-등록 기간" value={patent.applicationPeriod} />
-            <InfoCard label="현재 상태" value={patent.currentStatus} />
+            <InfoCard
+              label="현재 상태"
+              value={patent.currentStatus}
+              subValue={patent.expirationDate ? "~" + patent.expirationDate : undefined}
+            />
           </div>
 
-          <div className="flex gap-12">
+          <div className="flex w-full flex-col items-start gap-12 self-stretch">
             <ExplainSection title="핵심 요약" content={patent.summary} />
             <ExplainSection title="기술목적" content={patent.purpose} />
             <ExplainSection title="주요 특징" content={patent.mainFeatures} />
@@ -66,7 +71,6 @@ function PatentDetailPanel({
         </div>
       </div>
 
-      {/* 고정 버튼 영역 */}
       <div className="shrink-0 px-9 pb-10 pt-6">
         <Button>기술 진보성 분석</Button>
       </div>

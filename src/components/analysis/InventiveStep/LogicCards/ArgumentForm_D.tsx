@@ -2,40 +2,41 @@
 
 import { useState } from "react";
 import ArgumentFormHeader from "./Header";
-import { DropDown, type DropDownOption } from "./DropDown";
-import { TextArea } from "@/components/ui/TextArea";
+import { ArgumentTextArea } from "./ArgumentTextArea";
 
-// 추후 api 연동 시 교체 (구성요소 분석 단계에서 만든 구성요소 목록)
-const MOCK_ELEMENTS: DropDownOption[] = [
-  { id: crypto.randomUUID(), label: "생분해성 베이스 수지" },
-  { id: crypto.randomUUID(), label: "표면개질 나노 충전제" },
-  { id: crypto.randomUUID(), label: "무용제 수계 분산 공정" },
-  { id: crypto.randomUUID(), label: "UV 경화 가교" },
-];
+// 추후 api 연동 시 교체 (AI 추천이 아닌 항목은 api가 이 안내 문구를 내려줌)
+const MOCK_PLACEHOLDER_CONTENT = "직접 입력해주세요";
 
 export default function ArgumentFormD() {
-  const [changedElementId, setChangedElementId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [changedComponent, setChangedComponent] = useState(MOCK_PLACEHOLDER_CONTENT);
+  const [counterArgument, setCounterArgument] = useState(MOCK_PLACEHOLDER_CONTENT);
 
   return (
     <div className="w-full p-6 flex flex-col gap-5 bg-bg-surface border border-outline-sub rounded-lg">
-      <ArgumentFormHeader title="단순설계변경" subtitle="비-자명성 논리" />
+      <ArgumentFormHeader
+        title="단순설계변경"
+        subtitle="비-자명성 논리"
+        isEditing={isEditing}
+        onToggleEdit={() => setIsEditing((prev) => !prev)}
+      />
 
-      <div className="flex flex-col gap-5">
-        <DropDown
+      <div className="flex flex-col gap-10">
+        <ArgumentTextArea
           label="변경된 구성요소"
-          options={MOCK_ELEMENTS}
-          value={changedElementId}
-          onChange={setChangedElementId}
-          placeholder="구성요소를 선택해주세요"
-          className="w-1/2"
+          value={changedComponent}
+          onChange={setChangedComponent}
+          placeholder="EX) A. 무용제 수계 분산 공정"
+          isEditing={isEditing}
+          className="w-1/2 h-15"
         />
 
-        <TextArea
-          labelSize={15}
+        <ArgumentTextArea
           label="단순 설계 변경이 아님을 입증하는 논리"
+          value={counterArgument}
+          onChange={setCounterArgument}
           placeholder="변경된 구성요소가 통상의 기술자가 쉽게 도출할 수 있는 단순 설계 변경이 아니라는 논리를 작성합니다."
-          rows={2}
-          className="h-18"
+          isEditing={isEditing}
         />
       </div>
     </div>
