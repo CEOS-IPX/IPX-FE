@@ -8,8 +8,8 @@ export function InfoCard({
   subValue?: string;
 }) {
   return (
-    <div className="rounded-md border border-outline-sub bg-bg-surface flex flex-col gap-2 p-4">
-      <p className="text-label-15 text-body-disabled">{label}</p>
+    <div className="flex min-w-34 flex-1 flex-col items-start gap-2 self-stretch rounded-md border border-outline-sub bg-bg-surface p-4">
+      <p className="self-stretch text-label-15 text-body-disabled">{label}</p>
 
       <div className="flex flex-row items-center gap-1">
         <p className="text-label-15 text-title-secondary">{value}</p>
