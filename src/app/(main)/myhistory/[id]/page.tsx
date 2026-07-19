@@ -60,7 +60,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
       <BackButton />
 
-      <header className="flex w-full min-w-[63.3125rem] items-end justify-between">
+      <header className="flex w-full min-w-253.25 items-end justify-between">
         <div className="flex w-119 max-w-full flex-col items-start gap-2">
           <div className="flex w-full items-center gap-3">
             <h1 className="min-w-0 line-clamp-1 text-headline-emphasis-28 text-title-primary">
@@ -81,9 +81,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       </header>
 
       <div className="flex w-full items-start gap-4 self-stretch">
-        <section className="flex min-h-[30rem] min-w-0 flex-1 flex-col items-start gap-3 self-stretch rounded-[0.5rem] border border-outline-sub bg-bg-surface p-4">
+        <section className="flex min-h-120 min-w-0 flex-1 flex-col items-start gap-3 self-stretch rounded-lg border border-outline-sub bg-bg-surface p-4">
           <div className="flex w-full items-start justify-between">
-            <SortingTag label="적합도 순" className="rounded-[0.375rem]" />
+            <SortingTag label="적합도 순" className="rounded-md" />
             <ListSearchField aria-label="프로젝트 내 검색" placeholder="프로젝트 내 검색" />
           </div>
 
@@ -110,7 +110,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           </div>
         </section>
 
-        <div className="flex w-[17.5rem] shrink-0 flex-col gap-3">
+        <div className="flex w-70 shrink-0 flex-col gap-3">
           <AnalysisMenu />
           <AnalysisNotice />
         </div>

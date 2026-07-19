@@ -42,7 +42,7 @@ export default function SearchResultPage() {
           <Button
             size="sm"
             variant="primary"
-            className="h-[2.3125rem] rounded-[0.375rem]"
+            className="h-9.25 rounded-md"
             onClick={() => setIsPatentImportModalOpen(true)}
           >
             특허번호로 불러오기
