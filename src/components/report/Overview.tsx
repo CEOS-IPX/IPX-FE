@@ -12,7 +12,7 @@ type ReportOverviewProps = {
 export default function ReportOverview({ overview, components }: ReportOverviewProps) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-title-emphasis-18 text-title-secondary gap-2">
+      <h2 className=" flex text-title-emphasis-18 text-title-secondary gap-2">
         <span className="text-title-emphasis-18 text-primary-default">01</span>
         <span>발명의 개요</span>
       </h2>

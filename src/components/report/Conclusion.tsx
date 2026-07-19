@@ -5,7 +5,7 @@ type TotalConclusionProps = {
 export default function TotalConclusion({ conclusion }: TotalConclusionProps) {
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-title-emphasis-18 text-title-secondary gap-2">
+      <h2 className="flex text-title-emphasis-18 text-title-secondary gap-2">
         <span className="text-title-emphasis-18 text-primary-default">04</span>
         <span>종합 결론</span>
       </h2>
