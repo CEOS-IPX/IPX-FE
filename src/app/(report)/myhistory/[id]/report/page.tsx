@@ -1,6 +1,10 @@
 import { Chip } from "@/components/myhistory/ProjectCardChip";
 import { BackButton } from "@/components/ui/BackButton";
 import { PrintButton } from "@/components/ui/PrintButton";
+import ReportHeader from "@/components/report/Header";
+import ReportOverview from "@/components/report/Overview";
+import NoveltyComparison from "@/components/report/NoveltyComparision";
+import TotalConclusion from "@/components/report/Conclusion";
 
 // 추후 report API(GET) 연동 시 교체
 const MOCK_REPORT = {
@@ -94,96 +98,23 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
       </div>
 
       <main className="w-full max-w-210 px-10 py-6">
-        <article className="flex w-full flex-col gap-10 rounded-lg bg-bg-surface p-16 shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)] print:shadow-none">
-          <div className="flex flex-col gap-3">
-            <span className="text-label-15 text-caption-label">IPX Report</span>
-            <h1 className="text-headline-emphasis-32 text-title-primary">
-              {MOCK_REPORT.reportTitle}
-            </h1>
+        <article className="flex w-full flex-col gap-16 rounded-lg bg-bg-surface px-17.5 py-15 shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)] print:shadow-none">
+          <ReportHeader
+            title={MOCK_REPORT.reportTitle}
+            applicant={MOCK_REPORT.applicant}
+            inventor={MOCK_REPORT.inventor}
+            attorney={MOCK_REPORT.attorney}
+            createdAt={MOCK_REPORT.createdAt}
+          />
 
-            <dl className="flex flex-col gap-1 pt-2 text-body-15">
-              <div className="flex gap-3">
-                <dt className="w-12 text-caption-label">출원인</dt>
-                <dd className="text-body-secondary">{MOCK_REPORT.applicant}</dd>
-              </div>
-              <div className="flex gap-3">
-                <dt className="w-12 text-caption-label">발명자</dt>
-                <dd className="text-body-secondary">{MOCK_REPORT.inventor}</dd>
-              </div>
-              <div className="flex gap-3">
-                <dt className="w-12 text-caption-label">변리사</dt>
-                <dd className="text-body-secondary">{MOCK_REPORT.attorney}</dd>
-              </div>
-              <div className="flex gap-3">
-                <dt className="w-12 text-caption-label">작성일</dt>
-                <dd className="text-body-secondary">{MOCK_REPORT.createdAt}</dd>
-              </div>
-            </dl>
-          </div>
+          <ReportOverview overview={MOCK_REPORT.overview} components={MOCK_REPORT.components} />
 
-          <hr className="border-outline-sub" />
-
-          {/* 01 발명의 개요 */}
-          <section className="flex flex-col gap-4">
-            <h2 className="text-title-emphasis-20 text-primary-default">01 발명의 개요</h2>
-            <p className="text-body-15 text-body-secondary">{MOCK_REPORT.overview}</p>
-
-            <div className="flex flex-col">
-              {MOCK_REPORT.components.map((component) => (
-                <div
-                  key={component.label}
-                  className="flex items-center gap-4 border-b border-outline-sub py-3 last:border-b-0"
-                >
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-primary-light text-label-13 text-primary-default">
-                    {component.label}
-                  </span>
-                  <span className="w-52 shrink-0 text-label-emphasis-15 text-title-secondary">
-                    {component.title}
-                  </span>
-                  <span className="text-body-15 text-body-secondary">{component.description}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <hr className="border-outline-sub" />
-
-          {/* 02 신규성 분석 */}
-          <section className="flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <h2 className="text-title-emphasis-20 text-primary-default">02 신규성 분석</h2>
-              <Chip variant="primary">
-                {MOCK_REPORT.novelty.satisfied ? "신규성 충족" : "신규성 미충족"}
-              </Chip>
-            </div>
-
-            <p className="text-label-13 text-caption-label">{MOCK_REPORT.novelty.notice}</p>
-            <p className="text-body-15 text-body-secondary">{MOCK_REPORT.novelty.conclusion}</p>
-
-            <div className="flex flex-col gap-2 print:break-inside-avoid">
-              {MOCK_REPORT.novelty.items
-                .filter((item) => item.matchStatus === "novel")
-                .map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center gap-4 rounded-md bg-bg-neutral-hover px-4 py-3"
-                  >
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-bg-primary-light text-label-13 text-primary-default">
-                      {item.label}
-                    </span>
-                    <div className="flex w-52 shrink-0 flex-col">
-                      <span className="text-label-emphasis-15 text-title-secondary">
-                        {item.title}
-                      </span>
-                      <span className="text-label-13 text-caption-label">{item.source}</span>
-                    </div>
-                    <span className="text-body-15 text-body-secondary">{item.diff}</span>
-                  </div>
-                ))}
-            </div>
-          </section>
-
-          <hr className="border-outline-sub" />
+          <NoveltyComparison
+            satisfied={MOCK_REPORT.novelty.satisfied}
+            notice={MOCK_REPORT.novelty.notice}
+            conclusion={MOCK_REPORT.novelty.conclusion}
+            items={MOCK_REPORT.novelty.items}
+          />
 
           {/* 03 진보성 분석 */}
           <section className="flex flex-col gap-4 print:break-before-page">
@@ -266,11 +197,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
           <hr className="border-outline-sub" />
 
-          {/* 04 종합 결론 */}
-          <section className="flex flex-col gap-4">
-            <h2 className="text-title-emphasis-20 text-primary-default">04 종합 결론</h2>
-            <p className="text-body-15 text-body-secondary">{MOCK_REPORT.inventive.conclusion}</p>
-          </section>
+          <TotalConclusion conclusion={MOCK_REPORT.inventive.conclusion} />
         </article>
       </main>
     </div>
