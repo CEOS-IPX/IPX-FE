@@ -31,28 +31,27 @@ const MOCK_REPORT = {
       "관련도가 '매우 높음'으로 선정된 특허들 중 가장 유사한 특허를 기반으로, 구성요소를 개별 대비했습니다.",
     conclusion:
       "구성요소 C·D(무용제 수계 분산 공정, UV 경화 가교)는 주인용발명 D1에 개시되어 있지 않은 차이점입니다. 본 발명은 단일 선행문헌과 실질적으로 동일하지 않아 특허법 제29조 제1항의 신규성을 충족합니다.",
-    // 신규성 분석에는 matchStatus가 "novel"인 구성요소만 노출
     items: [
       {
         label: "A",
         title: "생분해성 베이스 수지",
         source: "PLA 블렌드 폴리에스터",
         diff: "동일 구성으로 개시됨",
-        matchStatus: "identical" as const,
+        matchStatus: "IDENTICAL" as const,
       },
       {
         label: "C",
         title: "무용제 수계 분산 공정",
         source: "PLA 블렌드 폴리에스터",
         diff: "유기용제 기반 분산 공정만 개시 — 무용제 수계 분산 공정은 개시·시사 없음",
-        matchStatus: "novel" as const,
+        matchStatus: "NEW" as const,
       },
       {
         label: "D",
         title: "UV 경화 기교",
         source: "PLA 블렌드 폴리에스터",
         diff: "자외선 경화형 가교 구성에 대한 개시가 없음",
-        matchStatus: "novel" as const,
+        matchStatus: "NEW" as const,
       },
     ],
   },
@@ -111,7 +110,6 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
 
           <NoveltyComparison
             satisfied={MOCK_REPORT.novelty.satisfied}
-            notice={MOCK_REPORT.novelty.notice}
             conclusion={MOCK_REPORT.novelty.conclusion}
             items={MOCK_REPORT.novelty.items}
           />
