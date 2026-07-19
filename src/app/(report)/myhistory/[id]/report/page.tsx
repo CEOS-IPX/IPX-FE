@@ -1,9 +1,9 @@
-import { Chip } from "@/components/myhistory/ProjectCardChip";
 import { BackButton } from "@/components/ui/BackButton";
 import { PrintButton } from "@/components/ui/PrintButton";
 import ReportHeader from "@/components/report/Header";
 import ReportOverview from "@/components/report/Overview";
 import NoveltyComparison from "@/components/report/NoveltyComparision";
+import InventiveStep from "@/components/report/InventiveStep";
 import TotalConclusion from "@/components/report/Conclusion";
 
 // 추후 report API(GET) 연동 시 교체
@@ -60,26 +60,43 @@ const MOCK_REPORT = {
     satisfied: true,
     comparisonTech: {
       primary: {
-        label: "주인용",
-        title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+        patentNumber: "KR 10-2023-0145XXX",
+        title: "저온 황산침출 기반 니켈·코발트 동시 회수 공정",
         organization: "한국지질자원연구원",
         year: 2024,
       },
       secondary: {
-        label: "부인용",
-        title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
+        patentNumber: "KR 10-2023-0145XXX",
+        title: "저온 황산침출 기반 니켈·코발트 동시 회수 공정",
         organization: "한국지질자원연구원",
         year: 2024,
       },
     },
     numericalLimits: [
-      { label: "VOC 배출량", unit: "g/L", before: "320", after: "8", improvement: "97.5%" },
+      {
+        id: "1",
+        category: "VOC 배출량",
+        unit: "g/L",
+        priorArt: "320",
+        invention: "8",
+        improvement: "97.5%",
+      },
     ],
     teachingAway: {
       backgroundLimit:
         "종래 생분해성 코팅(D1)은 유기용제 기반 분산에 의존하여 VOC 배출·작업 안전성 문제가 있고, D2의 UV 경화 필름은 별도의 경화 공정을 요구한다.",
       motivationAbsence:
         "D1과 D2는 서로 다른 기술 분야(분산 공정 vs 경화 공정)를 다루고 있어, 통상의 기술자가 두 문헌을 결합할 동기를 찾기 어렵다.",
+    },
+    commonKnowledge: {
+      rejectionReason: "구성요소 B(표면개질 나노 충전제)를 단순 주지관용기술로 봄.",
+      rebuttalLogic:
+        "표면개질 나노 충전제는 실란 커플링제로 표면 처리하여 수지와의 계면 결합력과 분산 안정성을 높인 구성으로, 통상의 기술자에게 관용적으로 채택되는 기술이 아니라 본 발명에 특유한 구성이다.",
+    },
+    simpleDesignChange: {
+      changedComponent: "무용제 수계 분산 공정",
+      nonObviousnessLogic:
+        "유기용제 기반 분산 공정을 무용제 수계 분산 공정으로 대체하는 것은 단순한 설계 변경이 아니라, 별도의 계면활성제 조성과 공정 조건 최적화가 요구되는 구성으로 통상의 기술자가 쉽게 도출할 수 없다.",
     },
     conclusion:
       "본 발명은 주인용발명 D1과 실질적으로 동일하지 않아 신규성을 충족하며, 차이점 구성요소(C·D)에 대해 수치한정·복수인용발명결합 논리로 결합 동기 부재 및 효과의 현저성이 인정되는 것으로 판단된다. 따라서 본 발명은 특허법 제29조 제1항 및 제2항의 특허요건을 만족한다.",
@@ -97,7 +114,7 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
       </div>
 
       <main className="w-full max-w-210 px-10 py-6">
-        <article className="flex w-full flex-col gap-16 rounded-lg bg-bg-surface px-17.5 py-15 shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)] print:shadow-none">
+        <article className="flex w-full flex-col gap-16 bg-bg-surface px-17.5 py-15 shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)] print:shadow-none">
           <ReportHeader
             title={MOCK_REPORT.reportTitle}
             applicant={MOCK_REPORT.applicant}
@@ -114,86 +131,18 @@ export default async function ReportPage({ params }: { params: Promise<{ id: str
             items={MOCK_REPORT.novelty.items}
           />
 
-          {/* 03 진보성 분석 */}
-          <section className="flex flex-col gap-4 print:break-before-page">
-            <div className="flex items-center gap-2">
-              <h2 className="text-title-emphasis-20 text-primary-default">03 진보성 분석</h2>
-              <Chip variant="primary">
-                {MOCK_REPORT.inventive.satisfied ? "진보성 충족" : "진보성 미충족"}
-              </Chip>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <h3 className="text-label-emphasis-15 text-title-secondary">비교 기술</h3>
-              <div className="flex flex-col gap-2 rounded-md border border-outline-sub p-3 print:break-inside-avoid">
-                {[
-                  MOCK_REPORT.inventive.comparisonTech.primary,
-                  MOCK_REPORT.inventive.comparisonTech.secondary,
-                ].map((ref) => (
-                  <div key={ref.label} className="flex items-center gap-3">
-                    <Chip variant={ref.label === "주인용" ? "primary" : "secondary"}>
-                      {ref.label}
-                    </Chip>
-                    <div className="flex flex-col">
-                      <span className="text-body-15 text-title-secondary">{ref.title}</span>
-                      <span className="text-label-13 text-caption-label">
-                        {ref.organization} · {ref.year}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <h3 className="text-label-emphasis-15 text-title-secondary">수치한정</h3>
-              <table className="w-full text-left text-body-15">
-                <thead>
-                  <tr className="border-b border-outline-sub text-label-13 text-caption-label">
-                    <th className="py-2 font-normal">구분</th>
-                    <th className="py-2 font-normal">단위</th>
-                    <th className="py-2 font-normal">종래기술</th>
-                    <th className="py-2 font-normal">본 발명</th>
-                    <th className="py-2 font-normal">개선폭</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {MOCK_REPORT.inventive.numericalLimits.map((row) => (
-                    <tr key={row.label} className="border-b border-outline-sub last:border-b-0">
-                      <td className="py-3 text-title-secondary">{row.label}</td>
-                      <td className="py-3 text-body-secondary">{row.unit}</td>
-                      <td className="py-3 text-body-secondary">{row.before}</td>
-                      <td className="py-3 text-primary-default">{row.after}</td>
-                      <td className="py-3 text-primary-default">{row.improvement}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex flex-col gap-3 print:break-inside-avoid">
-              <h3 className="text-label-emphasis-15 text-title-secondary">복수인용발명결합</h3>
-              <p className="text-label-emphasis-15 text-title-secondary">Teaching Away 논리</p>
-
-              <div className="flex flex-col gap-1">
-                <span className="text-label-13 text-caption-label">배경기술의 한계</span>
-                <p className="text-body-15 text-body-secondary">
-                  {MOCK_REPORT.inventive.teachingAway.backgroundLimit}
-                </p>
-              </div>
-
-              <div className="flex flex-col gap-1">
-                <span className="text-label-13 text-caption-label">
-                  결합 동기의 부재 (Teaching Away)
-                </span>
-                <p className="text-body-15 text-body-secondary">
-                  {MOCK_REPORT.inventive.teachingAway.motivationAbsence}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <hr className="border-outline-sub" />
+          <InventiveStep
+            satisfied={MOCK_REPORT.inventive.satisfied}
+            primaryReference={MOCK_REPORT.inventive.comparisonTech.primary}
+            secondaryReference={MOCK_REPORT.inventive.comparisonTech.secondary}
+            numericalLimits={MOCK_REPORT.inventive.numericalLimits}
+            backgroundLimit={MOCK_REPORT.inventive.teachingAway.backgroundLimit}
+            motivationAbsence={MOCK_REPORT.inventive.teachingAway.motivationAbsence}
+            rejectionReason={MOCK_REPORT.inventive.commonKnowledge.rejectionReason}
+            rebuttalLogic={MOCK_REPORT.inventive.commonKnowledge.rebuttalLogic}
+            changedComponent={MOCK_REPORT.inventive.simpleDesignChange.changedComponent}
+            nonObviousnessLogic={MOCK_REPORT.inventive.simpleDesignChange.nonObviousnessLogic}
+          />
 
           <TotalConclusion conclusion={MOCK_REPORT.inventive.conclusion} />
         </article>
