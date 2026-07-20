@@ -11,13 +11,18 @@ import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { Button } from "@/components/ui/Button";
 import { MoreInfoA } from "@/components/search/MoreInfo/MoreInfoA";
 import { MoreInfoB } from "@/components/search/MoreInfo/MoreInfoB";
+import { extractComponents } from "@/lib/api/search";
 
 export default function SearchPage() {
+  const [title, setTitle] = useState("");
+  const [technicalField, setTechnicalField] = useState("");
+  const [description, setDescription] = useState("");
   const [elements, setElements] = useState<Element[]>([
     { id: crypto.randomUUID(), name: "", description: "" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [aiCreateError, setAiCreateError] = useState<string | null>(null);
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -31,33 +36,30 @@ export default function SearchPage() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, [field]: value } : el)));
   };
 
-  const handleAICreate = () => {
+  const handleAICreate = async () => {
+    if (!title.trim() || !description.trim() || !technicalField.trim()) {
+      setAiCreateError("발명의 명칭, 기술 분야, 핵심 기술 설명을 먼저 입력해주세요.");
+      return;
+    }
+
+    setAiCreateError(null);
     setIsLoading(true);
-    setTimeout(() => {
-      setElements([
-        {
+    try {
+      const { components } = await extractComponents({ title, description, technicalField });
+      setElements(
+        components.map((component) => ({
           id: crypto.randomUUID(),
-          name: "생분해성 베이스 수지",
-          description: "PLA·PBAT 블렌드 폴리에스터",
-        },
-        {
-          id: crypto.randomUUID(),
-          name: "표면개질 나노 충전제",
-          description: "실란 처리된 무기 나노입자",
-        },
-        {
-          id: crypto.randomUUID(),
-          name: "무용제 수계 분산 공정",
-          description: "유기용제 없이 수계 분산으로 코팅층 형성",
-        },
-        {
-          id: crypto.randomUUID(),
-          name: "UV 경화 기교",
-          description: "자외선 경화형 가교제에 의한 표면 가교",
-        },
-      ]);
+          name: component.name,
+          description: component.description,
+        }))
+      );
+    } catch (err) {
+      setAiCreateError(
+        err instanceof Error && err.message ? err.message : "구성요소 추출 중 오류가 발생했습니다."
+      );
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -78,6 +80,8 @@ export default function SearchPage() {
             label="발명의 명칭"
             placeholder="EX) 생분해성 고분자 코팅 조성물"
             gap={1.5}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <div className="flex flex-row gap-3">
@@ -86,6 +90,8 @@ export default function SearchPage() {
               label="기술 분야"
               placeholder="EX) 고분자 화학 코팅"
               gap={1.5}
+              value={technicalField}
+              onChange={(e) => setTechnicalField(e.target.value)}
             />
             <TextField labelSize={17} label="IPC 분류" placeholder="EX) C09D 5/00" gap={1.5} />
           </div>
@@ -95,6 +101,8 @@ export default function SearchPage() {
             label="핵심 기술 설명"
             placeholder="발명의 핵심 구성과 작동 방식을 간단히 설명해주세요"
             rows={4}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
         </div>
       </div>
@@ -128,6 +136,8 @@ export default function SearchPage() {
 
           <AICreationButton onClick={handleAICreate} />
         </div>
+
+        {aiCreateError && <p className="ml-10 text-label-13 text-error-default">{aiCreateError}</p>}
 
         <div className="overflow-hidden border-y border-outline-default ml-10">
           <ElementList
