@@ -280,3 +280,11 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+@media print {
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}

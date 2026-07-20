@@ -18,7 +18,7 @@ const ANALYSIS_MENU_ITEMS = [
 export function AnalysisMenu() {
   return (
     <nav
-      className="flex w-[17.5rem] shrink-0 flex-col items-center overflow-hidden rounded-[0.5rem] border border-outline-sub bg-bg-surface"
+      className="flex w-70 shrink-0 flex-col items-center overflow-hidden rounded-lg border border-outline-sub bg-bg-surface"
       aria-label="활동 기록 분석 메뉴"
     >
       {ANALYSIS_MENU_ITEMS.map((item) => (

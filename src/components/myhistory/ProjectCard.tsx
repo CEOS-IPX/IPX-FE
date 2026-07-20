@@ -47,7 +47,7 @@ export function ProjectCard({
 
   return (
     <Link
-      href={`/myhistory/${id}`}
+      href={`/myhistory/${id}?title=${encodeURIComponent(title)}`}
       className="border border-outline-sub relative flex w-full flex-col rounded-lg bg-bg-surface p-6 hover:bg-bg-neutral-hover"
     >
       {" "}
