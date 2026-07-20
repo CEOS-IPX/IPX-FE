@@ -17,12 +17,21 @@ export default function SearchPage() {
   const [title, setTitle] = useState("");
   const [technicalField, setTechnicalField] = useState("");
   const [description, setDescription] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [clientName, setClientName] = useState("");
   const [elements, setElements] = useState<Element[]>([
     { id: crypto.randomUUID(), name: "", description: "" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [aiCreateError, setAiCreateError] = useState<string | null>(null);
+
+  const isInventionInfoFilled = Boolean(
+    title.trim() && technicalField.trim() && description.trim()
+  );
+  const isComponentsFilled =
+    elements.length > 0 && elements.every((el) => el.name.trim() && el.description.trim());
+  const isReadyToStart = isInventionInfoFilled && isComponentsFilled;
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -36,6 +45,7 @@ export default function SearchPage() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, [field]: value } : el)));
   };
 
+  //ai 자동 생성 버튼 api 연동 부분
   const handleAICreate = async () => {
     if (!title.trim() || !description.trim() || !technicalField.trim()) {
       setAiCreateError("발명의 명칭, 기술 분야, 핵심 기술 설명을 먼저 입력해주세요.");
@@ -116,12 +126,16 @@ export default function SearchPage() {
             label="사명 (선택)"
             placeholder="EX) 그린폴리머(주)"
             gap={1.5}
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
           />
           <TextField
             labelSize={17}
             label="의뢰인 (선택)"
             placeholder="담당자 또는 발명자 성명을 입력해주세요"
             gap={1.5}
+            value={clientName}
+            onChange={(e) => setClientName(e.target.value)}
           />
         </div>
       </div>
@@ -163,7 +177,7 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <Footer />
+      <Footer disabled={!isReadyToStart} />
 
       {isModalOpen && (
         <PatentImportModal
