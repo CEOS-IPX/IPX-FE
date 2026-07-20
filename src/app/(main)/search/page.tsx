@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Title from "@/components/search/SearchTitle";
 import { TextField } from "@/components/ui/TextField";
 import { TextArea } from "@/components/ui/TextArea";
@@ -13,11 +14,17 @@ import { MoreInfoA } from "@/components/search/MoreInfo/MoreInfoA";
 import { MoreInfoB } from "@/components/search/MoreInfo/MoreInfoB";
 
 export default function SearchPage() {
+  const router = useRouter();
   const [elements, setElements] = useState<Element[]>([
     { id: crypto.randomUUID(), name: "", description: "" },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [resultCount, setResultCount] = useState(10);
+
+  const handleStart = () => {
+    router.push(`/search/loading?count=${resultCount}`);
+  };
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -153,7 +160,11 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <Footer />
+      <Footer
+        resultCount={resultCount}
+        onResultCountChange={setResultCount}
+        onStart={handleStart}
+      />
 
       {isModalOpen && (
         <PatentImportModal
