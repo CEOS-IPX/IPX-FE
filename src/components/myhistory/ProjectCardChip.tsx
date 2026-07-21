@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 const ProjectCardChipVariants = cva(
-  "h-7 text-label-13 inline-flex items-center justify-center gap-1 rounded-full px-3 py-1.5",
+  "h-7 text-label-13 inline-flex items-center justify-center gap-1 rounded-full px-3 py-1",
   {
     variants: {
       variant: {
