@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Title from "@/components/search/SearchTitle";
 import { TextField } from "@/components/ui/TextField";
 import { TextArea } from "@/components/ui/TextArea";
@@ -14,6 +15,7 @@ import { MoreInfoB } from "@/components/search/MoreInfo/MoreInfoB";
 import { extractComponents } from "@/lib/api/search";
 
 export default function SearchPage() {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [technicalField, setTechnicalField] = useState("");
   const [description, setDescription] = useState("");
@@ -22,6 +24,7 @@ export default function SearchPage() {
   const [elements, setElements] = useState<Element[]>([
     { id: crypto.randomUUID(), name: "", description: "" },
   ]);
+  const [resultCount, setResultCount] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [aiCreateError, setAiCreateError] = useState<string | null>(null);
@@ -32,6 +35,10 @@ export default function SearchPage() {
   const isComponentsFilled =
     elements.length > 0 && elements.every((el) => el.name.trim() && el.description.trim());
   const isReadyToStart = isInventionInfoFilled && isComponentsFilled;
+
+  const handleStart = () => {
+    router.push(`/search/loading?count=${resultCount}`);
+  };
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -177,7 +184,12 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <Footer disabled={!isReadyToStart} />
+      <Footer
+        disabled={!isReadyToStart}
+        resultCount={resultCount}
+        onResultCountChange={setResultCount}
+        onStart={handleStart}
+      />
 
       {isModalOpen && (
         <PatentImportModal
