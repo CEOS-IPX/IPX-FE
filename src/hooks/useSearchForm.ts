@@ -1,40 +1,54 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { type Element } from "@/components/search/ElementList/ElementList";
 import { extractComponents, startSearch } from "@/lib/api/search";
+import { useSearchFormStore } from "@/store/searchFormStore";
 
 export function useSearchForm() {
   const router = useRouter();
 
-  const [title, setTitle] = useState("");
-  const [technicalField, setTechnicalField] = useState("");
-  const [description, setDescription] = useState("");
-  const [ipcInput, setIpcInput] = useState("");
-
-  const [applicantName, setApplicantName] = useState("");
-  const [inventorName, setInventorName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [clientName, setClientName] = useState("");
-
-  const [requiredApplicationNumbers, setRequiredApplicationNumbers] = useState<string[]>([]);
-  const [priorArtReference, setPriorArtReference] = useState("");
-  const [differentiationNotes, setDifferentiationNotes] = useState("");
-  const [measurementConditions, setMeasurementConditions] = useState("");
-  const [measurementResults, setMeasurementResults] = useState("");
-
-  const [elements, setElements] = useState<Element[]>([
-    { id: crypto.randomUUID(), name: "", description: "" },
-  ]);
-
-  const [resultCount, setResultCount] = useState(10);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [aiCreateError, setAiCreateError] = useState<string | null>(null);
-
-  const [isStartingSearch, setIsStartingSearch] = useState(false);
-  const [startSearchError, setStartSearchError] = useState<string | null>(null);
+  const {
+    title,
+    setTitle,
+    technicalField,
+    setTechnicalField,
+    description,
+    setDescription,
+    ipcInput,
+    setIpcInput,
+    applicantName,
+    setApplicantName,
+    inventorName,
+    setInventorName,
+    companyName,
+    setCompanyName,
+    clientName,
+    setClientName,
+    requiredApplicationNumbers,
+    setRequiredApplicationNumbers,
+    priorArtReference,
+    setPriorArtReference,
+    differentiationNotes,
+    setDifferentiationNotes,
+    measurementConditions,
+    setMeasurementConditions,
+    measurementResults,
+    setMeasurementResults,
+    elements,
+    setElements,
+    resultCount,
+    setResultCount,
+    isLoading,
+    setIsLoading,
+    isModalOpen,
+    setIsModalOpen,
+    aiCreateError,
+    setAiCreateError,
+    isStartingSearch,
+    setIsStartingSearch,
+    startSearchError,
+    setStartSearchError,
+  } = useSearchFormStore();
 
   const isInventionInfoFilled = Boolean(
     title.trim() && technicalField.trim() && description.trim()
