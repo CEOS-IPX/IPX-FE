@@ -1,4 +1,5 @@
-//구성요소 분해 페이지 ai 자동 추출 버튼 api request&response
+//구성요소 분해 페이지
+//ai 자동 추출 버튼 api request&response
 export type ExtractComponentsRequest = {
   title: string;
   description: string;
@@ -15,7 +16,7 @@ export type ExtractComponentsResponse = {
   components: ExtractedComponent[];
 };
 
-// 구성요소 분해 페이지 선행기술 탐색 실행  버튼 api request&response
+//선행기술 탐색 실행  버튼 api request&response
 export type StartSearchAdditionalInfo = {
   priorArtReference?: string;
   differentiationNotes?: string;
@@ -47,7 +48,8 @@ export type StartSearchResponse = {
   status: string;
 };
 
-//로딩 페이지 -> 진행률 조회 api
+//로딩 페이지
+//진행률 조회 api
 export type SearchStatus =
   | "in_progress"
   | "completed"
@@ -65,8 +67,30 @@ export type SearchStatusResponse = {
   error?: string | null;
 };
 
-// 로딩페이지 선행기술 탐색 중단하기 버튼 api
+//선행기술 탐색 중단하기 버튼 api
 export type CancelSearchResponse = {
   caseId: number;
   cancelled: boolean;
+};
+
+// 선행기술 탐색 결과 페이지
+// 사건별 선행문헌 목록 조회
+export type PriorArtRelevance = "VERY_HIGH" | "HIGH" | "MEDIUM" | "LOW" | "VERY_LOW";
+
+export type PriorArt = {
+  priorArtId: number;
+  applicationNumber: string;
+  title: string;
+  applicantName: string;
+  applicationDate: string;
+  legalStatus: string;
+  keywords: string[];
+  reason: string;
+  rrfScore: number;
+  relevance: PriorArtRelevance;
+};
+
+export type GetPriorArtsResponse = {
+  totalCount: number;
+  priorArts: PriorArt[];
 };

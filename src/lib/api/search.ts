@@ -5,6 +5,7 @@ import type {
   StartSearchResponse,
   SearchStatusResponse,
   CancelSearchResponse,
+  GetPriorArtsResponse,
 } from "@/types/search.type";
 import { apiRequest } from "./client";
 
@@ -26,7 +27,7 @@ export function startSearch(body: StartSearchRequest) {
 }
 
 //로딩중 페이지
-// 진행률 조회 api
+//진행률 조회 api
 export function getSearchStatus(caseId: number) {
   return apiRequest<SearchStatusResponse>(`/cases/${caseId}/searches/status`);
 }
@@ -36,4 +37,10 @@ export function cancelSearch(caseId: number) {
   return apiRequest<CancelSearchResponse>(`/cases/${caseId}/searches/cancel`, {
     method: "POST",
   });
+}
+
+// 선행기술 탐색 결과 페이지
+// 사건별 선행문헌 목록 조회
+export function getPriorArts(caseId: number) {
+  return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts`);
 }

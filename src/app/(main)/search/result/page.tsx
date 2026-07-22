@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { Pagination } from "@/components/searchlist/Pagination";
 import { ProjectList } from "@/components/searchlist/ProjectList";
@@ -9,22 +10,68 @@ import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
+import { getPriorArts } from "@/lib/api/search";
+import type { PriorArt, PriorArtRelevance } from "@/types/search.type";
 
-const MOCK_RESULT_COUNT = 20;
+const RELEVANCE_LABEL: Record<PriorArtRelevance, string> = {
+  VERY_HIGH: "매우 높음",
+  HIGH: "높음",
+  MEDIUM: "보통",
+  LOW: "낮음",
+  VERY_LOW: "매우 낮음",
+};
 
-const MOCK_RESULTS = Array.from({ length: 10 }, (_, index) => ({
-  id: `patent-${index + 1}`,
-  title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-  organization: "한국지질자원연구원",
-  year: 2024,
-  tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-  status: "등록",
-  recommendationReason:
-    "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-}));
+const RELEVANCE_VARIANT: Record<
+  PriorArtRelevance,
+  "verygood" | "good" | "related" | "bad" | "hold"
+> = {
+  VERY_HIGH: "verygood",
+  HIGH: "good",
+  MEDIUM: "related",
+  LOW: "bad",
+  VERY_LOW: "hold",
+};
 
-export default function SearchResultPage() {
+function SearchResultContent() {
+  const searchParams = useSearchParams();
+  const caseId = searchParams.get("caseId");
+
+  const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(() => Boolean(caseId));
+  const [error, setError] = useState<string | null>(null);
   const [isPatentImportModalOpen, setIsPatentImportModalOpen] = useState(false);
+
+  //선행기술 목록 불러오는 api
+  useEffect(() => {
+    if (!caseId) return;
+
+    let cancelled = false;
+
+    getPriorArts(Number(caseId))
+      .then((result) => {
+        if (cancelled) return;
+        setPriorArts(result.priorArts);
+        setTotalCount(result.totalCount);
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setError(
+          err instanceof Error && err.message
+            ? err.message
+            : "선행문헌 목록을 불러오는 중 오류가 발생했습니다."
+        );
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [caseId]);
 
   return (
     <div className="flex min-h-full w-full flex-col gap-6" aria-label="선행기술 탐색 결과">
@@ -32,7 +79,7 @@ export default function SearchResultPage() {
         <BackButton />
 
         <h1 className="text-headline-emphasis-24 text-title-primary">
-          탐색한 선행기술 <span className="text-primary-default">{MOCK_RESULT_COUNT}건</span>
+          탐색한 선행기술 <span className="text-primary-default">{totalCount}건</span>
         </h1>
       </div>
 
@@ -49,30 +96,37 @@ export default function SearchResultPage() {
           </Button>
         </div>
 
+        {error && <p className="text-body-15 text-error-default">{error}</p>}
+        {isLoading && <p className="text-body-15 text-caption-label">불러오는 중...</p>}
+
         <div className="flex flex-col items-center gap-9 self-stretch">
           <div className="flex w-full flex-col gap-4 self-stretch">
             <ResultListHeader variant="readonly" className="w-full" />
 
-            {MOCK_RESULTS.map((result, index) => (
-              <Link key={result.id} href={`/tech/${result.id}`} className="block w-full">
+            {priorArts.map((priorArt) => (
+              <Link
+                key={priorArt.priorArtId}
+                href={`/tech/${priorArt.priorArtId}`}
+                className="block w-full"
+              >
                 <ProjectList
                   showCheckbox={false}
                   className="w-full cursor-pointer"
-                  title={result.title}
-                  organization={result.organization}
-                  year={result.year}
-                  tags={result.tags}
-                  status={result.status}
-                  relevanceLabel={index === 0 ? "매우 높음" : "높음"}
-                  relevanceVariant={index === 0 ? "verygood" : "good"}
-                  recommendationReason={result.recommendationReason}
-                  thumbnailAlt={`${result.title} 대표 이미지`}
+                  title={priorArt.title}
+                  organization={priorArt.applicantName}
+                  year={priorArt.applicationDate.slice(0, 4)}
+                  tags={priorArt.keywords}
+                  status={priorArt.legalStatus}
+                  relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
+                  relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
+                  recommendationReason={priorArt.reason}
+                  thumbnailAlt={`${priorArt.title} 대표 이미지`}
                 />
               </Link>
             ))}
           </div>
 
-          <Pagination page={1} totalPages={4} />
+          <Pagination page={1} totalPages={1} />
         </div>
       </section>
 
@@ -84,5 +138,13 @@ export default function SearchResultPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function SearchResultPage() {
+  return (
+    <Suspense fallback={null}>
+      <SearchResultContent />
+    </Suspense>
   );
 }
