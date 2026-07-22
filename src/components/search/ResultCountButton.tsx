@@ -3,7 +3,7 @@
 import MinusIcon from "@/components/icons/icon-minus.svg";
 import PlusIcon from "@/components/icons/icon-plus.svg";
 
-const MIN_RESULT_COUNT = 1;
+const MIN_RESULT_COUNT = 10;
 const MAX_RESULT_COUNT = 30;
 
 type ResultCountButtonProps = {

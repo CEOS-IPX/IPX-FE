@@ -14,3 +14,35 @@ export type ExtractedComponent = {
 export type ExtractComponentsResponse = {
   components: ExtractedComponent[];
 };
+
+// 선행기술 탐색 실행 (POST /api/searches) request&response
+export type StartSearchAdditionalInfo = {
+  priorArtReference?: string;
+  differentiationNotes?: string;
+  measurementConditions?: string;
+  measurementResults?: string;
+};
+
+export type StartSearchComponent = {
+  name: string;
+  description: string;
+};
+
+export type StartSearchRequest = {
+  caseId?: number | null;
+  title: string;
+  description: string;
+  applicantName: string;
+  inventorName: string;
+  technicalField: string;
+  userInputIpc?: string[];
+  requiredApplicationNumbers?: string[];
+  resultCount: number;
+  components: StartSearchComponent[];
+  additionalInfo?: StartSearchAdditionalInfo;
+};
+
+export type StartSearchResponse = {
+  caseId: number;
+  status: string;
+};

@@ -6,9 +6,19 @@ import { TextArea } from "@/components/ui/TextArea";
 
 interface MoreInfoProps {
   label: string;
+  measurementConditions: string;
+  onChangeMeasurementConditions: (value: string) => void;
+  measurementResults: string;
+  onChangeMeasurementResults: (value: string) => void;
 }
 
-export function MoreInfoB({ label }: MoreInfoProps) {
+export function MoreInfoB({
+  label,
+  measurementConditions,
+  onChangeMeasurementConditions,
+  measurementResults,
+  onChangeMeasurementResults,
+}: MoreInfoProps) {
   const [checked, setChecked] = useState(false);
 
   return (
@@ -22,6 +32,8 @@ export function MoreInfoB({ label }: MoreInfoProps) {
             label="측정 조건 및 비교 대상"
             placeholder="어떤 지표를 어떤 조건에서 측정했는지 입력해주세요"
             className="h-40.5"
+            value={measurementConditions}
+            onChange={(e) => onChangeMeasurementConditions(e.target.value)}
           />
 
           <TextArea
@@ -29,6 +41,8 @@ export function MoreInfoB({ label }: MoreInfoProps) {
             label="측정 결과 및 해석"
             placeholder="측정한 수치가 어떻게 나왔는지 입력해주세요"
             className="h-40.5"
+            value={measurementResults}
+            onChange={(e) => onChangeMeasurementResults(e.target.value)}
           />
         </div>
       )}
