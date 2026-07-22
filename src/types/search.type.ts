@@ -46,3 +46,21 @@ export type StartSearchResponse = {
   caseId: number;
   status: string;
 };
+
+// 선행기술 탐색 시작 -> 로딩페이지에서 진행률 조회
+export type SearchStatus =
+  | "in_progress"
+  | "completed"
+  | "no_results"
+  | "invalid_input"
+  | "failed"
+  | "cancelled";
+
+export type SearchStatusResponse = {
+  caseId: number;
+  status: SearchStatus;
+  step: string;
+  progress: number;
+  reasonInvalid?: string | null;
+  error?: string | null;
+};

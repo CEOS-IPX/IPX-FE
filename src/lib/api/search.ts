@@ -3,6 +3,7 @@ import type {
   ExtractComponentsResponse,
   StartSearchRequest,
   StartSearchResponse,
+  SearchStatusResponse,
 } from "@/types/search.type";
 import { apiRequest } from "./client";
 
@@ -21,4 +22,9 @@ export function startSearch(body: StartSearchRequest) {
     method: "POST",
     body,
   });
+}
+
+// 탐색 진행 로딩 페이지에서 진행률 조회
+export function getSearchStatus(caseId: number) {
+  return apiRequest<SearchStatusResponse>(`/cases/${caseId}/searches/status`);
 }
