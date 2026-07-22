@@ -6,6 +6,7 @@ import type {
   SearchStatusResponse,
   CancelSearchResponse,
   GetPriorArtsResponse,
+  AddPriorArtsManualRequest,
 } from "@/types/search.type";
 import { apiRequest } from "./client";
 
@@ -43,4 +44,13 @@ export function cancelSearch(caseId: number) {
 // 사건별 선행문헌 목록 조회
 export function getPriorArts(caseId: number) {
   return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts`);
+}
+
+// 구성요소 분해 페이지+선행기술 탐색 결과 페이지
+// 출원번호로 선행문헌 수동 추가 api
+export function addPriorArtsManual(caseId: number, body: AddPriorArtsManualRequest) {
+  return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts/manual`, {
+    method: "POST",
+    body,
+  });
 }

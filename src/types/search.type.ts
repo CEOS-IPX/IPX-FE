@@ -94,3 +94,9 @@ export type GetPriorArtsResponse = {
   totalCount: number;
   priorArts: PriorArt[];
 };
+
+// 구성요소 분해 페이지+선행기술 탐색 결과 페이지
+// 출원번호로 선행문헌 수동 추가 api
+export type AddPriorArtsManualRequest = {
+  applicationNumbers: string[];
+};

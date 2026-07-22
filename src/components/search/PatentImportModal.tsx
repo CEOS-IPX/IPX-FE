@@ -9,9 +9,16 @@ interface PatentImportModalProps {
   initialPatentNumber: string;
   onClose: () => void;
   onSubmit: (data: { patentNumber: string }) => void;
+  error?: string | null;
+  isSubmitting?: boolean;
 }
 
-export function PatentImportModal({ onClose, onSubmit }: PatentImportModalProps) {
+export function PatentImportModal({
+  onClose,
+  onSubmit,
+  error,
+  isSubmitting,
+}: PatentImportModalProps) {
   const [patentNumber, setPatentNumber] = useState("");
 
   return (
@@ -42,7 +49,11 @@ export function PatentImportModal({ onClose, onSubmit }: PatentImportModalProps)
           placeholder="특허번호를 입력해주세요"
         />
 
-        <Button onClick={() => onSubmit({ patentNumber })}>기술 불러오기</Button>
+        {error && <p className="text-label-13 text-error-default">{error}</p>}
+
+        <Button onClick={() => onSubmit({ patentNumber })} disabled={isSubmitting}>
+          기술 불러오기
+        </Button>
       </div>
     </div>
   );

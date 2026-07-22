@@ -10,7 +10,7 @@ import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
-import { getPriorArts } from "@/lib/api/search";
+import { addPriorArtsManual, getPriorArts } from "@/lib/api/search";
 import type { PriorArt, PriorArtRelevance } from "@/types/search.type";
 
 const RELEVANCE_LABEL: Record<PriorArtRelevance, string> = {
@@ -41,6 +41,8 @@ function SearchResultContent() {
   const [isLoading, setIsLoading] = useState(() => Boolean(caseId));
   const [error, setError] = useState<string | null>(null);
   const [isPatentImportModalOpen, setIsPatentImportModalOpen] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
 
   //선행기술 목록 불러오는 api
   useEffect(() => {
@@ -72,6 +74,29 @@ function SearchResultContent() {
       cancelled = true;
     };
   }, [caseId]);
+
+  //특허번호로 불러오기 api
+  const handleImportPatentNumber = async ({ patentNumber }: { patentNumber: string }) => {
+    if (!caseId) return;
+    const trimmed = patentNumber.trim();
+    if (!trimmed) return;
+
+    setImportError(null);
+    setIsImporting(true);
+
+    try {
+      const result = await addPriorArtsManual(Number(caseId), { applicationNumbers: [trimmed] });
+      setPriorArts(result.priorArts);
+      setTotalCount(result.totalCount);
+      setIsPatentImportModalOpen(false);
+    } catch (err) {
+      setImportError(
+        err instanceof Error && err.message ? err.message : "선행문헌 추가 중 오류가 발생했습니다."
+      );
+    } finally {
+      setIsImporting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-full w-full flex-col gap-6" aria-label="선행기술 탐색 결과">
@@ -134,7 +159,9 @@ function SearchResultContent() {
         <PatentImportModal
           initialPatentNumber=""
           onClose={() => setIsPatentImportModalOpen(false)}
-          onSubmit={() => setIsPatentImportModalOpen(false)}
+          onSubmit={handleImportPatentNumber}
+          error={importError}
+          isSubmitting={isImporting}
         />
       )}
     </div>
