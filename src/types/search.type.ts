@@ -100,3 +100,32 @@ export type GetPriorArtsResponse = {
 export type AddPriorArtsManualRequest = {
   applicationNumbers: string[];
 };
+
+// 선행기술 탐색 결과 상세 페이지
+// 선행문헌 상세 조회 api
+export type PriorArtDetail = {
+  priorArtId: number;
+  caseId: number;
+  applicationNumber: string;
+  registrationNumber?: string | null;
+  openNumber?: string | null;
+  title?: string | null;
+  applicantName?: string | null;
+  inventorName?: string | null;
+  applicationDate?: string | null;
+  openDate?: string | null;
+  registrationDate?: string | null;
+  legalStatus?: string | null;
+  ipcCodes: string[];
+  cpcCodes: string[];
+  abstractText?: string | null;
+  independentClaims?: string | null;
+  source: string;
+  rrfScore: number;
+  reason?: string | null;
+  summary?: string | null;
+  techPurpose?: string | null;
+  keyFeatures: string[];
+  matchedKeywords: string[];
+  createdAt: string;
+};

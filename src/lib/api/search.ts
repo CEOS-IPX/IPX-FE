@@ -7,6 +7,7 @@ import type {
   CancelSearchResponse,
   GetPriorArtsResponse,
   AddPriorArtsManualRequest,
+  PriorArtDetail,
 } from "@/types/search.type";
 import { apiRequest } from "./client";
 
@@ -53,4 +54,10 @@ export function addPriorArtsManual(caseId: number, body: AddPriorArtsManualReque
     method: "POST",
     body,
   });
+}
+
+// 선행기술 탐색 결과 상세 페이지
+// 선행문헌 상세 조회 api(특허 개별 페이지)
+export function getPriorArtDetail(priorArtId: number) {
+  return apiRequest<PriorArtDetail>(`/prior-arts/${priorArtId}`);
 }
