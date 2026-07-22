@@ -137,6 +137,11 @@
   --text-headline-24--font-weight: 500;
 
   /* Headline Emphasis */
+  --text-headline-emphasis-46: 2.875rem;
+  --text-headline-emphasis-46--line-height: 110%;
+  --text-headline-emphasis-46--letter-spacing: -0.02em;
+  --text-headline-emphasis-46--font-weight: 600;
+
   --text-headline-emphasis-32: 2rem;
   --text-headline-emphasis-32--line-height: 130%;
   --text-headline-emphasis-32--letter-spacing: -0.02em;

@@ -14,6 +14,7 @@ const twMerge = extendTailwindMerge({
         "headline-emphasis-24",
         "headline-emphasis-28",
         "headline-emphasis-32",
+        "headline-emphasis-46",
         "title-18",
         "title-20",
         "title-22",
