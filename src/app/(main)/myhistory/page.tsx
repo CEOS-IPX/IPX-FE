@@ -1,76 +1,88 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Tab } from "@/components/myhistory/Tab";
 import { ProjectCard } from "@/components/myhistory/ProjectCard";
 import { ModifyModal } from "@/components/myhistory/ModifyModal";
+import { getCases } from "@/lib/api/case";
+import type { CaseStatusGroup, CaseSummary } from "@/types/case.type";
 
 type TabValue = "전체" | "대기 중" | "완료";
 
-const MOCK_PROJECTS = [
-  {
-    id: "1",
-    status: "선행 조사 중" as const,
-    title: "생분해성 고분자 코팅 조성물",
-    company: "그린폴리머(주)",
-    manager: "김도현",
-    patents: [],
-  },
-  {
-    id: "2",
-    status: "선행 조사 중" as const,
-    title: "초저전력 IoT 센서 통신 모듈",
-    company: "그린폴리머(주)",
-    manager: "김도현",
-    patents: [],
-  },
-  {
-    id: "3",
-    status: "완료" as const,
-    title: "나노복합소재 기반 전자파 차폐 필름",
-    company: "그린폴리머(주)",
-    manager: "김도현",
-    patents: [],
-  },
-];
+const STATUS_GROUP_BY_TAB: Record<TabValue, CaseStatusGroup> = {
+  전체: "ALL",
+  "대기 중": "PENDING",
+  완료: "COMPLETED",
+};
 
 type EditingProject = { id: string; title: string; company: string; manager: string };
 
 export default function MyHistoryPage() {
   const [activeTab, setActiveTab] = useState<TabValue>("전체");
   const [editingProject, setEditingProject] = useState<EditingProject | null>(null);
+  const [cases, setCases] = useState<CaseSummary[]>([]);
+  const [counts, setCounts] = useState({ 전체: 0, "대기 중": 0, 완료: 0 });
+  const [error, setError] = useState<string | null>(null);
 
-  const filtered = MOCK_PROJECTS.filter((p) => {
-    if (activeTab === "전체") return true;
-    if (activeTab === "대기 중") return p.status === "선행 조사 중";
-    return p.status === "완료";
-  });
+  //내 활동 기록 -> 사건 목록 조회(프로젝트들)
+  useEffect(() => {
+    let cancelled = false;
 
-  const counts = {
-    전체: MOCK_PROJECTS.length,
-    "대기 중": MOCK_PROJECTS.filter((p) => p.status === "선행 조사 중").length,
-    완료: MOCK_PROJECTS.filter((p) => p.status === "완료").length,
-  };
+    getCases({ statusGroup: STATUS_GROUP_BY_TAB[activeTab], size: 50 })
+      .then((result) => {
+        if (cancelled) return;
+
+        setCases(result.cases);
+
+        setCounts({
+          전체: result.totalCount,
+          "대기 중": result.pendingCount,
+          완료: result.completedCount,
+        });
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+
+        setError(
+          err instanceof Error && err.message
+            ? err.message
+            : "목록을 불러오는 중 오류가 발생했습니다."
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   return (
     <div className="flex flex-col gap-6 py-4">
       <Tab active={activeTab} counts={counts} onChange={setActiveTab} />
 
+      {error && <p className="text-body-15 text-error-default">{error}</p>}
+
       <div className="grid grid-cols-2 gap-4">
-        {filtered.map((project) => (
+        {cases.map((project) => (
           <ProjectCard
-            key={project.id}
-            {...project}
+            key={project.caseId}
+            id={String(project.caseId)}
+            status={project.statusLabel}
+            statusVariant={project.status.includes("COMPLETED") ? "secondary" : "primary"}
+            title={project.title}
+            company={project.applicantName ?? ""}
+            manager={project.inventorName ?? ""}
+            patents={[]}
             onEdit={() =>
               setEditingProject({
-                id: project.id,
+                id: String(project.caseId),
                 title: project.title,
-                company: project.company,
-                manager: project.manager,
+                company: project.applicantName ?? "",
+                manager: project.inventorName ?? "",
               })
             }
             onDelete={() => {
-              /* TODO: 삭제 처리 */
+              /* 여기가 프로젝트 삭제 기능 */
             }}
           />
         ))}
