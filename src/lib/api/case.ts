@@ -3,6 +3,7 @@ import type {
   GetCasesResponse,
   UpdateCaseRequest,
   UpdateCaseResponse,
+  DeleteCaseResponse,
 } from "@/types/case.type";
 import { apiRequest } from "./client";
 
@@ -20,11 +21,18 @@ export function getCases(params: GetCasesParams = {}) {
   return apiRequest<GetCasesResponse>(`/cases${queryString ? `?${queryString}` : ""}`);
 }
 
-// 수정하기 모달
-// 사건 수정 api
+// 수정하기 모달 + 삭제 메뉴
+// 사건(사명, 출원인) 수정 api
 export function updateCase(caseId: number, body: UpdateCaseRequest) {
   return apiRequest<UpdateCaseResponse>(`/cases/${caseId}`, {
     method: "PATCH",
     body,
+  });
+}
+
+// 사건 삭제 api
+export function deleteCase(caseId: number) {
+  return apiRequest<DeleteCaseResponse>(`/cases/${caseId}`, {
+    method: "DELETE",
   });
 }

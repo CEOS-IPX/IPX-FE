@@ -35,7 +35,7 @@ export type GetCasesResponse = {
   cases: CaseSummary[];
 };
 
-// 수정하기 모달
+// 수정하기 모달 + 삭제 메뉴
 // 사건(사명, 출원인) 수정 api
 export type UpdateCaseRequest = {
   title?: string;
@@ -49,4 +49,9 @@ export type UpdateCaseResponse = {
   applicantName?: string | null;
   inventorName?: string | null;
   updatedAt: string;
+};
+
+// 사건 삭제 api
+export type DeleteCaseResponse = {
+  deletedCaseId: number;
 };

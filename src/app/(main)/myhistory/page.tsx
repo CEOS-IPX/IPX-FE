@@ -18,6 +18,8 @@ export default function MyHistoryPage() {
     modifyError,
     isModifying,
     handleModifySubmit,
+    deleteError,
+    handleDelete,
   } = useMyHistory();
 
   return (
@@ -25,6 +27,7 @@ export default function MyHistoryPage() {
       <Tab active={activeTab} counts={counts} onChange={setActiveTab} />
 
       {error && <p className="text-body-15 text-error-default">{error}</p>}
+      {deleteError && <p className="text-body-15 text-error-default">{deleteError}</p>}
 
       <div className="grid grid-cols-2 gap-4">
         {cases.map((project) => (
@@ -38,9 +41,7 @@ export default function MyHistoryPage() {
             manager={project.inventorName ?? ""}
             patents={[]}
             onEdit={() => openEditModal(project)}
-            onDelete={() => {
-              /* 여기가 프로젝트 삭제 기능 -> 나중에 추가할게여~~ */
-            }}
+            onDelete={() => handleDelete(project)}
           />
         ))}
       </div>
