@@ -117,7 +117,7 @@ function SearchResultContent() {
             className="h-9.25 rounded-md"
             onClick={() => setIsPatentImportModalOpen(true)}
           >
-            특허번호로 불러오기
+            출원번호로 불러오기
           </Button>
         </div>
 

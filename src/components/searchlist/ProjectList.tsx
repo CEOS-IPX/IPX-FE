@@ -88,7 +88,7 @@ export function ProjectList({
                 <span className="shrink-0">{year}</span>
               </div>
 
-              <div className="mt-3 flex items-center gap-1.5">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
                 {tags.map((tag) => (
                   <TagChip key={tag} label={tag} active={highlighted} />
                 ))}
