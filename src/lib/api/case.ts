@@ -1,4 +1,9 @@
-import type { GetCasesParams, GetCasesResponse } from "@/types/case.type";
+import type {
+  GetCasesParams,
+  GetCasesResponse,
+  UpdateCaseRequest,
+  UpdateCaseResponse,
+} from "@/types/case.type";
 import { apiRequest } from "./client";
 
 // 내 활동 기록
@@ -13,4 +18,13 @@ export function getCases(params: GetCasesParams = {}) {
 
   const queryString = query.toString();
   return apiRequest<GetCasesResponse>(`/cases${queryString ? `?${queryString}` : ""}`);
+}
+
+// 수정하기 모달
+// 사건 수정 api
+export function updateCase(caseId: number, body: UpdateCaseRequest) {
+  return apiRequest<UpdateCaseResponse>(`/cases/${caseId}`, {
+    method: "PATCH",
+    body,
+  });
 }

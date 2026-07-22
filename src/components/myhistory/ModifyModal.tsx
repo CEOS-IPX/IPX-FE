@@ -11,6 +11,8 @@ interface ModifyModalProps {
   initialManager?: string;
   onClose: () => void;
   onSubmit: (data: { title: string; company: string; manager: string }) => void;
+  error?: string | null;
+  isSubmitting?: boolean;
 }
 
 export function ModifyModal({
@@ -19,6 +21,8 @@ export function ModifyModal({
   initialManager = "",
   onClose,
   onSubmit,
+  error,
+  isSubmitting,
 }: ModifyModalProps) {
   const [title, setTitle] = useState(initialTitle);
   const [company, setCompany] = useState(initialCompany);
@@ -64,7 +68,11 @@ export function ModifyModal({
           </div>
         </div>
 
-        <Button onClick={() => onSubmit({ title, company, manager })}>변경</Button>
+        {error && <p className="text-label-13 text-error-default">{error}</p>}
+
+        <Button onClick={() => onSubmit({ title, company, manager })} disabled={isSubmitting}>
+          변경
+        </Button>
       </div>
     </div>
   );

@@ -34,3 +34,19 @@ export type GetCasesResponse = {
   hasNext: boolean;
   cases: CaseSummary[];
 };
+
+// 수정하기 모달
+// 사건(사명, 출원인) 수정 api
+export type UpdateCaseRequest = {
+  title?: string;
+  applicantName?: string | null;
+  inventorName?: string | null;
+};
+
+export type UpdateCaseResponse = {
+  caseId: number;
+  title: string;
+  applicantName?: string | null;
+  inventorName?: string | null;
+  updatedAt: string;
+};
