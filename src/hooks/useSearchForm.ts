@@ -58,6 +58,7 @@ export function useSearchForm() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, [field]: value } : el)));
   };
 
+  //이 부분이 api 호출하는게 아니라 탐색 전에 로컬에 일시저장하기만 함 -> 탐색 결과에 얘도 찾아서 추가할 수 있도록
   const handleImportPatentNumber = (patentNumber: string) => {
     const trimmed = patentNumber.trim();
     if (trimmed) {
@@ -117,6 +118,7 @@ export function useSearchForm() {
               .map((code) => code.trim())
               .filter(Boolean)
           : undefined,
+        //이 부분이 특허번호로 불러오기 -> 같이 보내버림(request로..)
         requiredApplicationNumbers:
           requiredApplicationNumbers.length > 0 ? requiredApplicationNumbers : undefined,
         resultCount,

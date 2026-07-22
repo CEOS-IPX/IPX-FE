@@ -46,8 +46,8 @@ export function getPriorArts(caseId: number) {
   return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts`);
 }
 
-// 구성요소 분해 페이지+선행기술 탐색 결과 페이지
-// 출원번호로 선행문헌 수동 추가 api
+// 선행기술 탐색 결과 페이지
+// 출원번호로 선행문헌 추가 api
 export function addPriorArtsManual(caseId: number, body: AddPriorArtsManualRequest) {
   return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts/manual`, {
     method: "POST",

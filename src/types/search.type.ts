@@ -95,7 +95,7 @@ export type GetPriorArtsResponse = {
   priorArts: PriorArt[];
 };
 
-// 구성요소 분해 페이지+선행기술 탐색 결과 페이지
+// 탐색결과 페이지(그냥 구성요소페이지에서는 번호를 가지고만 잇음)
 // 출원번호로 선행문헌 수동 추가 api
 export type AddPriorArtsManualRequest = {
   applicationNumbers: string[];
