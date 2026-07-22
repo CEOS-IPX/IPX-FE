@@ -33,7 +33,7 @@ export default function InformationA({
       <div className="flex justify-between">
         <Title stepnum={1} title="발명 정보" />
         <Button variant="secondary" size="sm" onClick={onOpenPatentModal}>
-          특허 번호로 불러오기
+          출원 번호로 불러오기
         </Button>
       </div>
 
