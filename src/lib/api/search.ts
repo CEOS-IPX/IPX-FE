@@ -4,6 +4,7 @@ import type {
   StartSearchRequest,
   StartSearchResponse,
   SearchStatusResponse,
+  CancelSearchResponse,
 } from "@/types/search.type";
 import { apiRequest } from "./client";
 
@@ -24,7 +25,15 @@ export function startSearch(body: StartSearchRequest) {
   });
 }
 
-// 탐색 진행 로딩 페이지에서 진행률 조회
+//로딩중 페이지
+// 진행률 조회 api
 export function getSearchStatus(caseId: number) {
   return apiRequest<SearchStatusResponse>(`/cases/${caseId}/searches/status`);
+}
+
+// 탐색 중단하기 버튼 api
+export function cancelSearch(caseId: number) {
+  return apiRequest<CancelSearchResponse>(`/cases/${caseId}/searches/cancel`, {
+    method: "POST",
+  });
 }

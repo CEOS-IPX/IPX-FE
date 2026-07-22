@@ -15,7 +15,7 @@ export type ExtractComponentsResponse = {
   components: ExtractedComponent[];
 };
 
-// 선행기술 탐색 실행 (POST /api/searches) request&response
+// 구성요소 분해 페이지 선행기술 탐색 실행  버튼 api request&response
 export type StartSearchAdditionalInfo = {
   priorArtReference?: string;
   differentiationNotes?: string;
@@ -47,7 +47,7 @@ export type StartSearchResponse = {
   status: string;
 };
 
-// 선행기술 탐색 시작 -> 로딩페이지에서 진행률 조회
+//로딩 페이지 -> 진행률 조회 api
 export type SearchStatus =
   | "in_progress"
   | "completed"
@@ -63,4 +63,10 @@ export type SearchStatusResponse = {
   progress: number;
   reasonInvalid?: string | null;
   error?: string | null;
+};
+
+// 로딩페이지 선행기술 탐색 중단하기 버튼 api
+export type CancelSearchResponse = {
+  caseId: number;
+  cancelled: boolean;
 };

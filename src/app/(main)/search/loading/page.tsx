@@ -4,7 +4,7 @@ import { Suspense, useEffect, useId, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import StopIcon from "@/components/icons/icon-stop.svg";
 import { Button } from "@/components/ui/Button";
-import { getSearchStatus } from "@/lib/api/search";
+import { cancelSearch, getSearchStatus } from "@/lib/api/search";
 import type { SearchStatusResponse } from "@/types/search.type";
 
 const DEFAULT_RESULT_COUNT = 10;
@@ -86,7 +86,23 @@ function LoadingContent() {
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
   const [mockStepIndex, setMockStepIndex] = useState(0);
+  const [isStopping, setIsStopping] = useState(false);
   const mockSteps = getMockSteps(resultCount);
+
+  const handleStop = async () => {
+    if (!caseId) {
+      router.push("/search");
+      return;
+    }
+
+    setIsStopping(true);
+    try {
+      await cancelSearch(Number(caseId));
+    } catch {
+    } finally {
+      router.push("/search");
+    }
+  };
 
   useEffect(() => {
     if (!caseId) return;
@@ -151,7 +167,7 @@ function LoadingContent() {
         )}
       </div>
 
-      <Button variant="secondary" size="sm" onClick={() => router.push("/search")}>
+      <Button variant="secondary" size="sm" onClick={handleStop} disabled={isStopping}>
         <StopIcon className="h-4 w-4 text-icon-neutral-default [&_path]:fill-current" aria-hidden />
         탐색 중단하기
       </Button>
