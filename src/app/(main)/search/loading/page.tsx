@@ -24,7 +24,7 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 const TERMINAL_MESSAGE: Record<string, (status: SearchStatusResponse) => string> = {
   no_results: () => "조건에 맞는 선행기술을 찾지 못했어요.",
   invalid_input: (status) => status.reasonInvalid || "입력하신 내용을 다시 확인해주세요.",
-  failed: (status) => status.error || "탐색 중 오류가 발생했습니다.",
+  failed: (status) => status.error || status.reasonInvalid || "탐색 중 오류가 발생했습니다.",
   cancelled: () => "탐색이 취소되었습니다.",
 };
 
