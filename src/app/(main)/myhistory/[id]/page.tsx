@@ -13,8 +13,11 @@ import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { getCaseDetail } from "@/lib/api/case";
+import { getPriorArts, PRIOR_ARTS_ERROR_MESSAGES } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
 import type { CaseDetail } from "@/types/case.type";
+import type { PriorArt } from "@/types/search.type";
 
 // 에러코드별 메시지 정리해놓음
 const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
@@ -32,43 +35,6 @@ function deriveCurrentStep(detail: CaseDetail): ProjectStep {
   return "구성요소 분해";
 }
 
-// 이 부분은 테스트용! (저장된 선행문헌 목록은 별도 API로 연동 예정)
-const MOCK_RESULTS = [
-  {
-    id: "patent-1",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-  {
-    id: "patent-2",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-  {
-    id: "patent-3",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-];
-
 export default function ProjectDetailPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
@@ -77,7 +43,11 @@ export default function ProjectDetailPage() {
   const [isLoading, setIsLoading] = useState(() => Boolean(id));
   const [error, setError] = useState<string | null>(null);
 
-  //프로젝트 별 저장된 특허 목록 조회 api
+  const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
+  const [isPriorArtsLoading, setIsPriorArtsLoading] = useState(() => Boolean(id));
+  const [priorArtsError, setPriorArtsError] = useState<string | null>(null);
+
+  //프로젝트별 개요 및 상태(헤드 데이터) 조회 api
   useEffect(() => {
     if (!id) return;
 
@@ -106,6 +76,42 @@ export default function ProjectDetailPage() {
       .finally(() => {
         if (cancelled) return;
         setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  //프로젝트 별 저장된 특허 목록 조회 api (탐색 결과 페이지와 동일한 api)
+  useEffect(() => {
+    if (!id) return;
+
+    let cancelled = false;
+
+    getPriorArts(Number(id))
+      .then((result) => {
+        if (cancelled) return;
+
+        setPriorArts(result.priorArts);
+        setPriorArtsError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+
+        if (err instanceof ApiError) {
+          setPriorArtsError(
+            PRIOR_ARTS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "저장된 특허 목록을 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setPriorArtsError("저장된 특허 목록을 불러오는 중 오류가 발생했습니다.");
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsPriorArtsLoading(false);
       });
 
     return () => {
@@ -167,20 +173,29 @@ export default function ProjectDetailPage() {
           <div className="flex w-full flex-col gap-4">
             <ResultListHeader variant="readonly" className="w-full" />
 
-            {MOCK_RESULTS.map((result) => (
-              <Link key={result.id} href={`/tech/${result.id}`} className="block w-full">
+            {priorArtsError && <p className="text-body-15 text-error-default">{priorArtsError}</p>}
+            {isPriorArtsLoading && (
+              <p className="text-body-15 text-caption-label">불러오는 중...</p>
+            )}
+
+            {priorArts.map((priorArt) => (
+              <Link
+                key={priorArt.priorArtId}
+                href={`/tech/${priorArt.priorArtId}`}
+                className="block w-full"
+              >
                 <ProjectList
                   showCheckbox={false}
                   className="w-full cursor-pointer"
-                  title={result.title}
-                  organization={result.organization}
-                  year={result.year}
-                  tags={result.tags}
-                  status={result.status}
-                  relevanceLabel={result.relevanceLabel}
-                  relevanceVariant="verygood"
-                  recommendationReason={result.recommendationReason}
-                  thumbnailAlt={`${result.title} 대표 이미지`}
+                  title={priorArt.title}
+                  organization={priorArt.applicantName}
+                  year={priorArt.applicationDate.slice(0, 4)}
+                  tags={priorArt.keywords}
+                  status={priorArt.legalStatus}
+                  relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
+                  relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
+                  recommendationReason={priorArt.reason}
+                  thumbnailAlt={`${priorArt.title} 대표 이미지`}
                 />
               </Link>
             ))}

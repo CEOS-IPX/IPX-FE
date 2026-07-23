@@ -38,8 +38,8 @@ export function deleteCase(caseId: number) {
   });
 }
 
-// 내 활동 기록 - 사건 상세 페이지 (사건 개요 / 상태 표시 영역)
-// 사건 상세 조회 api
+// 내 활동 기록 -> 개별 프로젝트 조회
+// 프로젝트별 특허 목록이 아닌 헤드 데이터 조회 api
 export function getCaseDetail(caseId: number) {
   return apiRequest<CaseDetail>(`/cases/${caseId}`);
 }

@@ -56,8 +56,8 @@ export type DeleteCaseResponse = {
   deletedCaseId: number;
 };
 
-// 사건 상세 페이지 (개별 특허 페이지가 아니라 개별 프로젝트에 대한 api, 프로젝트 하나를 선택했을 때)
-// 사건 상세 조회 api
+// 프로젝트 상세 페이지 (개별 특허 페이지가 아니라 개별 프로젝트에 대한 api, 프로젝트 하나를 선택했을 때)
+// 프로젝트별 특허 목록이 아닌 헤드 데이터 조회 api
 export type CaseDetail = {
   caseId: number;
   title: string;

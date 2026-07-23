@@ -41,11 +41,19 @@ export function cancelSearch(caseId: number) {
   });
 }
 
-// 선행기술 탐색 결과 페이지
-// 사건별 선행문헌 목록 조회
+// 선행기술 탐색 결과 페이지 + 내 활동 기록(개별 프로젝트) 저장된 특허 목록
+// 사건별 선행문헌 목록 조회 (같은 api를 두 화면에서 공용으로 사용)
 export function getPriorArts(caseId: number) {
   return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts`);
 }
+
+// 에러코드별 메시지 (두 화면에서 동일하게 사용 -> 페이지가 아니라 ts에 저장)
+export const PRIOR_ARTS_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
 
 // 선행기술 탐색 결과 페이지
 // 출원번호로 선행문헌 추가 api
