@@ -30,7 +30,7 @@ export default function InformationC({
           label="청구항을 구성요소 단위로 분해해 판단의 정밀성을 높일 수 있어요"
         />
 
-        <AICreationButton onClick={onAICreate} />
+        <AICreationButton onClick={onAICreate} disabled={isLoading} />
       </div>
 
       {aiCreateError && <p className="ml-10 text-label-13 text-error-default">{aiCreateError}</p>}

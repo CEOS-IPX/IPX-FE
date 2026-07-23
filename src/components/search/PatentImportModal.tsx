@@ -14,12 +14,13 @@ interface PatentImportModalProps {
 }
 
 export function PatentImportModal({
+  initialPatentNumber,
   onClose,
   onSubmit,
   error,
   isSubmitting,
 }: PatentImportModalProps) {
-  const [patentNumber, setPatentNumber] = useState("");
+  const [patentNumber, setPatentNumber] = useState(initialPatentNumber);
 
   return (
     <div

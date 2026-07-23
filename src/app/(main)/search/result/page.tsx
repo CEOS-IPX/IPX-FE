@@ -79,7 +79,10 @@ function SearchResultContent() {
   const handleImportPatentNumber = async ({ patentNumber }: { patentNumber: string }) => {
     if (!caseId) return;
     const trimmed = patentNumber.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setImportError("특허번호를 입력해주세요.");
+      return;
+    }
 
     setImportError(null);
     setIsImporting(true);
@@ -115,7 +118,10 @@ function SearchResultContent() {
             size="sm"
             variant="primary"
             className="h-9.25 rounded-md"
-            onClick={() => setIsPatentImportModalOpen(true)}
+            onClick={() => {
+              setImportError(null);
+              setIsPatentImportModalOpen(true);
+            }}
           >
             출원번호로 불러오기
           </Button>

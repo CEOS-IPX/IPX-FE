@@ -9,6 +9,7 @@ import type { SearchStatusResponse } from "@/types/search.type";
 
 const DEFAULT_RESULT_COUNT = 10;
 const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_RETRIES = 5;
 
 // 이 부분은 테스트용!
 const getMockSteps = (resultCount: number) => [
@@ -98,7 +99,8 @@ function LoadingContent() {
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
-    } catch {
+    } catch (err) {
+      console.error("탐색 취소 요청 실패:", err);
     } finally {
       router.push("/search");
     }
@@ -109,12 +111,15 @@ function LoadingContent() {
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
+    let consecutiveErrors = 0;
 
     const poll = async () => {
       try {
         const result = await getSearchStatus(Number(caseId));
         if (cancelled) return;
+        consecutiveErrors = 0;
         setStatus(result);
+        setPollError(null);
 
         if (result.status === "in_progress") {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
@@ -123,11 +128,20 @@ function LoadingContent() {
         }
       } catch (err) {
         if (cancelled) return;
-        setPollError(
+        consecutiveErrors += 1;
+
+        const message =
           err instanceof Error && err.message
             ? err.message
-            : "진행 상태 조회 중 오류가 발생했습니다."
-        );
+            : "진행 상태 조회 중 오류가 발생했습니다.";
+
+        if (consecutiveErrors < MAX_POLL_RETRIES) {
+          // 일시적인 네트워크 오류일 수 있으니 바로 포기하지 않고 재시도
+          setPollError(message);
+          timer = setTimeout(poll, POLL_INTERVAL_MS);
+        } else {
+          setPollError(message);
+        }
       }
     };
 
