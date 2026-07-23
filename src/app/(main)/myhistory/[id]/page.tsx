@@ -1,22 +1,38 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { BackButton } from "@/components/ui/BackButton";
 import { AnalysisMenu } from "@/components/myhistory/AnalysisMenu";
 import { AnalysisNotice } from "@/components/myhistory/AnalysisNotice";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
-import { SelectableItemGroup } from "@/components/myhistory/SelectableItem";
+import { SelectableItemGroup, type ProjectStep } from "@/components/myhistory/SelectableItem";
 import { ListSearchField } from "@/components/searchlist/ListSearchField";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
+import { getCaseDetail } from "@/lib/api/case";
+import { ApiError } from "@/lib/api/error";
+import type { CaseDetail } from "@/types/case.type";
 
-const MOCK_PROJECT = {
-  title: "생분해성 고분자 코팅 조성물",
-  status: "선행 조사 중",
-  company: "그린폴리머(주)",
-  manager: "김도현",
-  step: "기술 분석" as const,
+// 에러코드별 메시지 정리해놓음
+const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
+  AU004: "인증이 필요합니다.",
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
 };
 
+// 백엔드가 진행 단계(currentStep)를 직접 안 줘서, 완료 시각 필드들로 프론트에서 추정
+function deriveCurrentStep(detail: CaseDetail): ProjectStep {
+  if (detail.reportCompletedAt) return "분석 리포트";
+  if (detail.noveltyCompletedAt || detail.inventiveCompletedAt) return "기술 분석";
+  return "구성요소 분해";
+}
+
+// 이 부분은 테스트용! (저장된 선행문헌 목록은 별도 API로 연동 예정)
 const MOCK_RESULTS = [
   {
     id: "patent-1",
@@ -53,8 +69,69 @@ const MOCK_RESULTS = [
   },
 ];
 
-export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default function ProjectDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
+
+  const [detail, setDetail] = useState<CaseDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(() => Boolean(id));
+  const [error, setError] = useState<string | null>(null);
+
+  //프로젝트 별 저장된 특허 목록 조회 api
+  useEffect(() => {
+    if (!id) return;
+
+    let cancelled = false;
+
+    getCaseDetail(Number(id))
+      .then((result) => {
+        if (cancelled) return;
+
+        setDetail(result);
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+
+        if (err instanceof ApiError) {
+          setError(
+            CASE_DETAIL_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "사건 정보를 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setError("사건 정보를 불러오는 중 오류가 발생했습니다.");
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
+        <BackButton />
+        <p className="text-body-15 text-caption-label">저장된 특허 목록을 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error || !detail) {
+    return (
+      <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
+        <BackButton />
+        <p className="text-body-15 text-error-default">
+          {error ?? "사건 정보를 불러오지 못했습니다."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
@@ -64,20 +141,20 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="flex w-119 max-w-full flex-col items-start gap-2">
           <div className="flex w-full items-center gap-3">
             <h1 className="min-w-0 line-clamp-1 text-headline-emphasis-28 text-title-primary">
-              {MOCK_PROJECT.title}
+              {detail.title}
             </h1>
             <Chip variant="primary" className="flex h-auto shrink-0 py-1">
-              {MOCK_PROJECT.status}
+              {detail.statusLabel}
             </Chip>
           </div>
           <div className="flex items-center gap-1 text-body-17 text-caption-label">
-            <span>{MOCK_PROJECT.company}</span>
+            <span>{detail.applicantName ?? "-"}</span>
             <span className="size-0.75 shrink-0 rounded-full bg-icon-neutral-subtle" aria-hidden />
-            <span>{MOCK_PROJECT.manager}</span>
+            <span>{detail.inventorName ?? "-"}</span>
           </div>
         </div>
 
-        <SelectableItemGroup currentStep={MOCK_PROJECT.step} />
+        <SelectableItemGroup currentStep={deriveCurrentStep(detail)} />
       </header>
 
       <div className="flex w-full items-start gap-4 self-stretch">

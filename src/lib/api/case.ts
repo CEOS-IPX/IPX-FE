@@ -4,6 +4,7 @@ import type {
   UpdateCaseRequest,
   UpdateCaseResponse,
   DeleteCaseResponse,
+  CaseDetail,
 } from "@/types/case.type";
 import { apiRequest } from "./client";
 
@@ -35,4 +36,10 @@ export function deleteCase(caseId: number) {
   return apiRequest<DeleteCaseResponse>(`/cases/${caseId}`, {
     method: "DELETE",
   });
+}
+
+// 내 활동 기록 - 사건 상세 페이지 (사건 개요 / 상태 표시 영역)
+// 사건 상세 조회 api
+export function getCaseDetail(caseId: number) {
+  return apiRequest<CaseDetail>(`/cases/${caseId}`);
 }

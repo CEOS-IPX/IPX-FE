@@ -55,3 +55,26 @@ export type UpdateCaseResponse = {
 export type DeleteCaseResponse = {
   deletedCaseId: number;
 };
+
+// 사건 상세 페이지 (개별 특허 페이지가 아니라 개별 프로젝트에 대한 api, 프로젝트 하나를 선택했을 때)
+// 사건 상세 조회 api
+export type CaseDetail = {
+  caseId: number;
+  title: string;
+  applicantName?: string | null;
+  inventorName?: string | null;
+  technicalField?: string | null;
+  description?: string | null;
+  userInputIpc: string[];
+  status: string;
+  statusLabel: string;
+  componentCount: number;
+  priorArtCount: number;
+  reportAvailable: boolean;
+  searchCompletedAt?: string | null;
+  noveltyCompletedAt?: string | null;
+  inventiveCompletedAt?: string | null;
+  reportCompletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
