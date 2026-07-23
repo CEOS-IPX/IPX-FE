@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import TrashIcon from "@/components/icons/icon-trashcan.svg";
 import { ElementTitle } from "./ElementTitle";
 
@@ -18,17 +21,23 @@ export function ElementRow({
   onChangeName,
   onChangeDescription,
 }: ElementRowProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [description]);
+
   return (
-    <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 px-4 py-3">
+    <div className="grid grid-cols-[1fr_2fr_auto] items-start gap-4 px-4 py-3">
       <ElementTitle index={index} value={name} onChange={onChangeName} />
 
       <textarea
+        ref={textareaRef}
         value={description}
-        onChange={(e) => {
-          onChangeDescription(e.target.value);
-          e.target.style.height = "auto";
-          e.target.style.height = `${e.target.scrollHeight}px`;
-        }}
+        onChange={(e) => onChangeDescription(e.target.value)}
         placeholder="구성요소 설명"
         rows={1}
         className="w-full resize-none overflow-hidden bg-transparent text-label-17 text-body-secondary placeholder:text-caption-label placeholder:text-label-17 focus:outline-none"

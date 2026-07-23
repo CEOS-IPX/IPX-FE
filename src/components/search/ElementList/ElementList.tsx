@@ -27,7 +27,7 @@ export function ElementList({
 }: ElementListProps) {
   return (
     <div className="w-full">
-      <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-4 bg-bg-neutral-hover px-4 py-2.5">
+      <div className="grid grid-cols-[1fr_2fr_auto] items-center gap-4 bg-bg-neutral-hover px-4 py-2.5">
         <span className="text-label-15 text-body-disabled">발명 구성요소</span>
         <span className="text-label-15 text-body-disabled">설명</span>
         <div className="w-11" />

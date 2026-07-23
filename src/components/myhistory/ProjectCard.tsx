@@ -7,11 +7,10 @@ import { Chip } from "./ProjectCardChip";
 import { Menu } from "./Menu";
 import { Thumbnail, type Patent } from "./Thumbnail";
 
-type ProjectStatus = "선행 조사 중" | "완료";
-
 interface ProjectCardProps {
   id: string;
-  status: ProjectStatus;
+  status: string;
+  statusVariant?: "primary" | "secondary";
   title: string;
   company: string;
   manager: string;
@@ -23,6 +22,7 @@ interface ProjectCardProps {
 export function ProjectCard({
   id,
   status,
+  statusVariant,
   title,
   company,
   manager,
@@ -51,9 +51,10 @@ export function ProjectCard({
       className="border border-outline-sub relative flex w-full flex-col rounded-lg bg-bg-surface p-6 hover:bg-bg-neutral-hover"
     >
       {" "}
-      {/* w-131에서 full로 수정 */}
       <div className="flex h-6.5 mb-4 items-center justify-between">
-        <Chip variant={status === "선행 조사 중" ? "primary" : "secondary"}>{status}</Chip>
+        <Chip variant={statusVariant ?? (status === "선행 조사 중" ? "primary" : "secondary")}>
+          {status}
+        </Chip>
 
         <div ref={menuRef} className="relative">
           <button

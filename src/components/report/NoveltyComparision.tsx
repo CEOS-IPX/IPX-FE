@@ -20,7 +20,7 @@ export default function NoveltyComparison({
   items,
 }: NoveltyComparisonProps) {
   return (
-    <section className="flex flex-col gap-5">
+    <section className="flex flex-col gap-5 print:break-before-page print:mt-10">
       <div className="flex items-center gap-2">
         <h2 className="flex text-title-emphasis-18 text-title-secondary gap-2">
           <span className="text-title-emphasis-18 text-primary-default">02</span>

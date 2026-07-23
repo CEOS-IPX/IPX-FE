@@ -1,18 +1,24 @@
 "use client";
 
-import { useState } from "react";
 import MinusIcon from "@/components/icons/icon-minus.svg";
 import PlusIcon from "@/components/icons/icon-plus.svg";
 
-export function ResultCountButton() {
-  const [count, setCount] = useState(10);
+const MIN_RESULT_COUNT = 10;
+const MAX_RESULT_COUNT = 30;
 
+type ResultCountButtonProps = {
+  count: number;
+  onChange: (count: number) => void;
+};
+
+export function ResultCountButton({ count, onChange }: ResultCountButtonProps) {
   return (
     <div className="flex items-center overflow-hidden rounded-sm bg-bg-surface border border-outline-sub text-icon-neutral-subtle">
       <button
         type="button"
-        onClick={() => setCount((n) => Math.max(1, n - 1))}
-        className="flex h-12 w-11 px-3 py-2 items-center justify-center transition-colors hover:bg-bg-neutral-hover active:bg-bg-neutral-subtle"
+        onClick={() => onChange(Math.max(MIN_RESULT_COUNT, count - 1))}
+        disabled={count <= MIN_RESULT_COUNT}
+        className="flex h-12 w-11 px-3 py-2 items-center justify-center transition-colors hover:bg-bg-neutral-hover active:bg-bg-neutral-subtle disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
       >
         <MinusIcon className="h-5 w-5 [&_path]:fill-current" />
       </button>
@@ -23,8 +29,9 @@ export function ResultCountButton() {
 
       <button
         type="button"
-        onClick={() => setCount((n) => n + 1)}
-        className="flex h-12 w-11 px-3 py-2 items-center justify-center transition-colors hover:bg-bg-neutral-hover active:bg-bg-neutral-subtle"
+        onClick={() => onChange(Math.min(MAX_RESULT_COUNT, count + 1))}
+        disabled={count >= MAX_RESULT_COUNT}
+        className="flex h-12 w-11 px-3 py-2 items-center justify-center transition-colors hover:bg-bg-neutral-hover active:bg-bg-neutral-subtle disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
       >
         <PlusIcon className="h-5 w-5 [&_path]:fill-current" />
       </button>
