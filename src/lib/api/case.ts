@@ -5,6 +5,7 @@ import type {
   UpdateCaseResponse,
   DeleteCaseResponse,
   CaseDetail,
+  GetRecentCasesResponse,
 } from "@/types/case.type";
 import { apiRequest } from "./client";
 
@@ -42,4 +43,11 @@ export function deleteCase(caseId: number) {
 // 프로젝트별 특허 목록이 아닌 헤드 데이터 조회 api
 export function getCaseDetail(caseId: number) {
   return apiRequest<CaseDetail>(`/cases/${caseId}`);
+}
+
+// 사이드바 최근 탐색
+// 최근 사건 목록 조회 api
+export function getRecentCases(limit?: number) {
+  const query = limit !== undefined ? `?limit=${limit}` : "";
+  return apiRequest<GetRecentCasesResponse>(`/cases/recent${query}`);
 }

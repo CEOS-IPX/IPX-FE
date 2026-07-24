@@ -8,6 +8,7 @@ import MyHistory from "@/components/icons/icon-group.svg";
 import Search from "@/components/icons/icon-search.svg";
 import { SidebarNavItem } from "@/components/sidebar/SidebarNavItem";
 import { PreviousSearchItem } from "@/components/sidebar/PreviousSearchItem";
+import { useRecentCases } from "@/hooks/useRecentCases";
 
 interface SidebarProps {
   open: boolean;
@@ -16,11 +17,12 @@ interface SidebarProps {
 
 export function Sidebar({ open, onToggle }: SidebarProps) {
   const pathname = usePathname();
+  const { cases: recentCases, error: recentCasesError } = useRecentCases(5);
 
   return (
     <aside
       className={`flex h-full flex-col gap-5 overflow-hidden border-r border-outline-sub py-5 transition-all duration-500 ${
-        open ? "w-72 px-3" : "w-15 px-2" // 닫혔을 때 padding을 살짝 줄여주면 좁은 공간에서 밸런스가 더 좋습니다.
+        open ? "w-72 px-3" : "w-15 px-2"
       }`}
     >
       <div className={`flex h-14 shrink-0 items-center py-2 ${open ? "px-3" : "justify-center"}`}>
@@ -62,13 +64,24 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
         />
       </nav>
 
-      <div
-        className={`flex flex-1 flex-col gap-1.5 overflow-y-auto transition-opacity ${open ? "opacity-100 duration-300 delay-200" : "pointer-events-none opacity-0 duration-500"}`}
-      >
-        <span className="px-3 text-label-13 text-title-primary">최근 탐색</span>
-        <PreviousSearchItem href="#" label="니켈 회수율을 높일 수 있는 습식제련 기..." />
-        {/* ... */}
-      </div>
+      {(recentCases.length > 0 || recentCasesError) && (
+        <div
+          className={`flex flex-1 flex-col gap-1.5 overflow-y-auto transition-opacity ${open ? "opacity-100 duration-300 delay-200" : "pointer-events-none opacity-0 duration-500"}`}
+        >
+          <span className="px-3 text-label-13 text-title-primary">최근 탐색</span>
+          {recentCasesError
+            ? open && <p className="px-3 text-label-13 text-error-default">{recentCasesError}</p>
+            : recentCases.map((recentCase) => (
+                <PreviousSearchItem
+                  key={recentCase.caseId}
+                  href={`/myhistory/${recentCase.caseId}`}
+                  label={recentCase.title}
+                  active={pathname === `/myhistory/${recentCase.caseId}`}
+                  open={open}
+                />
+              ))}
+        </div>
+      )}
     </aside>
   );
 }

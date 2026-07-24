@@ -78,3 +78,18 @@ export type CaseDetail = {
   createdAt: string;
   updatedAt: string;
 };
+
+// 사이드바 최근 탐색 영역(3개 탭 아래 부분)
+// 최근 사건 목록 조회 api
+export type RecentCase = {
+  caseId: number;
+  title: string;
+  technicalField?: string | null;
+  status: string;
+  statusLabel: string;
+  updatedAt: string;
+};
+
+export type GetRecentCasesResponse = {
+  cases: RecentCase[];
+};
