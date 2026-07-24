@@ -74,7 +74,7 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
             : recentCases.map((recentCase) => (
                 <PreviousSearchItem
                   key={recentCase.caseId}
-                  href={`/myhistory/${recentCase.caseId}`}
+                  href={`/myhistory/${recentCase.caseId}?title=${encodeURIComponent(recentCase.title)}`}
                   label={recentCase.title}
                   active={pathname === `/myhistory/${recentCase.caseId}`}
                   open={open}
