@@ -13,6 +13,16 @@ const STATUS_GROUP_BY_TAB: Record<TabValue, CaseStatusGroup> = {
   완료: "COMPLETED",
 };
 
+//수정하기 관련 에러코드
+const UPDATE_CASE_ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
+//삭제하기 관련 에러코드
 const DELETE_CASE_ERROR_MESSAGES: Record<string, string> = {
   SC001: "인증이 필요합니다.",
   CA002: "해당 사건에 접근할 권한이 없습니다.",
@@ -105,9 +115,15 @@ export function useMyHistory() {
       );
       setEditingProject(null);
     } catch (err) {
-      setModifyError(
-        err instanceof Error && err.message ? err.message : "사건 수정 중 오류가 발생했습니다."
-      );
+      if (err instanceof ApiError) {
+        setModifyError(
+          UPDATE_CASE_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "사건 수정 중 오류가 발생했습니다."
+        );
+      } else {
+        setModifyError("사건 수정 중 오류가 발생했습니다.");
+      }
     } finally {
       setIsModifying(false);
     }
@@ -134,7 +150,11 @@ export function useMyHistory() {
       }));
     } catch (err) {
       if (err instanceof ApiError) {
-        setDeleteError(DELETE_CASE_ERROR_MESSAGES[err.errorCode] ?? err.message);
+        setDeleteError(
+          DELETE_CASE_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "사건 삭제 중 오류가 발생했습니다."
+        );
       } else {
         setDeleteError("사건 삭제 중 오류가 발생했습니다.");
       }

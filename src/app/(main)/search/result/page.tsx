@@ -10,27 +10,10 @@ import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
-import { addPriorArtsManual, getPriorArts } from "@/lib/api/search";
-import type { PriorArt, PriorArtRelevance } from "@/types/search.type";
-
-const RELEVANCE_LABEL: Record<PriorArtRelevance, string> = {
-  VERY_HIGH: "매우 높음",
-  HIGH: "높음",
-  MEDIUM: "보통",
-  LOW: "낮음",
-  VERY_LOW: "매우 낮음",
-};
-
-const RELEVANCE_VARIANT: Record<
-  PriorArtRelevance,
-  "verygood" | "good" | "related" | "bad" | "hold"
-> = {
-  VERY_HIGH: "verygood",
-  HIGH: "good",
-  MEDIUM: "related",
-  LOW: "bad",
-  VERY_LOW: "hold",
-};
+import { addPriorArtsManual, getPriorArts, PRIOR_ARTS_ERROR_MESSAGES } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
+import type { PriorArt } from "@/types/search.type";
 
 function SearchResultContent() {
   const searchParams = useSearchParams();
@@ -59,11 +42,15 @@ function SearchResultContent() {
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(
-          err instanceof Error && err.message
-            ? err.message
-            : "선행문헌 목록을 불러오는 중 오류가 발생했습니다."
-        );
+        if (err instanceof ApiError) {
+          setError(
+            PRIOR_ARTS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "선행문헌 목록을 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setError("선행문헌 목록을 불러오는 중 오류가 발생했습니다.");
+        }
       })
       .finally(() => {
         if (cancelled) return;

@@ -55,3 +55,41 @@ export type UpdateCaseResponse = {
 export type DeleteCaseResponse = {
   deletedCaseId: number;
 };
+
+// 프로젝트 상세 페이지 (개별 특허 페이지가 아니라 개별 프로젝트에 대한 api, 프로젝트 하나를 선택했을 때)
+// 프로젝트별 특허 목록이 아닌 헤드 데이터 조회 api
+export type CaseDetail = {
+  caseId: number;
+  title: string;
+  applicantName?: string | null;
+  inventorName?: string | null;
+  technicalField?: string | null;
+  description?: string | null;
+  userInputIpc: string[];
+  status: string;
+  statusLabel: string;
+  componentCount: number;
+  priorArtCount: number;
+  reportAvailable: boolean;
+  searchCompletedAt?: string | null;
+  noveltyCompletedAt?: string | null;
+  inventiveCompletedAt?: string | null;
+  reportCompletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// 사이드바 최근 탐색 영역(3개 탭 아래 부분)
+// 최근 사건 목록 조회 api
+export type RecentCase = {
+  caseId: number;
+  title: string;
+  technicalField?: string | null;
+  status: string;
+  statusLabel: string;
+  updatedAt: string;
+};
+
+export type GetRecentCasesResponse = {
+  cases: RecentCase[];
+};

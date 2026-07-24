@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import { BackButton } from "@/components/ui/BackButton";
 import { AnalysisMenu } from "@/components/myhistory/AnalysisMenu";
 import { AnalysisNotice } from "@/components/myhistory/AnalysisNotice";
@@ -8,76 +11,60 @@ import { ListSearchField } from "@/components/searchlist/ListSearchField";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
+import { useCaseDetail, deriveCurrentStep } from "@/hooks/useCaseDetail";
+import { usePriorArtsList } from "@/hooks/usePriorArtsList";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
 
-const MOCK_PROJECT = {
-  title: "생분해성 고분자 코팅 조성물",
-  status: "선행 조사 중",
-  company: "그린폴리머(주)",
-  manager: "김도현",
-  step: "기술 분석" as const,
-};
+export default function ProjectDetailPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
 
-const MOCK_RESULTS = [
-  {
-    id: "patent-1",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-  {
-    id: "patent-2",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-  {
-    id: "patent-3",
-    title: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-    organization: "한국지질자원연구원",
-    year: 2024,
-    tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-    status: "등록",
-    relevanceLabel: "매우 높음",
-    recommendationReason:
-      "핵심 기능 키워드(저온/회수율) 직접 일치 · 폐리튬이온전지 적용 사례 명시 · 황산 사용량 30% 절감 청구",
-  },
-];
+  const { detail, isLoading, error } = useCaseDetail(id);
+  const { priorArts, isLoading: isPriorArtsLoading, error: priorArtsError } = usePriorArtsList(id);
 
-export default async function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  if (isLoading) {
+    return (
+      <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
+        <BackButton />
+        <p className="text-body-15 text-caption-label">불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (error || !detail) {
+    return (
+      <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
+        <BackButton />
+        <p className="text-body-15 text-error-default">
+          {error ?? "사건 정보를 불러오지 못했습니다."}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
       <BackButton />
 
       <header className="flex w-full min-w-253.25 items-end justify-between">
-        <div className="flex w-119 max-w-full flex-col items-start gap-2">
+        <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
           <div className="flex w-full items-center gap-3">
             <h1 className="min-w-0 line-clamp-1 text-headline-emphasis-28 text-title-primary">
-              {MOCK_PROJECT.title}
+              {detail.title}
             </h1>
+
             <Chip variant="primary" className="flex h-auto shrink-0 py-1">
-              {MOCK_PROJECT.status}
+              {detail.statusLabel}
             </Chip>
           </div>
           <div className="flex items-center gap-1 text-body-17 text-caption-label">
-            <span>{MOCK_PROJECT.company}</span>
+            <span>{detail.applicantName ?? "-"}</span>
             <span className="size-0.75 shrink-0 rounded-full bg-icon-neutral-subtle" aria-hidden />
-            <span>{MOCK_PROJECT.manager}</span>
+            <span>{detail.inventorName ?? "-"}</span>
           </div>
         </div>
 
-        <SelectableItemGroup currentStep={MOCK_PROJECT.step} />
+        <SelectableItemGroup currentStep={deriveCurrentStep(detail)} />
       </header>
 
       <div className="flex w-full items-start gap-4 self-stretch">
@@ -90,20 +77,29 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <div className="flex w-full flex-col gap-4">
             <ResultListHeader variant="readonly" className="w-full" />
 
-            {MOCK_RESULTS.map((result) => (
-              <Link key={result.id} href={`/tech/${result.id}`} className="block w-full">
+            {priorArtsError && <p className="text-body-15 text-error-default">{priorArtsError}</p>}
+            {isPriorArtsLoading && (
+              <p className="text-body-15 text-caption-label">불러오는 중...</p>
+            )}
+
+            {priorArts.map((priorArt) => (
+              <Link
+                key={priorArt.priorArtId}
+                href={`/tech/${priorArt.priorArtId}`}
+                className="block w-full"
+              >
                 <ProjectList
                   showCheckbox={false}
                   className="w-full cursor-pointer"
-                  title={result.title}
-                  organization={result.organization}
-                  year={result.year}
-                  tags={result.tags}
-                  status={result.status}
-                  relevanceLabel={result.relevanceLabel}
-                  relevanceVariant="verygood"
-                  recommendationReason={result.recommendationReason}
-                  thumbnailAlt={`${result.title} 대표 이미지`}
+                  title={priorArt.title}
+                  organization={priorArt.applicantName}
+                  year={priorArt.applicationDate.slice(0, 4)}
+                  tags={priorArt.keywords}
+                  status={priorArt.legalStatus}
+                  relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
+                  relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
+                  recommendationReason={priorArt.reason}
+                  thumbnailAlt={`${priorArt.title} 대표 이미지`}
                 />
               </Link>
             ))}
