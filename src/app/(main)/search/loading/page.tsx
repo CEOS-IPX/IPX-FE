@@ -22,6 +22,9 @@ const SEARCH_STATUS_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
+// 탐색 중단 api 에러코드별 메시지 (조회 api와 코드 구성이 동일)
+const SEARCH_CANCEL_ERROR_MESSAGES = SEARCH_STATUS_ERROR_MESSAGES;
+
 // 이 부분은 테스트용!
 const getMockSteps = (resultCount: number) => [
   { percent: 12, label: "검색 의도 해석 중" },
@@ -97,6 +100,7 @@ function LoadingContent() {
   // caseId가 있으면 실제 진행률 API를 폴링, 없으면 데모용 mock 진행을 보여줌(이 부분은 테스트용)
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [mockStepIndex, setMockStepIndex] = useState(0);
   const [isStopping, setIsStopping] = useState(false);
   const mockSteps = getMockSteps(resultCount);
@@ -107,13 +111,23 @@ function LoadingContent() {
       return;
     }
 
+    setCancelError(null);
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
-    } catch (err) {
-      console.error("탐색 취소 요청 실패:", err);
-    } finally {
       router.push("/search");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setCancelError(
+          SEARCH_CANCEL_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "탐색 중단 중 오류가 발생했습니다."
+        );
+      } else {
+        setCancelError("탐색 중단 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsStopping(false);
     }
   };
 
@@ -194,10 +208,16 @@ function LoadingContent() {
         )}
       </div>
 
-      <Button variant="secondary" size="sm" onClick={handleStop} disabled={isStopping}>
-        <StopIcon className="h-4 w-4 text-icon-neutral-default [&_path]:fill-current" aria-hidden />
-        탐색 중단하기
-      </Button>
+      <div className="flex flex-col items-center gap-2">
+        <Button variant="secondary" size="sm" onClick={handleStop} disabled={isStopping}>
+          <StopIcon
+            className="h-4 w-4 text-icon-neutral-default [&_path]:fill-current"
+            aria-hidden
+          />
+          탐색 중단하기
+        </Button>
+        {cancelError && <p className="text-label-13 text-error-default">{cancelError}</p>}
+      </div>
     </div>
   );
 }
