@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getCaseDetail } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { parseCaseId } from "@/lib/parseCaseId";
 import type { ProjectStep } from "@/components/myhistory/SelectableItem";
 import type { CaseDetail } from "@/types/case.type";
 
@@ -26,25 +27,27 @@ const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
 // 내 활동 기록
 // 사건 상세 조회 api
 export function useCaseDetail(id: string | undefined) {
+  const caseId = parseCaseId(id);
+
   const [detail, setDetail] = useState<CaseDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 지금 detail/error가 어느 id에 대한 결과인지 -> id가 바뀌면 아직 그 id로 fetch가 안 끝났다는 뜻이라
+  // 지금 detail/error가 어느 caseId에 대한 결과인지 -> caseId가 바뀌면 아직 그 caseId로 fetch가 안 끝났다는 뜻이라
   // isLoading을 effect 안에서 동기적으로 setState하지 않고 렌더링 시점에 비교로 도출(react-hooks/set-state-in-effect 회피)
-  const [loadedId, setLoadedId] = useState<string | undefined>(undefined);
-  const isLoading = Boolean(id) && id !== loadedId;
+  const [loadedId, setLoadedId] = useState<number | null>(null);
+  const isLoading = caseId !== null && caseId !== loadedId;
 
   useEffect(() => {
-    if (!id) return;
+    if (caseId === null) return;
 
     let cancelled = false;
 
-    getCaseDetail(Number(id))
+    getCaseDetail(caseId)
       .then((result) => {
         if (cancelled) return;
         setDetail(result);
         setError(null);
-        setLoadedId(id);
+        setLoadedId(caseId);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -57,13 +60,17 @@ export function useCaseDetail(id: string | undefined) {
         } else {
           setError("사건 정보를 불러오는 중 오류가 발생했습니다.");
         }
-        setLoadedId(id);
+        setLoadedId(caseId);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [caseId]);
+
+  if (id && caseId === null) {
+    return { detail: null, isLoading: false, error: "잘못된 사건 ID입니다." };
+  }
 
   return { detail: isLoading ? null : detail, isLoading, error: isLoading ? null : error };
 }
