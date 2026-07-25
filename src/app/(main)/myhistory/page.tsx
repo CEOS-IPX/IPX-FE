@@ -10,6 +10,7 @@ export default function MyHistoryPage() {
     activeTab,
     setActiveTab,
     counts,
+    isLoading,
     error,
     cases,
     editingProject,
@@ -29,7 +30,9 @@ export default function MyHistoryPage() {
       {error && <p className="text-body-15 text-error-default">{error}</p>}
       {deleteError && <p className="text-body-15 text-error-default">{deleteError}</p>}
 
-      {cases.length === 0 && !error ? (
+      {isLoading ? (
+        <p className="py-20 text-center text-body-15 text-caption-label">불러오는 중...</p>
+      ) : cases.length === 0 && !error ? (
         <p className="py-20 text-center text-body-emphasis-17 text-caption-label">
           선행기술 탐색 탭에서 특허를 등록해주세요.
         </p>

@@ -27,8 +27,12 @@ const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
 // 사건 상세 조회 api
 export function useCaseDetail(id: string | undefined) {
   const [detail, setDetail] = useState<CaseDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(() => Boolean(id));
   const [error, setError] = useState<string | null>(null);
+
+  // 지금 detail/error가 어느 id에 대한 결과인지 -> id가 바뀌면 아직 그 id로 fetch가 안 끝났다는 뜻이라
+  // isLoading을 effect 안에서 동기적으로 setState하지 않고 렌더링 시점에 비교로 도출(react-hooks/set-state-in-effect 회피)
+  const [loadedId, setLoadedId] = useState<string | undefined>(undefined);
+  const isLoading = Boolean(id) && id !== loadedId;
 
   useEffect(() => {
     if (!id) return;
@@ -40,6 +44,7 @@ export function useCaseDetail(id: string | undefined) {
         if (cancelled) return;
         setDetail(result);
         setError(null);
+        setLoadedId(id);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -52,10 +57,7 @@ export function useCaseDetail(id: string | undefined) {
         } else {
           setError("사건 정보를 불러오는 중 오류가 발생했습니다.");
         }
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsLoading(false);
+        setLoadedId(id);
       });
 
     return () => {
@@ -63,5 +65,5 @@ export function useCaseDetail(id: string | undefined) {
     };
   }, [id]);
 
-  return { detail, isLoading, error };
+  return { detail: isLoading ? null : detail, isLoading, error: isLoading ? null : error };
 }

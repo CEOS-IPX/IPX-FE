@@ -42,6 +42,9 @@ export function useMyHistory() {
   const [isModifying, setIsModifying] = useState(false);
   const [modifyError, setModifyError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  // activeTab이 바뀌면 아직 그 탭으로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
+  const [loadedTab, setLoadedTab] = useState<TabValue | undefined>(undefined);
+  const isLoading = activeTab !== loadedTab;
 
   //내 활동 기록 -> 사건 목록 조회(프로젝트들)
   useEffect(() => {
@@ -59,6 +62,7 @@ export function useMyHistory() {
           완료: result.completedCount,
         });
         setError(null);
+        setLoadedTab(activeTab);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -68,6 +72,7 @@ export function useMyHistory() {
             ? err.message
             : "목록을 불러오는 중 오류가 발생했습니다."
         );
+        setLoadedTab(activeTab);
       });
 
     return () => {
@@ -165,6 +170,7 @@ export function useMyHistory() {
     activeTab,
     setActiveTab,
     counts,
+    isLoading,
     error,
     cases,
 

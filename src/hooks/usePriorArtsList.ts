@@ -9,8 +9,10 @@ import type { PriorArt } from "@/types/search.type";
 // 사건별 선행문헌 목록 조회 api (탐색 결과 페이지와 동일한 api를 이 페이지에서도 사용)
 export function usePriorArtsList(caseId: string | undefined) {
   const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
-  const [isLoading, setIsLoading] = useState(() => Boolean(caseId));
   const [error, setError] = useState<string | null>(null);
+  // caseId가 바뀌면 아직 그 caseId로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
+  const [loadedCaseId, setLoadedCaseId] = useState<string | undefined>(undefined);
+  const isLoading = Boolean(caseId) && caseId !== loadedCaseId;
 
   useEffect(() => {
     if (!caseId) return;
@@ -22,6 +24,7 @@ export function usePriorArtsList(caseId: string | undefined) {
         if (cancelled) return;
         setPriorArts(result.priorArts);
         setError(null);
+        setLoadedCaseId(caseId);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -34,10 +37,7 @@ export function usePriorArtsList(caseId: string | undefined) {
         } else {
           setError("저장된 특허 목록을 불러오는 중 오류가 발생했습니다.");
         }
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsLoading(false);
+        setLoadedCaseId(caseId);
       });
 
     return () => {
@@ -45,5 +45,5 @@ export function usePriorArtsList(caseId: string | undefined) {
     };
   }, [caseId]);
 
-  return { priorArts, isLoading, error };
+  return { priorArts: isLoading ? [] : priorArts, isLoading, error: isLoading ? null : error };
 }

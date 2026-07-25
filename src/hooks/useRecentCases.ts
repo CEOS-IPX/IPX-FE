@@ -16,8 +16,10 @@ const RECENT_CASES_ERROR_MESSAGES: Record<string, string> = {
 // 사이드바 "최근 탐색" 영역 - 최근 사건 목록 조회
 export function useRecentCases(limit = 5) {
   const [cases, setCases] = useState<RecentCase[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // limit이 바뀌면 아직 그 limit으로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
+  const [loadedLimit, setLoadedLimit] = useState<number | undefined>(undefined);
+  const isLoading = limit !== loadedLimit;
 
   useEffect(() => {
     let cancelled = false;
@@ -28,6 +30,7 @@ export function useRecentCases(limit = 5) {
 
         setCases(result.cases);
         setError(null);
+        setLoadedLimit(limit);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -42,11 +45,7 @@ export function useRecentCases(limit = 5) {
         } else {
           setError("최근 사건 목록을 불러오는 중 오류가 발생했습니다.");
         }
-      })
-      .finally(() => {
-        if (cancelled) return;
-
-        setIsLoading(false);
+        setLoadedLimit(limit);
       });
 
     return () => {
