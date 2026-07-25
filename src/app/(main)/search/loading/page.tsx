@@ -5,11 +5,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import StopIcon from "@/components/icons/icon-stop.svg";
 import { Button } from "@/components/ui/Button";
 import { cancelSearch, getSearchStatus } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
 import type { SearchStatusResponse } from "@/types/search.type";
 
 const DEFAULT_RESULT_COUNT = 10;
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_RETRIES = 5;
+
+// 탐색 진행률 조회 api 에러코드별 메시지
+const SEARCH_STATUS_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  S001: "검색 정보를 찾을 수 없습니다.",
+  R001: "일시적인 시스템 오류입니다. 잠시 후 다시 시도해주세요.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
 
 // 이 부분은 테스트용!
 const getMockSteps = (resultCount: number) => [
@@ -131,8 +142,10 @@ function LoadingContent() {
         consecutiveErrors += 1;
 
         const message =
-          err instanceof Error && err.message
-            ? err.message
+          err instanceof ApiError
+            ? SEARCH_STATUS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "진행 상태 조회 중 오류가 발생했습니다."
             : "진행 상태 조회 중 오류가 발생했습니다.";
 
         if (consecutiveErrors < MAX_POLL_RETRIES) {
