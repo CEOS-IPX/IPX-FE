@@ -84,10 +84,13 @@ export async function apiRequest<T>(
   }));
 
   if (!res.ok || !json.success || json.error) {
+    // Spring Security 인증 필터 단(401)에서 컨트롤러에 도달하기 전에 막히는 요청은
+    // 공통 응답 포맷({success, data, error})을 안 거치고 {status, code, message}를 그대로 내려줄 때가 있어 같이 처리
+    const flat = json as unknown as { status?: number; code?: string; message?: string };
     const error = new ApiError({
-      status: json.error?.status ?? res.status,
-      errorCode: json.error?.code ?? "COMMON_001",
-      message: json.error?.message ?? res.statusText,
+      status: json.error?.status ?? flat.status ?? res.status,
+      errorCode: json.error?.code ?? flat.code ?? "COMMON_001",
+      message: json.error?.message ?? flat.message ?? res.statusText,
       errors: json.error?.errors,
     });
     logApiError(method, url, error.status, error.errorCode, error.message);

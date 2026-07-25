@@ -13,10 +13,7 @@ export function NoveltyRow({ comparison }: NoveltyRowProps) {
           {comparison.componentLabel}
         </span>
 
-        <div className="flex flex-col">
-          <p className="text-label-emphasis-17 text-title-secondary">{comparison.componentName}</p>
-          <p className="text-label-13 text-caption-label"> 수단</p>
-        </div>
+        <p className="text-label-emphasis-17 text-title-secondary">{comparison.componentName}</p>
       </div>
 
       <p className="text-label-15 text-caption-label">{comparison.priorArtExcerpt}</p>
