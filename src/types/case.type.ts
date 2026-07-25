@@ -3,6 +3,15 @@
 export type CaseStatusGroup = "ALL" | "PENDING" | "COMPLETED";
 export type CaseSort = "LATEST" | "OLDEST" | "TITLE";
 
+// 각 단계 완료 시각 기준으로, 지금까지 완료된 가장 마지막 단계를 나타냄
+// (진행 중/실패/취소 상태는 포함 안 됨 -> 그건 GET /cases/{caseId}/searches/status에서 따로 확인)
+export type CaseStatus =
+  | "NOT_STARTED"
+  | "SEARCH_COMPLETED"
+  | "NOVELTY_COMPLETED"
+  | "INVENTIVE_COMPLETED"
+  | "REPORT_COMPLETED";
+
 export type GetCasesParams = {
   statusGroup?: CaseStatusGroup;
   keyword?: string;
@@ -17,7 +26,7 @@ export type CaseSummary = {
   applicantName?: string | null;
   inventorName?: string | null;
   technicalField?: string | null;
-  status: string;
+  status: CaseStatus;
   statusLabel: string;
   priorArtCount: number;
   reportAvailable: boolean;
@@ -66,7 +75,7 @@ export type CaseDetail = {
   technicalField?: string | null;
   description?: string | null;
   userInputIpc: string[];
-  status: string;
+  status: CaseStatus;
   statusLabel: string;
   componentCount: number;
   priorArtCount: number;
@@ -85,7 +94,7 @@ export type RecentCase = {
   caseId: number;
   title: string;
   technicalField?: string | null;
-  status: string;
+  status: CaseStatus;
   statusLabel: string;
   updatedAt: string;
 };

@@ -139,7 +139,7 @@ export function useMyHistory() {
     setDeleteError(null);
     try {
       const result = await deleteCase(project.caseId);
-      const wasCompleted = project.status.includes("COMPLETED");
+      const wasCompleted = project.status === "REPORT_COMPLETED";
 
       setCases((prev) => prev.filter((c) => c.caseId !== result.deletedCaseId));
 

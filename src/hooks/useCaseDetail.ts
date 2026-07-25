@@ -6,11 +6,12 @@ import { ApiError } from "@/lib/api/error";
 import type { ProjectStep } from "@/components/myhistory/SelectableItem";
 import type { CaseDetail } from "@/types/case.type";
 
-// 이 부분 더 확인하고 수정할 필요 있음!!!!
+// status는 지금까지 완료된 가장 마지막 단계를 나타냄(탐색, 신규성, 진보성, 리포트 순서로!)
+// NOT_STARTED -> 구성요소 분해, SEARCH/NOVELTY/INVENTIVE_COMPLETED -> 기술 분석, REPORT_COMPLETED -> 분석 리포트
 export function deriveCurrentStep(detail: CaseDetail): ProjectStep {
-  if (detail.reportCompletedAt) return "분석 리포트";
-  if (detail.noveltyCompletedAt || detail.inventiveCompletedAt) return "기술 분석";
-  return "구성요소 분해";
+  if (detail.status === "REPORT_COMPLETED") return "분석 리포트";
+  if (detail.status === "NOT_STARTED") return "구성요소 분해";
+  return "기술 분석";
 }
 
 // 에러코드별 메시지 정리해놓음
@@ -22,7 +23,7 @@ const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
-// 내 활동 기록 - 사건 상세 페이지 (사건 개요 / 상태 표시 영역)
+// 내 활동 기록
 // 사건 상세 조회 api
 export function useCaseDetail(id: string | undefined) {
   const [detail, setDetail] = useState<CaseDetail | null>(null);

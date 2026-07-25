@@ -40,7 +40,7 @@ export default function MyHistoryPage() {
               key={project.caseId}
               id={String(project.caseId)}
               status={project.statusLabel}
-              statusVariant={project.status.includes("COMPLETED") ? "secondary" : "primary"}
+              statusVariant={project.status === "REPORT_COMPLETED" ? "secondary" : "primary"}
               title={project.title}
               company={project.applicantName ?? ""}
               manager={project.inventorName ?? ""}
