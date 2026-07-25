@@ -5,7 +5,7 @@ import { extractComponents, startSearch } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useSearchFormStore } from "@/store/searchFormStore";
 
-// api 에러코드별 메시지
+// api 에러코드별 메시지(탐색하기)
 const START_SEARCH_ERROR_MESSAGES: Record<string, string> = {
   C001: "잘못된 입력값입니다.",
   SC001: "인증이 필요합니다.",
