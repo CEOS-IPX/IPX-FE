@@ -2,7 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { extractComponents, startSearch } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
 import { useSearchFormStore } from "@/store/searchFormStore";
+
+// api 에러코드별 메시지
+const START_SEARCH_ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  SC001: "인증이 필요합니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  AU007: "사용자를 찾을 수 없습니다.",
+  S003: "진행 중인 검색이 있습니다.",
+  RQ002: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.",
+  R001: "일시적인 시스템 오류입니다. 잠시 후 다시 시도해주세요.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
 
 export function useSearchForm() {
   const router = useRouter();
@@ -149,9 +162,15 @@ export function useSearchForm() {
 
       router.push(`/search/loading?count=${resultCount}&caseId=${caseId}`);
     } catch (err) {
-      setStartSearchError(
-        err instanceof Error && err.message ? err.message : "탐색 시작 중 오류가 발생했습니다."
-      );
+      if (err instanceof ApiError) {
+        setStartSearchError(
+          START_SEARCH_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "탐색 시작 중 오류가 발생했습니다."
+        );
+      } else {
+        setStartSearchError("탐색 시작 중 오류가 발생했습니다.");
+      }
     } finally {
       setIsStartingSearch(false);
     }
