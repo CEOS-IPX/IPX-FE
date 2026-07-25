@@ -17,6 +17,15 @@ const START_SEARCH_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
+// api 에러코드별 메시지(구성요소 AI 자동 생성)
+const AI_CREATE_ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  SC001: "인증이 필요합니다.",
+  RQ002: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.",
+  PY001: "AI 검색 서버와 통신 중 오류가 발생했습니다.",
+  PY002: "AI 서버 응답 시간이 초과되었습니다.",
+};
+
 export function useSearchForm() {
   const router = useRouter();
 
@@ -113,9 +122,15 @@ export function useSearchForm() {
         }))
       );
     } catch (err) {
-      setAiCreateError(
-        err instanceof Error && err.message ? err.message : "구성요소 추출 중 오류가 발생했습니다."
-      );
+      if (err instanceof ApiError) {
+        setAiCreateError(
+          AI_CREATE_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "구성요소 추출 중 오류가 발생했습니다."
+        );
+      } else {
+        setAiCreateError("구성요소 추출 중 오류가 발생했습니다.");
+      }
     } finally {
       setIsLoading(false);
     }
