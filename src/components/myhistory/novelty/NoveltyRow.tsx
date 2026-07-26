@@ -1,5 +1,11 @@
-import { MatchStatusChip } from "./MatchStatusChip";
-import type { NoveltyComparison } from "./NoveltyTable";
+import { MatchStatusChip, type MatchStatus } from "./MatchStatusChip";
+import type { NoveltyComparison, NoveltyComparisonResult } from "@/types/novelty.type";
+
+const MATCH_STATUS_BY_RESULT: Record<NoveltyComparisonResult, MatchStatus> = {
+  IDENTICAL: "identical",
+  SIMILAR: "similar",
+  NOVEL: "novel",
+};
 
 interface NoveltyRowProps {
   comparison: NoveltyComparison;
@@ -19,10 +25,15 @@ export function NoveltyRow({ comparison }: NoveltyRowProps) {
         </div>
       </div>
 
-      <p className="text-label-15 text-caption-label">{comparison.priorArtExcerpt}</p>
+      <div className="flex min-w-0 flex-col gap-1">
+        <p className="text-label-15 text-caption-label">{comparison.disclosureText}</p>
+        {comparison.citation && (
+          <p className="text-body-13 text-body-disabled">{comparison.citation}</p>
+        )}
+      </div>
 
       <div className="flex mr-2.5 justify-end">
-        <MatchStatusChip matchStatus={comparison.matchStatus} />
+        <MatchStatusChip matchStatus={MATCH_STATUS_BY_RESULT[comparison.comparisonResult]} />
       </div>
     </div>
   );

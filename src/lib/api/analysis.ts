@@ -9,3 +9,9 @@ export function runNoveltyAnalysis(caseId: string | number) {
     }
   );
 }
+
+export function getNoveltyAnalysis(caseId: string | number) {
+  return apiRequest<NoveltyAnalysisResponse>(
+    `/cases/${encodeURIComponent(String(caseId))}/novelty-analysis`
+  );
+}
