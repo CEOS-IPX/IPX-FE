@@ -72,6 +72,7 @@ export function AnalysisMenu({ caseId }: { caseId: string }) {
       >
         {ANALYSIS_MENU_ITEMS.map((item) => {
           const isNoveltyItem = item.key === "novelty";
+          const isInventiveStepItem = item.key === "inventive-step";
           const isLoading = isNoveltyItem && isNoveltyAnalyzing;
 
           return (
@@ -80,7 +81,13 @@ export function AnalysisMenu({ caseId }: { caseId: string }) {
               type="button"
               disabled={isLoading}
               aria-busy={isLoading}
-              onClick={isNoveltyItem ? handleNoveltyAnalysis : undefined}
+              onClick={
+                isNoveltyItem
+                  ? handleNoveltyAnalysis
+                  : isInventiveStepItem
+                    ? () => router.push(`/analysis/${encodeURIComponent(caseId)}`)
+                    : undefined
+              }
               className="flex w-full cursor-pointer items-center justify-between border-b border-outline-sub py-4 pr-3 pl-3.5 text-left last:border-b-0 hover:bg-bg-neutral-hover disabled:cursor-wait disabled:bg-bg-neutral-hover"
             >
               <span className="flex min-w-0 flex-1 flex-col items-start">
