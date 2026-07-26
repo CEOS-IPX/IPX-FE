@@ -32,3 +32,9 @@ export function runInventiveStepAnalysis(
     }
   );
 }
+
+export function getInventiveStepAnalysis(caseId: string | number) {
+  return apiRequest<InventiveStepAnalysisResponse>(
+    `/cases/${encodeURIComponent(String(caseId))}/inventive-step-analysis`
+  );
+}

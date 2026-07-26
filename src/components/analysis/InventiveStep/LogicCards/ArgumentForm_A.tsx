@@ -2,22 +2,38 @@
 
 import { useState } from "react";
 import ArgumentFormHeader from "./Header";
-import { EffectTable, type Effect } from "./EffectTable/EffectTable";
+import { EffectTable, type Effect, type EffectField } from "./EffectTable/EffectTable";
 
-// 추후 api 연동 시 교체
-const MOCK_EFFECTS: Effect[] = [
-  {
-    id: crypto.randomUUID(),
-    category: "VOC 배출량",
-    unit: "g/L",
-    priorArt: "320",
-    invention: "8",
-    improvement: "97.5%",
-  },
-];
+type InitialEffect = Omit<Effect, "id">;
 
-export default function ArgumentFormA() {
-  const [effects, setEffects] = useState<Effect[]>(MOCK_EFFECTS);
+export default function ArgumentFormA({
+  initialEffects,
+  recommended,
+}: {
+  initialEffects: InitialEffect[];
+  recommended: boolean;
+}) {
+  const [effects, setEffects] = useState<Effect[]>(() =>
+    initialEffects.map((effect, index) =>
+      recommended
+        ? { ...effect, id: `effect-${index}` }
+        : {
+            id: `effect-${index}`,
+            category: "",
+            unit: "",
+            priorArt: "",
+            invention: "",
+            improvement: "",
+            placeholders: {
+              category: effect.category,
+              unit: effect.unit,
+              priorArt: effect.priorArt,
+              invention: effect.invention,
+              improvement: effect.improvement,
+            },
+          }
+    )
+  );
   const [isEditing, setIsEditing] = useState(false);
 
   const handleAdd = () => {
@@ -34,7 +50,7 @@ export default function ArgumentFormA() {
     ]);
   };
 
-  const handleChange = (id: string, field: keyof Omit<Effect, "id">, value: string) => {
+  const handleChange = (id: string, field: EffectField, value: string) => {
     setEffects((prev) =>
       prev.map((effect) => (effect.id === id ? { ...effect, [field]: value } : effect))
     );
