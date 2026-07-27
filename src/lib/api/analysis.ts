@@ -2,6 +2,8 @@ import { apiRequest } from "@/lib/api/client";
 import type {
   InventiveStepAnalysisResponse,
   RunInventiveStepAnalysisRequest,
+  UpdateInventiveArgumentRequest,
+  UpdateInventiveArgumentResponse,
 } from "@/types/inventiveStep.type";
 import type { NoveltyAnalysisResponse } from "@/types/novelty.type";
 
@@ -36,5 +38,18 @@ export function runInventiveStepAnalysis(
 export function getInventiveStepAnalysis(caseId: string | number) {
   return apiRequest<InventiveStepAnalysisResponse>(
     `/cases/${encodeURIComponent(String(caseId))}/inventive-step-analysis`
+  );
+}
+
+export function updateInventiveArgument(
+  argumentId: string | number,
+  body: UpdateInventiveArgumentRequest
+) {
+  return apiRequest<UpdateInventiveArgumentResponse>(
+    `/inventive-arguments/${encodeURIComponent(String(argumentId))}`,
+    {
+      method: "PATCH",
+      body,
+    }
   );
 }

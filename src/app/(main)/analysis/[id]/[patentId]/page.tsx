@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import ComparisionPatentBox from "@/components/analysis/InventiveStep/Comparision/ComparisionPatentBox";
 import { InventiveStepCard } from "@/components/analysis/InventiveStep/InventiveLogics/InventiveStepCard";
 import ArgumentFormA from "@/components/analysis/InventiveStep/LogicCards/ArgumentForm_A";
@@ -13,12 +14,14 @@ import {
 } from "@/constants/analysis/inventiveStep";
 import { Button } from "@/components/ui/Button";
 import { BackButton } from "@/components/ui/BackButton";
-import { getInventiveStepAnalysis } from "@/lib/api/analysis";
+import { getInventiveStepAnalysis, updateInventiveArgument } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
 import type {
   InventiveStepAnalysisResponse,
   InventiveStepArgument,
+  InventiveStepArgumentContent,
+  UpdateInventiveArgumentRequest,
 } from "@/types/inventiveStep.type";
 
 const ARGUMENT_TYPE_TO_LOGIC_KEY: Record<
@@ -46,6 +49,8 @@ const INVENTIVE_STEP_ERROR_MESSAGES: Record<string, string> = {
   CA002: "해당 사건에 접근할 권한이 없습니다.",
   CA001: "사건을 찾을 수 없습니다.",
   I003: "진보성 분석 결과가 존재하지 않습니다.",
+  I004: "수정할 진보성 논리 항목을 찾을 수 없습니다.",
+  C001: "수정할 내용을 확인해주세요.",
   C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 };
 
@@ -56,7 +61,9 @@ function getArgument(analysis: InventiveStepAnalysisResponse, logicKey: Inventiv
 
 function renderArgumentForm(
   analysis: InventiveStepAnalysisResponse,
-  logicKey: InventiveStepLogicKey
+  logicKey: InventiveStepLogicKey,
+  contentIsPlaceholder: boolean,
+  onSave: (argumentId: number, content: InventiveStepArgumentContent) => Promise<void>
 ) {
   const argument = getArgument(analysis, logicKey);
   if (!argument) return null;
@@ -65,8 +72,13 @@ function renderArgumentForm(
     case "NUMERICAL_LIMIT":
       return (
         <ArgumentFormA
-          recommended={argument.recommended}
-          initialEffects={argument.content.effect_items.map((effect) => ({
+          recommended={!contentIsPlaceholder}
+          onSave={(effectItems) =>
+            onSave(argument.argumentId, {
+              effect_items: effectItems,
+            })
+          }
+          initialEffects={(argument.content.effect_items ?? []).map((effect) => ({
             category: effect.metric,
             unit: effect.unit,
             priorArt: effect.prior_art_value,
@@ -78,28 +90,30 @@ function renderArgumentForm(
     case "COMBINATION_MOTIVATION":
       return (
         <ArgumentFormB
-          initialBackgroundLimit={argument.content.background_limit}
-          initialTeachingAway={argument.content.teaching_away}
-          recommended={argument.recommended}
+          initialBackgroundLimit={argument.content.background_limit ?? ""}
+          initialTeachingAway={argument.content.teaching_away ?? ""}
+          recommended={!contentIsPlaceholder}
+          onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
     case "COMMON_TECHNIQUE": {
-      const target = [argument.content.target_label, argument.content.target_name]
+      const target = [argument.content.target_label ?? "", argument.content.target_name ?? ""]
         .filter(Boolean)
         .join(". ");
 
       return (
         <ArgumentFormC
           initialTarget={target}
-          initialRebuttal={argument.content.rebuttal}
-          recommended={argument.recommended}
+          initialRebuttal={argument.content.rebuttal ?? ""}
+          recommended={!contentIsPlaceholder}
+          onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
     }
     case "SIMPLE_DESIGN": {
       const changedComponent = [
-        argument.content.changed_component_label,
-        argument.content.changed_component_name,
+        argument.content.changed_component_label ?? "",
+        argument.content.changed_component_name ?? "",
       ]
         .filter(Boolean)
         .join(". ");
@@ -107,8 +121,9 @@ function renderArgumentForm(
       return (
         <ArgumentFormD
           initialChangedComponent={changedComponent}
-          initialNonObviousness={argument.content.non_obviousness}
-          recommended={argument.recommended}
+          initialNonObviousness={argument.content.non_obviousness ?? ""}
+          recommended={!contentIsPlaceholder}
+          onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
     }
@@ -121,6 +136,7 @@ export default function AnalysisReportPage({
   params: Promise<{ id: string; patentId: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const isAuthInitialized = useAuthStore((state) => state.isInitialized);
   const accessToken = useAuthStore((state) => state.accessToken);
   const [result, setResult] = useState<{
@@ -133,6 +149,9 @@ export default function AnalysisReportPage({
   } | null>(null);
   const [reloadCount, setReloadCount] = useState(0);
   const [selectedLogics, setSelectedLogics] = useState<Set<InventiveStepLogicKey>>(new Set());
+  const [placeholderArgumentIds, setPlaceholderArgumentIds] = useState<Set<number>>(new Set());
+  const [updatingLogics, setUpdatingLogics] = useState<Set<InventiveStepLogicKey>>(new Set());
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthInitialized || !accessToken) return;
@@ -150,6 +169,13 @@ export default function AnalysisReportPage({
             data.arguments
               .filter((argument) => argument.recommended)
               .map((argument) => ARGUMENT_TYPE_TO_LOGIC_KEY[argument.argumentType])
+          )
+        );
+        setPlaceholderArgumentIds(
+          new Set(
+            data.arguments
+              .filter((argument) => !argument.recommended)
+              .map((argument) => argument.argumentId)
           )
         );
       })
@@ -179,16 +205,84 @@ export default function AnalysisReportPage({
         : null
       : INVENTIVE_STEP_ERROR_MESSAGES.SC001;
 
-  const toggleLogic = (key: InventiveStepLogicKey) => {
-    setSelectedLogics((previous) => {
+  const applyArgumentUpdate = (
+    updatedArgument: InventiveStepArgument,
+    body: UpdateInventiveArgumentRequest
+  ) => {
+    setResult((previous) => {
+      if (!previous || previous.caseId !== id) return previous;
+
+      return {
+        ...previous,
+        analysis: {
+          ...previous.analysis,
+          arguments: previous.analysis.arguments.map((argument) =>
+            argument.argumentId === updatedArgument.argumentId
+              ? {
+                  ...argument,
+                  recommended: updatedArgument.recommended,
+                  ...(body.content ? { content: body.content } : {}),
+                }
+              : argument
+          ) as InventiveStepArgument[],
+        },
+      };
+    });
+  };
+
+  const saveArgument = async (argumentId: number, body: UpdateInventiveArgumentRequest) => {
+    try {
+      const updatedArgument = await updateInventiveArgument(argumentId, body);
+      applyArgumentUpdate(updatedArgument, body);
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? (INVENTIVE_STEP_ERROR_MESSAGES[error.errorCode] ?? error.message)
+          : "진보성 논리 수정 중 네트워크 오류가 발생했습니다.";
+      throw new Error(message);
+    }
+  };
+
+  const saveArgumentContent = async (argumentId: number, content: InventiveStepArgumentContent) => {
+    await saveArgument(argumentId, { content });
+    setPlaceholderArgumentIds((previous) => {
       const next = new Set(previous);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
+      next.delete(argumentId);
       return next;
     });
+  };
+
+  const toggleLogic = async (key: InventiveStepLogicKey) => {
+    if (!analysis || updatingLogics.has(key)) return;
+
+    const argument = getArgument(analysis, key);
+    if (!argument) return;
+
+    const nextRecommended = !selectedLogics.has(key);
+
+    setUpdatingLogics((previous) => new Set(previous).add(key));
+    setUpdateError(null);
+
+    try {
+      await saveArgument(argument.argumentId, { recommended: nextRecommended });
+      setSelectedLogics((previous) => {
+        const next = new Set(previous);
+        if (nextRecommended) {
+          next.add(key);
+        } else {
+          next.delete(key);
+        }
+        return next;
+      });
+    } catch (error) {
+      setUpdateError(error instanceof Error ? error.message : "선택 상태를 저장하지 못했습니다.");
+    } finally {
+      setUpdatingLogics((previous) => {
+        const next = new Set(previous);
+        next.delete(key);
+        return next;
+      });
+    }
   };
 
   if (!isAuthInitialized || (accessToken && !analysis && !errorMessage)) {
@@ -212,6 +306,7 @@ export default function AnalysisReportPage({
             setResult(null);
             setRequestError(null);
             setSelectedLogics(new Set());
+            setPlaceholderArgumentIds(new Set());
             setReloadCount((count) => count + 1);
           }}
         >
@@ -260,10 +355,17 @@ export default function AnalysisReportPage({
               description={logic.description}
               aiRecommended={getArgument(analysis, logic.key)?.recommended ?? false}
               selected={selectedLogics.has(logic.key)}
+              disabled={updatingLogics.has(logic.key)}
               onClick={() => toggleLogic(logic.key)}
             />
           ))}
         </div>
+
+        {updateError && (
+          <p role="alert" className="text-body-13 text-error-default">
+            {updateError}
+          </p>
+        )}
 
         <div className="mt-3 flex flex-col gap-3">
           {selectedLogics.size === 0 ? (
@@ -274,7 +376,14 @@ export default function AnalysisReportPage({
             INVENTIVE_STEP_LOGIC_TYPES.filter((logic) => selectedLogics.has(logic.key)).map(
               (logic) => (
                 <div key={`${analysis.analysisId}-${logic.key}`}>
-                  {renderArgumentForm(analysis, logic.key)}
+                  {renderArgumentForm(
+                    analysis,
+                    logic.key,
+                    placeholderArgumentIds.has(
+                      getArgument(analysis, logic.key)?.argumentId ?? Number.NaN
+                    ),
+                    saveArgumentContent
+                  )}
                 </div>
               )
             )
@@ -282,8 +391,8 @@ export default function AnalysisReportPage({
         </div>
       </div>
 
-      <Button variant="secondary" className="mt-4">
-        저장 후 목록으로
+      <Button variant="secondary" className="mt-4" onClick={() => router.push("/analysis")}>
+        목록으로
       </Button>
     </div>
   );

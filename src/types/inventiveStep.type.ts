@@ -16,6 +16,7 @@ export type NumericalLimitEffectItem = {
 
 export type InventiveStepArgument =
   | {
+      argumentId: number;
       argumentType: "NUMERICAL_LIMIT";
       recommended: boolean;
       content: {
@@ -23,6 +24,7 @@ export type InventiveStepArgument =
       };
     }
   | {
+      argumentId: number;
       argumentType: "COMBINATION_MOTIVATION";
       recommended: boolean;
       content: {
@@ -31,6 +33,7 @@ export type InventiveStepArgument =
       };
     }
   | {
+      argumentId: number;
       argumentType: "COMMON_TECHNIQUE";
       recommended: boolean;
       content: {
@@ -40,6 +43,7 @@ export type InventiveStepArgument =
       };
     }
   | {
+      argumentId: number;
       argumentType: "SIMPLE_DESIGN";
       recommended: boolean;
       content: {
@@ -48,6 +52,15 @@ export type InventiveStepArgument =
         non_obviousness: string;
       };
     };
+
+export type InventiveStepArgumentContent = InventiveStepArgument["content"];
+
+export type UpdateInventiveArgumentRequest = {
+  recommended?: boolean | null;
+  content?: InventiveStepArgumentContent | Record<string, never> | null;
+};
+
+export type UpdateInventiveArgumentResponse = InventiveStepArgument;
 
 export type RunInventiveStepAnalysisRequest = {
   primaryApplicationNumber: string;

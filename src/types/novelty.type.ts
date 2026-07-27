@@ -11,6 +11,7 @@ export type NoveltyPrimaryArt = {
 };
 
 export type NoveltyComparison = {
+  comparisonId: number;
   componentLabel: string;
   componentName: string;
   comparisonResult: NoveltyComparisonResult;

@@ -15,8 +15,8 @@ export default function NoveltyTable({ comparisons }: NoveltyTableProps) {
       </div>
 
       <div>
-        {comparisons.map((comparison, index) => (
-          <NoveltyRow key={`${comparison.componentLabel}-${index}`} comparison={comparison} />
+        {comparisons.map((comparison) => (
+          <NoveltyRow key={comparison.comparisonId} comparison={comparison} />
         ))}
       </div>
     </div>

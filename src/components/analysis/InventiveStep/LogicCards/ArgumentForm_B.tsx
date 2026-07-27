@@ -8,18 +8,45 @@ interface ArgumentFormBProps {
   initialBackgroundLimit: string;
   initialTeachingAway: string;
   recommended: boolean;
+  onSave: (content: { background_limit: string; teaching_away: string }) => Promise<void>;
 }
 
 export default function ArgumentFormB({
   initialBackgroundLimit,
   initialTeachingAway,
   recommended,
+  onSave,
 }: ArgumentFormBProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [backgroundLimitation, setBackgroundLimitation] = useState(
     recommended ? initialBackgroundLimit : ""
   );
   const [teachingAway, setTeachingAway] = useState(recommended ? initialTeachingAway : "");
+
+  const handleToggleEdit = async () => {
+    if (!isEditing) {
+      setSaveError(null);
+      setIsEditing(true);
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      await onSave({
+        background_limit: backgroundLimitation,
+        teaching_away: teachingAway,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "수정 내용을 저장하지 못했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full pt-7 px-9 pb-9 flex flex-col gap-6 bg-bg-surface border border-outline-sub rounded-lg">
@@ -28,7 +55,8 @@ export default function ArgumentFormB({
         subtitle="Teaching Away 논리"
         description="내 발명에서 수치(파라미터)가 법적 권리를 확보할 수 있는지를 검토해요"
         isEditing={isEditing}
-        onToggleEdit={() => setIsEditing((prev) => !prev)}
+        isSaving={isSaving}
+        onToggleEdit={handleToggleEdit}
       />
 
       <div className="flex flex-col gap-10">
@@ -48,6 +76,12 @@ export default function ArgumentFormB({
           isEditing={isEditing}
         />
       </div>
+
+      {saveError && (
+        <p role="alert" className="text-body-13 text-error-default">
+          {saveError}
+        </p>
+      )}
     </div>
   );
 }

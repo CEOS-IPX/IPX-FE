@@ -8,16 +8,51 @@ interface ArgumentFormCProps {
   initialTarget: string;
   initialRebuttal: string;
   recommended: boolean;
+  onSave: (content: {
+    target_label: string;
+    target_name: string;
+    rebuttal: string;
+  }) => Promise<void>;
 }
 
 export default function ArgumentFormC({
   initialTarget,
   initialRebuttal,
   recommended,
+  onSave,
 }: ArgumentFormCProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState(recommended ? initialTarget : "");
   const [counterArgument, setCounterArgument] = useState(recommended ? initialRebuttal : "");
+
+  const handleToggleEdit = async () => {
+    if (!isEditing) {
+      setSaveError(null);
+      setIsEditing(true);
+      return;
+    }
+
+    const [targetLabel, ...targetNameParts] = rejectionReason.split(". ");
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      await onSave({
+        target_label: targetNameParts.length > 0 ? targetLabel.trim() : "",
+        target_name:
+          targetNameParts.length > 0 ? targetNameParts.join(". ").trim() : rejectionReason.trim(),
+        rebuttal: counterArgument,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "수정 내용을 저장하지 못했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full p-6 flex flex-col gap-5 bg-bg-surface border border-outline-sub rounded-lg">
@@ -25,7 +60,8 @@ export default function ArgumentFormC({
         title="주지관용기술"
         subtitle="주지관용기술 반박 논리"
         isEditing={isEditing}
-        onToggleEdit={() => setIsEditing((prev) => !prev)}
+        isSaving={isSaving}
+        onToggleEdit={handleToggleEdit}
       />
 
       <div className="flex flex-col gap-10">
@@ -45,6 +81,12 @@ export default function ArgumentFormC({
           isEditing={isEditing}
         />
       </div>
+
+      {saveError && (
+        <p role="alert" className="text-body-13 text-error-default">
+          {saveError}
+        </p>
+      )}
     </div>
   );
 }
