@@ -1,8 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { extractComponents, startSearch } from "@/lib/api/search";
+import { getCaseComponents } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { parseCaseId } from "@/lib/parseCaseId";
 import { useSearchFormStore } from "@/store/searchFormStore";
 
 // api 에러코드별 메시지(탐색하기)
@@ -26,8 +29,20 @@ const AI_CREATE_ERROR_MESSAGES: Record<string, string> = {
   PY002: "AI 서버 응답 시간이 초과되었습니다.",
 };
 
+// api 에러코드별 메시지(재탐색하기)
+const GET_CASE_COMPONENTS_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
 export function useSearchForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const reSearchCaseId = parseCaseId(searchParams.get("caseId") ?? undefined);
+
+  const [loadComponentsError, setLoadComponentsError] = useState<string | null>(null);
 
   const {
     title,
@@ -66,6 +81,8 @@ export function useSearchForm() {
     setIsModalOpen,
     aiCreateError,
     setAiCreateError,
+    prefilledCaseId,
+    setPrefilledCaseId,
     isStartingSearch,
     setIsStartingSearch,
     startSearchError,
@@ -81,6 +98,49 @@ export function useSearchForm() {
   const isComponentsFilled =
     elements.length > 0 && elements.every((el) => el.name.trim() && el.description.trim());
   const isReadyToStart = isInventionInfoFilled && isApplicantInfoFilled && isComponentsFilled;
+
+  const isLoadingComponents = reSearchCaseId !== null && reSearchCaseId !== prefilledCaseId;
+
+  useEffect(() => {
+    if (reSearchCaseId === null || reSearchCaseId === prefilledCaseId) return;
+
+    let cancelled = false;
+
+    getCaseComponents(reSearchCaseId)
+      .then((result) => {
+        if (cancelled) return;
+
+        if (result.components.length > 0) {
+          setElements(
+            result.components.map((component) => ({
+              id: crypto.randomUUID(),
+              name: component.name,
+              description: component.description,
+            }))
+          );
+        }
+        setLoadComponentsError(null);
+        setPrefilledCaseId(reSearchCaseId);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+
+        if (err instanceof ApiError) {
+          setLoadComponentsError(
+            GET_CASE_COMPONENTS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "구성요소 목록을 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setLoadComponentsError("구성요소 목록을 불러오는 중 오류가 발생했습니다.");
+        }
+        setPrefilledCaseId(reSearchCaseId);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reSearchCaseId, prefilledCaseId, setElements, setPrefilledCaseId]);
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -227,6 +287,9 @@ export function useSearchForm() {
     handleDelete,
     handleChange,
     handleAICreate,
+
+    isLoadingComponents,
+    loadComponentsError,
 
     resultCount,
     setResultCount,

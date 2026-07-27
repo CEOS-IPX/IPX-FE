@@ -28,6 +28,7 @@ type SearchFormState = {
   isLoading: boolean;
   isStartingSearch: boolean;
   startSearchError: string | null;
+  prefilledCaseId: number | null;
 };
 
 type SearchFormActions = {
@@ -51,6 +52,7 @@ type SearchFormActions = {
   setIsLoading: (v: boolean) => void;
   setIsStartingSearch: (v: boolean) => void;
   setStartSearchError: (v: string | null) => void;
+  setPrefilledCaseId: (v: number) => void;
 };
 
 // /search 페이지 작성 중 탐색 중단하기, 에러나서 탐색 중단 등으로 다시 이전 페이지로언마운트돼도
@@ -76,6 +78,7 @@ export const useSearchFormStore = create<SearchFormState & SearchFormActions>((s
   isLoading: false,
   isStartingSearch: false,
   startSearchError: null,
+  prefilledCaseId: null,
 
   setTitle: (title) => set({ title }),
   setTechnicalField: (technicalField) => set({ technicalField }),
@@ -100,4 +103,5 @@ export const useSearchFormStore = create<SearchFormState & SearchFormActions>((s
   setIsLoading: (isLoading) => set({ isLoading }),
   setIsStartingSearch: (isStartingSearch) => set({ isStartingSearch }),
   setStartSearchError: (startSearchError) => set({ startSearchError }),
+  setPrefilledCaseId: (prefilledCaseId) => set({ prefilledCaseId }),
 }));

@@ -6,6 +6,7 @@ import type {
   DeleteCaseResponse,
   CaseDetail,
   GetRecentCasesResponse,
+  GetCaseComponentsResponse,
 } from "@/types/case.type";
 import { apiRequest } from "./client";
 
@@ -50,4 +51,9 @@ export function getCaseDetail(caseId: number) {
 export function getRecentCases(limit?: number) {
   const query = limit !== undefined ? `?limit=${limit}` : "";
   return apiRequest<GetRecentCasesResponse>(`/cases/recent${query}`);
+}
+
+// 재탐색하기(프로젝트 개별 상세 페이지에서) -> 사건에 저장된 구성요소 목록 조회 api
+export function getCaseComponents(caseId: number) {
+  return apiRequest<GetCaseComponentsResponse>(`/cases/${caseId}/components`);
 }
