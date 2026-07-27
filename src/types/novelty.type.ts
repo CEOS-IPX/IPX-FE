@@ -26,3 +26,15 @@ export type NoveltyAnalysisResponse = {
   conclusionText: string;
   comparisons: NoveltyComparison[];
 };
+
+export type UpdateNoveltyComparisonRequest = {
+  comparisonResult: NoveltyComparisonResult;
+  citation?: string | null;
+};
+
+export type UpdateNoveltyComparisonResponse = {
+  comparisonId: number;
+  comparisonResult: NoveltyComparisonResult;
+  comparisonResultLabel: string;
+  citation?: string | null;
+};

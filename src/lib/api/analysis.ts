@@ -5,7 +5,11 @@ import type {
   UpdateInventiveArgumentRequest,
   UpdateInventiveArgumentResponse,
 } from "@/types/inventiveStep.type";
-import type { NoveltyAnalysisResponse } from "@/types/novelty.type";
+import type {
+  NoveltyAnalysisResponse,
+  UpdateNoveltyComparisonRequest,
+  UpdateNoveltyComparisonResponse,
+} from "@/types/novelty.type";
 
 export function runNoveltyAnalysis(caseId: string | number) {
   return apiRequest<NoveltyAnalysisResponse>(
@@ -47,6 +51,19 @@ export function updateInventiveArgument(
 ) {
   return apiRequest<UpdateInventiveArgumentResponse>(
     `/inventive-arguments/${encodeURIComponent(String(argumentId))}`,
+    {
+      method: "PATCH",
+      body,
+    }
+  );
+}
+
+export function updateNoveltyComparison(
+  comparisonId: string | number,
+  body: UpdateNoveltyComparisonRequest
+) {
+  return apiRequest<UpdateNoveltyComparisonResponse>(
+    `/novelty-comparisons/${encodeURIComponent(String(comparisonId))}`,
     {
       method: "PATCH",
       body,

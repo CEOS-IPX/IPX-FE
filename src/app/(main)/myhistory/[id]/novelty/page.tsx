@@ -6,10 +6,14 @@ import { BackButton } from "@/components/ui/BackButton";
 import Header from "@/components/myhistory/novelty/Header";
 import Similarity from "@/components/myhistory/novelty/Similarity";
 import NoveltyTable from "@/components/myhistory/novelty/NoveltyTable";
-import { getNoveltyAnalysis } from "@/lib/api/analysis";
+import { getNoveltyAnalysis, updateNoveltyComparison } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
-import type { NoveltyAnalysisResponse, NoveltyOverallSimilarity } from "@/types/novelty.type";
+import type {
+  NoveltyAnalysisResponse,
+  NoveltyOverallSimilarity,
+  UpdateNoveltyComparisonRequest,
+} from "@/types/novelty.type";
 
 const SIMILARITY_LABELS: Record<NoveltyOverallSimilarity, string> = {
   VERY_HIGH: "매우 높음",
@@ -20,10 +24,12 @@ const SIMILARITY_LABELS: Record<NoveltyOverallSimilarity, string> = {
 };
 
 const NOVELTY_ANALYSIS_ERROR_MESSAGES: Record<string, string> = {
+  C001: "수정할 내용을 확인해주세요.",
   SC001: "로그인이 필요합니다.",
   CA002: "해당 사건에 접근할 권한이 없습니다.",
   CA001: "사건을 찾을 수 없습니다.",
   N001: "신규성 분석 결과가 존재하지 않습니다.",
+  N002: "수정할 신규성 비교 결과를 찾을 수 없습니다.",
   C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 };
 
@@ -78,6 +84,41 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
         : null
       : NOVELTY_ANALYSIS_ERROR_MESSAGES.SC001;
 
+  const handleComparisonSave = async (
+    comparisonId: number,
+    body: UpdateNoveltyComparisonRequest
+  ) => {
+    try {
+      const updated = await updateNoveltyComparison(comparisonId, body);
+
+      setResult((previous) => {
+        if (!previous || previous.caseId !== id) return previous;
+
+        return {
+          ...previous,
+          analysis: {
+            ...previous.analysis,
+            comparisons: previous.analysis.comparisons.map((comparison) =>
+              comparison.comparisonId === updated.comparisonId
+                ? {
+                    ...comparison,
+                    comparisonResult: updated.comparisonResult,
+                    citation: updated.citation !== undefined ? updated.citation : body.citation,
+                  }
+                : comparison
+            ),
+          },
+        };
+      });
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? (NOVELTY_ANALYSIS_ERROR_MESSAGES[error.errorCode] ?? error.message)
+          : "신규성 비교 결과 수정 중 네트워크 오류가 발생했습니다.";
+      throw new Error(message);
+    }
+  };
+
   if (!isAuthInitialized || (accessToken && !analysis && !errorMessage)) {
     return (
       <div className="flex min-h-80 items-center justify-center">
@@ -129,7 +170,7 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
         reason={analysis.conclusionText}
       />
 
-      <NoveltyTable comparisons={analysis.comparisons} />
+      <NoveltyTable comparisons={analysis.comparisons} onSave={handleComparisonSave} />
     </div>
   );
 }
