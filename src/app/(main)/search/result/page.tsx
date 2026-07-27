@@ -4,16 +4,33 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
-import { Pagination } from "@/components/searchlist/Pagination";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
-import { addPriorArtsManual, getPriorArts, PRIOR_ARTS_ERROR_MESSAGES } from "@/lib/api/search";
+import {
+  addPriorArtsManual,
+  getPriorArts,
+  PRIOR_ARTS_ERROR_MESSAGES,
+  ADD_PRIOR_ARTS_MANUAL_ERROR_MESSAGES,
+} from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
-import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT, RELEVANCE_RANK } from "@/lib/priorArtRelevance";
 import type { PriorArt } from "@/types/search.type";
+
+const SORT_OPTIONS = ["관련도 순", "최신순"] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
+function sortPriorArts(priorArts: PriorArt[], sortOption: SortOption): PriorArt[] {
+  const sorted = [...priorArts];
+  if (sortOption === "최신순") {
+    sorted.sort((a, b) => b.applicationDate.localeCompare(a.applicationDate));
+  } else {
+    sorted.sort((a, b) => RELEVANCE_RANK[b.relevance] - RELEVANCE_RANK[a.relevance]);
+  }
+  return sorted;
+}
 
 function SearchResultContent() {
   const searchParams = useSearchParams();
@@ -26,6 +43,9 @@ function SearchResultContent() {
   const [isPatentImportModalOpen, setIsPatentImportModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+  const [sortOption, setSortOption] = useState<SortOption>("관련도 순");
+
+  const sortedPriorArts = sortPriorArts(priorArts, sortOption);
 
   //선행기술 목록 불러오는 api
   useEffect(() => {
@@ -80,9 +100,15 @@ function SearchResultContent() {
       setTotalCount(result.totalCount);
       setIsPatentImportModalOpen(false);
     } catch (err) {
-      setImportError(
-        err instanceof Error && err.message ? err.message : "선행문헌 추가 중 오류가 발생했습니다."
-      );
+      if (err instanceof ApiError) {
+        setImportError(
+          ADD_PRIOR_ARTS_MANUAL_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "선행문헌 추가 중 오류가 발생했습니다."
+        );
+      } else {
+        setImportError("선행문헌 추가 중 오류가 발생했습니다.");
+      }
     } finally {
       setIsImporting(false);
     }
@@ -100,7 +126,11 @@ function SearchResultContent() {
 
       <section className="flex h-[158.625rem] w-full flex-col items-center gap-4 self-stretch">
         <div className="flex w-full items-end justify-between self-stretch">
-          <SortingTag label="관련도 순" options={["관련도 순", "최신순"]} />
+          <SortingTag
+            label="관련도 순"
+            options={[...SORT_OPTIONS]}
+            onChange={(value) => setSortOption(value as SortOption)}
+          />
           <Button
             size="sm"
             variant="primary"
@@ -121,7 +151,7 @@ function SearchResultContent() {
           <div className="flex w-full flex-col gap-4 self-stretch">
             <ResultListHeader variant="readonly" className="w-full" />
 
-            {priorArts.map((priorArt) => (
+            {sortedPriorArts.map((priorArt) => (
               <Link
                 key={priorArt.priorArtId}
                 href={`/tech/${priorArt.priorArtId}`}
@@ -143,8 +173,6 @@ function SearchResultContent() {
               </Link>
             ))}
           </div>
-
-          <Pagination page={1} totalPages={1} />
         </div>
       </section>
 

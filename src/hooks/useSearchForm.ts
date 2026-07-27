@@ -264,7 +264,9 @@ export function useSearchForm() {
           : undefined,
       });
 
-      router.push(`/search/loading?count=${resultCount}&caseId=${caseId}`);
+      router.push(
+        `/search/loading?count=${resultCount}&caseId=${caseId}&title=${encodeURIComponent(title)}`
+      );
     } catch (err) {
       if (err instanceof ApiError) {
         setStartSearchError(

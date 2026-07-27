@@ -96,8 +96,8 @@ function LoadingContent() {
   const searchParams = useSearchParams();
   const resultCount = Number(searchParams.get("count")) || DEFAULT_RESULT_COUNT;
   const caseId = searchParams.get("caseId");
+  const title = searchParams.get("title");
 
-  // caseId가 있으면 실제 진행률 API를 폴링, 없으면 데모용 mock 진행을 보여줌(이 부분은 테스트용)
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -149,7 +149,9 @@ function LoadingContent() {
         if (result.status === "in_progress") {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
         } else if (result.status === "completed") {
-          router.push(`/search/result?caseId=${caseId}`);
+          router.push(
+            `/search/result?caseId=${caseId}${title ? `&title=${encodeURIComponent(title)}` : ""}`
+          );
         }
       } catch (err) {
         if (cancelled) return;
@@ -177,7 +179,7 @@ function LoadingContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [caseId, router]);
+  }, [caseId, router, title]);
 
   useEffect(() => {
     if (caseId) return;
