@@ -117,3 +117,14 @@ export type GetCaseComponentsResponse = {
   componentCount: number;
   components: CaseComponent[];
 };
+
+// 구성요소 수정 사항 재저장 + 탐색 시작 api
+export type UpdateCaseComponentsRequest = {
+  components: { name: string; description: string }[];
+};
+
+export type UpdateCaseComponentsResponse = {
+  caseId: number;
+  componentCount: number;
+  components: CaseComponent[];
+};
