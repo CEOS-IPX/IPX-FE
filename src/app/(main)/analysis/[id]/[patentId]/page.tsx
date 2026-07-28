@@ -14,7 +14,6 @@ import {
 } from "@/constants/analysis/inventiveStep";
 import { Button } from "@/components/ui/Button";
 import { BackButton } from "@/components/ui/BackButton";
-import { CreateReportForm } from "@/components/report/CreateReportForm";
 import { getInventiveStepAnalysis, updateInventiveArgument } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
@@ -392,9 +391,7 @@ export default function AnalysisReportPage({
         </div>
       </div>
 
-      <CreateReportForm caseId={id} />
-
-      <Button variant="secondary" onClick={() => router.push("/analysis")}>
+      <Button variant="secondary" className="mt-4" onClick={() => router.push("/analysis")}>
         목록으로
       </Button>
     </div>
