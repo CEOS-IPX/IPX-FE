@@ -11,9 +11,15 @@ import type { CaseDetail } from "@/types/case.type";
 // 신규성/진보성 분석은 순서 상관없이 독립적으로 실행 가능하므로, status(단일 값) 대신
 // 각 단계별 완료 시각 필드로 개별 판단 -> "기술 분석"은 신규성+진보성 둘 다 끝났을 때만 완료로 표시
 export function deriveCompletedSteps(detail: CaseDetail): Record<ProjectStep, boolean> {
+  const technicalAnalysisCompleted =
+    (Boolean(detail.noveltyCompletedAt) && Boolean(detail.inventiveCompletedAt)) ||
+    detail.status === "INVENTIVE_COMPLETED" ||
+    detail.status === "REPORT_COMPLETED" ||
+    detail.reportAvailable;
+
   return {
     "구성요소 분해": detail.status !== "NOT_STARTED",
-    "기술 분석": Boolean(detail.noveltyCompletedAt) && Boolean(detail.inventiveCompletedAt),
+    "기술 분석": technicalAnalysisCompleted,
     "분석 리포트": detail.status === "REPORT_COMPLETED",
   };
 }
