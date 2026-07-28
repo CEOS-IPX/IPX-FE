@@ -19,3 +19,12 @@ export const RELEVANCE_VARIANT: Record<
   LOW: "bad",
   VERY_LOW: "hold",
 };
+
+// 정렬 방식 -> 관련도 순 정렬 위한 순위!!
+export const RELEVANCE_RANK: Record<PriorArtRelevance, number> = {
+  VERY_HIGH: 4,
+  HIGH: 3,
+  MEDIUM: 2,
+  LOW: 1,
+  VERY_LOW: 0,
+};

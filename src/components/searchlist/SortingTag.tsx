@@ -54,7 +54,7 @@ export const SortingTag = forwardRef<HTMLButtonElement, SortingTagProps>(
           aria-haspopup="listbox"
           aria-expanded={open}
           className={cn(
-            "inline-flex cursor-pointer items-center justify-center rounded-[0.375rem] border border-outline-default bg-bg-surface py-2 pr-2 pl-4 text-label-15",
+            "inline-flex cursor-pointer items-center justify-center rounded-md border border-outline-default bg-bg-surface py-2 pr-2 pl-4 text-label-15",
             open ? "text-primary-default" : "text-body-secondary",
             disabled && "cursor-not-allowed",
             className
@@ -79,7 +79,7 @@ export const SortingTag = forwardRef<HTMLButtonElement, SortingTagProps>(
           <div
             role="listbox"
             aria-label="정렬 방식"
-            className="absolute top-[calc(100%+0.5rem)] left-0 z-10 flex w-[9.75rem] flex-col items-start justify-center rounded-[0.375rem] bg-bg-surface shadow-[0_1px_6px_0_rgba(144,155,165,0.36)]"
+            className="absolute top-[calc(100%+0.5rem)] left-0 z-10 flex w-39 flex-col items-start justify-center rounded-md bg-bg-surface shadow-[0_1px_6px_0_rgba(144,155,165,0.36)]"
           >
             {options.map((option) => {
               const active = option === selected;
@@ -91,7 +91,7 @@ export const SortingTag = forwardRef<HTMLButtonElement, SortingTagProps>(
                   role="option"
                   aria-selected={active}
                   className={cn(
-                    "flex w-full cursor-pointer items-center gap-2 rounded-[0.25rem] px-3 py-2.5 text-left text-label-15 hover:bg-bg-neutral-hover",
+                    "flex w-full cursor-pointer items-center gap-2 rounded-sm px-3 py-2.5 text-left text-label-15 hover:bg-bg-neutral-hover",
                     active ? "text-primary-default" : "text-body-secondary"
                   )}
                   onClick={() => handleSelect(option)}

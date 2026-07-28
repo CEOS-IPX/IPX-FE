@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import InformationA from "@/components/search/items/InformationA";
 import InformationB from "@/components/search/items/InformationB";
 import InformationC from "@/components/search/items/InformationC";
@@ -8,12 +9,16 @@ import { Footer } from "@/components/search/Footer";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { useSearchForm } from "@/hooks/useSearchForm";
 
-export default function SearchPage() {
+function SearchPageContent() {
   const form = useSearchForm();
 
   return (
     <div className="flex flex-col gap-15 px-20 py-5">
       <h1 className="text-headline-28 text-title-primary">새로운 선행 기술 탐색하기</h1>
+
+      {form.loadCaseDetailError && (
+        <p className="text-label-13 text-error-default">{form.loadCaseDetailError}</p>
+      )}
 
       <InformationA
         title={form.title}
@@ -39,9 +44,13 @@ export default function SearchPage() {
         onChangeClientName={form.setClientName}
       />
 
+      {form.loadComponentsError && (
+        <p className="ml-10 text-label-13 text-error-default">{form.loadComponentsError}</p>
+      )}
+
       <InformationC
         elements={form.elements}
-        isLoading={form.isLoading}
+        isLoading={form.isLoading || form.isLoadingComponents}
         aiCreateError={form.aiCreateError}
         onAICreate={form.handleAICreate}
         onAdd={form.handleAdd}
@@ -79,5 +88,13 @@ export default function SearchPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={null}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

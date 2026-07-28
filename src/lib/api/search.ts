@@ -64,6 +64,19 @@ export function addPriorArtsManual(caseId: number, body: AddPriorArtsManualReque
   });
 }
 
+// 에러코드별 메시지(수동으로 특허 추가 api)
+export const ADD_PRIOR_ARTS_MANUAL_ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  P002: "모든 특허가 이미 추가되어 있습니다.",
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  RQ002: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.",
+  PY001: "AI 검색 서버와 통신 중 오류가 발생했습니다.",
+  PY002: "AI 서버 응답 시간이 초과되었습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
 // 선행기술 탐색 결과 상세 페이지
 // 선행문헌 상세 조회 api(특허 개별 페이지)
 export function getPriorArtDetail(priorArtId: number) {

@@ -5,11 +5,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import StopIcon from "@/components/icons/icon-stop.svg";
 import { Button } from "@/components/ui/Button";
 import { cancelSearch, getSearchStatus } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
 import type { SearchStatusResponse } from "@/types/search.type";
 
 const DEFAULT_RESULT_COUNT = 10;
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_RETRIES = 5;
+
+// 탐색 진행률 조회 api 에러코드별 메시지
+const SEARCH_STATUS_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  S001: "검색 정보를 찾을 수 없습니다.",
+  R001: "일시적인 시스템 오류입니다. 잠시 후 다시 시도해주세요.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
+// 탐색 중단 api 에러코드별 메시지 (조회 api와 코드 구성이 동일)
+const SEARCH_CANCEL_ERROR_MESSAGES = SEARCH_STATUS_ERROR_MESSAGES;
 
 // 이 부분은 테스트용!
 const getMockSteps = (resultCount: number) => [
@@ -82,10 +96,11 @@ function LoadingContent() {
   const searchParams = useSearchParams();
   const resultCount = Number(searchParams.get("count")) || DEFAULT_RESULT_COUNT;
   const caseId = searchParams.get("caseId");
+  const title = searchParams.get("title");
 
-  // caseId가 있으면 실제 진행률 API를 폴링, 없으면 데모용 mock 진행을 보여줌(이 부분은 테스트용)
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [mockStepIndex, setMockStepIndex] = useState(0);
   const [isStopping, setIsStopping] = useState(false);
   const mockSteps = getMockSteps(resultCount);
@@ -96,13 +111,23 @@ function LoadingContent() {
       return;
     }
 
+    setCancelError(null);
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
-    } catch (err) {
-      console.error("탐색 취소 요청 실패:", err);
-    } finally {
       router.push("/search");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setCancelError(
+          SEARCH_CANCEL_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "탐색 중단 중 오류가 발생했습니다."
+        );
+      } else {
+        setCancelError("탐색 중단 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsStopping(false);
     }
   };
 
@@ -124,15 +149,19 @@ function LoadingContent() {
         if (result.status === "in_progress") {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
         } else if (result.status === "completed") {
-          router.push(`/search/result?caseId=${caseId}`);
+          router.push(
+            `/search/result?caseId=${caseId}${title ? `&title=${encodeURIComponent(title)}` : ""}`
+          );
         }
       } catch (err) {
         if (cancelled) return;
         consecutiveErrors += 1;
 
         const message =
-          err instanceof Error && err.message
-            ? err.message
+          err instanceof ApiError
+            ? SEARCH_STATUS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "진행 상태 조회 중 오류가 발생했습니다."
             : "진행 상태 조회 중 오류가 발생했습니다.";
 
         if (consecutiveErrors < MAX_POLL_RETRIES) {
@@ -150,7 +179,7 @@ function LoadingContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [caseId, router]);
+  }, [caseId, router, title]);
 
   useEffect(() => {
     if (caseId) return;
@@ -181,10 +210,16 @@ function LoadingContent() {
         )}
       </div>
 
-      <Button variant="secondary" size="sm" onClick={handleStop} disabled={isStopping}>
-        <StopIcon className="h-4 w-4 text-icon-neutral-default [&_path]:fill-current" aria-hidden />
-        탐색 중단하기
-      </Button>
+      <div className="flex flex-col items-center gap-2">
+        <Button variant="secondary" size="sm" onClick={handleStop} disabled={isStopping}>
+          <StopIcon
+            className="h-4 w-4 text-icon-neutral-default [&_path]:fill-current"
+            aria-hidden
+          />
+          탐색 중단하기
+        </Button>
+        {cancelError && <p className="text-label-13 text-error-default">{cancelError}</p>}
+      </div>
     </div>
   );
 }

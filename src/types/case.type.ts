@@ -102,3 +102,29 @@ export type RecentCase = {
 export type GetRecentCasesResponse = {
   cases: RecentCase[];
 };
+
+// 재탐색하기(프로젝트 개별 상세 페이지 -> 재탐색하기 버튼 누르면 구성요소 분해 페이지로 이동+저장내용 다시 불러옴) -> 사건에 저장된 구성요소 목록 조회 api
+export type CaseComponent = {
+  componentId: number;
+  displayOrder: number;
+  label: string;
+  name: string;
+  description: string;
+};
+
+export type GetCaseComponentsResponse = {
+  caseId: number;
+  componentCount: number;
+  components: CaseComponent[];
+};
+
+// 구성요소 수정 사항 재저장 + 탐색 시작 api
+export type UpdateCaseComponentsRequest = {
+  components: { name: string; description: string }[];
+};
+
+export type UpdateCaseComponentsResponse = {
+  caseId: number;
+  componentCount: number;
+  components: CaseComponent[];
+};

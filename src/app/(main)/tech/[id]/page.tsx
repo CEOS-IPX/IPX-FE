@@ -11,11 +11,23 @@ import { TagChip } from "@/components/searchlist/TagChip";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
 import { getPriorArtDetail } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
+import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import type { PriorArtDetail } from "@/types/search.type";
 
 // 백엔드 legalStatus enum 전체 목록이 확인되지 않아 확인된 값만 매핑, 나머지는 원본 값 그대로 표시
 const LEGAL_STATUS_LABEL: Record<string, string> = {
   REGISTERED: "등록",
+};
+
+// 선행문헌 상세 조회 api 에러코드별 메시지
+const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  P001: "해당 선행기술을 찾을 수 없습니다.",
+  P003: "선행기술 문서를 찾을 수 없습니다.",
+  O001: "특허 검색 서버와 통신 중 오류가 발생했습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
 };
 
 // rrfScore -> 관련도 등급 변환 기준(백엔드 확정 스펙 없음, 우선 프론트에서 추정한 임시 기준)
@@ -56,6 +68,7 @@ export default function TechDetailPage() {
   const [detail, setDetail] = useState<PriorArtDetail | null>(null);
   const [isLoading, setIsLoading] = useState(() => Boolean(priorArtId));
   const [error, setError] = useState<string | null>(null);
+  const thumbnailUrl = useKiprisThumbnail(detail?.applicationNumber);
 
   //선행문헌 상세 조회
   useEffect(() => {
@@ -73,11 +86,15 @@ export default function TechDetailPage() {
       .catch((err) => {
         if (cancelled) return;
 
-        setError(
-          err instanceof Error && err.message
-            ? err.message
-            : "선행문헌 상세를 불러오는 중 오류가 발생했습니다."
-        );
+        if (err instanceof ApiError) {
+          setError(
+            PRIOR_ART_DETAIL_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "선행문헌 상세를 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setError("선행문헌 상세를 불러오는 중 오류가 발생했습니다.");
+        }
       })
       .finally(() => {
         if (cancelled) return;
@@ -130,9 +147,10 @@ export default function TechDetailPage() {
           <header className="flex w-full items-end gap-9 self-stretch">
             <div className="flex min-w-0 flex-1 items-start gap-5.25">
               <div
-                role="img"
-                aria-label="선행기술 대표 이미지"
+                role={thumbnailUrl ? "img" : undefined}
+                aria-label={thumbnailUrl ? "선행기술 대표 이미지" : undefined}
                 className="flex size-25 shrink-0 aspect-square items-center justify-center gap-2.5 rounded-sm border border-outline-sub bg-bg-neutral-subtle bg-cover bg-center bg-no-repeat p-2.5"
+                style={thumbnailUrl ? { backgroundImage: `url("${thumbnailUrl}")` } : undefined}
               />
 
               <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
