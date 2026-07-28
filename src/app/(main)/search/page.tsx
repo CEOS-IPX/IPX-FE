@@ -16,6 +16,10 @@ function SearchPageContent() {
     <div className="flex flex-col gap-15 px-20 py-5">
       <h1 className="text-headline-28 text-title-primary">새로운 선행 기술 탐색하기</h1>
 
+      {form.loadCaseDetailError && (
+        <p className="text-label-13 text-error-default">{form.loadCaseDetailError}</p>
+      )}
+
       <InformationA
         title={form.title}
         onChangeTitle={form.setTitle}

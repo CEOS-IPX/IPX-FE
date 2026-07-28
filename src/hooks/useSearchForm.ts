@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { extractComponents, startSearch } from "@/lib/api/search";
-import { getCaseComponents, updateCaseComponents } from "@/lib/api/case";
+import { getCaseComponents, getCaseDetail, updateCaseComponents } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
 import { parseCaseId } from "@/lib/parseCaseId";
 import { useSearchFormStore } from "@/store/searchFormStore";
@@ -29,6 +29,15 @@ const AI_CREATE_ERROR_MESSAGES: Record<string, string> = {
   PY002: "AI 서버 응답 시간이 초과되었습니다.",
 };
 
+// api 에러코드별 메시지(재탐색하기 -> 사건 상세 조회)
+const GET_CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
+  AU004: "인증이 필요합니다.",
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
+
 // api 에러코드별 메시지(재탐색하기 -> 구성요소 목록 조회)
 const GET_CASE_COMPONENTS_ERROR_MESSAGES: Record<string, string> = {
   SC001: "인증이 필요합니다.",
@@ -52,6 +61,7 @@ export function useSearchForm() {
   const reSearchCaseId = parseCaseId(searchParams.get("caseId") ?? undefined);
 
   const [loadComponentsError, setLoadComponentsError] = useState<string | null>(null);
+  const [loadCaseDetailError, setLoadCaseDetailError] = useState<string | null>(null);
 
   const {
     title,
@@ -110,12 +120,39 @@ export function useSearchForm() {
 
   const isLoadingComponents = reSearchCaseId !== null && reSearchCaseId !== prefilledCaseId;
 
+  //재탐색하기 시에 저장 내용을 자동으로 채워줌
   useEffect(() => {
     if (reSearchCaseId === null || reSearchCaseId === prefilledCaseId) return;
 
     let cancelled = false;
 
-    getCaseComponents(reSearchCaseId)
+    const loadDetail = getCaseDetail(reSearchCaseId)
+      .then((detail) => {
+        if (cancelled) return;
+
+        setTitle(detail.title);
+        setTechnicalField(detail.technicalField ?? "");
+        setDescription(detail.description ?? "");
+        setApplicantName(detail.applicantName ?? "");
+        setInventorName(detail.inventorName ?? "");
+        setIpcInput(detail.userInputIpc.join(", "));
+        setLoadCaseDetailError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+
+        if (err instanceof ApiError) {
+          setLoadCaseDetailError(
+            GET_CASE_DETAIL_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "사건 정보를 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setLoadCaseDetailError("사건 정보를 불러오는 중 오류가 발생했습니다.");
+        }
+      });
+
+    const loadComponents = getCaseComponents(reSearchCaseId)
       .then((result) => {
         if (cancelled) return;
 
@@ -129,7 +166,6 @@ export function useSearchForm() {
           );
         }
         setLoadComponentsError(null);
-        setPrefilledCaseId(reSearchCaseId);
       })
       .catch((err) => {
         if (cancelled) return;
@@ -143,13 +179,28 @@ export function useSearchForm() {
         } else {
           setLoadComponentsError("구성요소 목록을 불러오는 중 오류가 발생했습니다.");
         }
-        setPrefilledCaseId(reSearchCaseId);
       });
+
+    Promise.allSettled([loadDetail, loadComponents]).then(() => {
+      if (cancelled) return;
+      setPrefilledCaseId(reSearchCaseId);
+    });
 
     return () => {
       cancelled = true;
     };
-  }, [reSearchCaseId, prefilledCaseId, setElements, setPrefilledCaseId]);
+  }, [
+    reSearchCaseId,
+    prefilledCaseId,
+    setElements,
+    setPrefilledCaseId,
+    setTitle,
+    setTechnicalField,
+    setDescription,
+    setApplicantName,
+    setInventorName,
+    setIpcInput,
+  ]);
 
   const handleAdd = () => {
     setElements((prev) => [...prev, { id: crypto.randomUUID(), name: "", description: "" }]);
@@ -321,6 +372,7 @@ export function useSearchForm() {
 
     isLoadingComponents,
     loadComponentsError,
+    loadCaseDetailError,
 
     resultCount,
     setResultCount,

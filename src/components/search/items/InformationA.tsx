@@ -65,7 +65,7 @@ export default function InformationA({
           <TextField
             labelSize={17}
             label="IPC 분류"
-            placeholder="EX) C09D 5/00 (여러 개는 콤마로 구분)"
+            placeholder="EX) C09D 5/00 (2개 이상은 쉼표로 구분)"
             gap={1.5}
             value={ipcInput}
             onChange={(e) => onChangeIpcInput(e.target.value)}
