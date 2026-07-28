@@ -22,6 +22,11 @@ const ANALYSIS_MENU_ITEMS = [
     title: "신규성 분석",
     description: "선행기술 대비 분석",
   },
+  {
+    key: "report",
+    title: "분석 리포트",
+    description: "종합 보고서",
+  },
 ] as const;
 
 const NOVELTY_ANALYSIS_ERROR_MESSAGES: Record<string, string> = {
@@ -39,7 +44,15 @@ const NOVELTY_ANALYSIS_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 };
 
-export function AnalysisMenu({ caseId, title }: { caseId: string; title: string }) {
+export function AnalysisMenu({
+  caseId,
+  title,
+  showReport,
+}: {
+  caseId: string;
+  title: string;
+  showReport: boolean;
+}) {
   const router = useRouter();
   const [isNoveltyAnalyzing, setIsNoveltyAnalyzing] = useState(false);
   const [noveltyAnalysisError, setNoveltyAnalysisError] = useState<string | null>(null);
@@ -71,10 +84,11 @@ export function AnalysisMenu({ caseId, title }: { caseId: string; title: string 
         className="flex w-full flex-col items-center overflow-hidden rounded-lg border border-outline-sub bg-bg-surface"
         aria-label="활동 기록 분석 메뉴"
       >
-        {ANALYSIS_MENU_ITEMS.map((item) => {
+        {ANALYSIS_MENU_ITEMS.filter((item) => item.key !== "report" || showReport).map((item) => {
           const isResearchItem = item.key === "research";
           const isNoveltyItem = item.key === "novelty";
           const isInventiveStepItem = item.key === "inventive-step";
+          const isReportItem = item.key === "report";
           const isLoading = isNoveltyItem && isNoveltyAnalyzing;
 
           return (
@@ -90,7 +104,12 @@ export function AnalysisMenu({ caseId, title }: { caseId: string; title: string 
                     ? handleNoveltyAnalysis
                     : isInventiveStepItem
                       ? () => router.push(`/analysis/${encodeURIComponent(caseId)}${titleQuery}`)
-                      : undefined
+                      : isReportItem
+                        ? () =>
+                            router.push(
+                              `/myhistory/${encodeURIComponent(caseId)}/report${titleQuery}`
+                            )
+                        : undefined
               }
               className="flex w-full cursor-pointer items-center justify-between border-b border-outline-sub py-4 pr-3 pl-3.5 text-left last:border-b-0 hover:bg-bg-neutral-hover disabled:cursor-wait disabled:bg-bg-neutral-hover"
             >

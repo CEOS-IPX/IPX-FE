@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getCaseDetail } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
 import { parseCaseId } from "@/lib/parseCaseId";
+import { useAuthStore } from "@/store/authStore";
 import type { ProjectStep } from "@/components/myhistory/SelectableItem";
 import type { CaseDetail } from "@/types/case.type";
 
@@ -30,6 +31,9 @@ const CASE_DETAIL_ERROR_MESSAGES: Record<string, string> = {
 // 사건 상세 조회 api
 export function useCaseDetail(id: string | undefined) {
   const caseId = parseCaseId(id);
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const canRequest = isAuthInitialized && Boolean(accessToken);
 
   const [detail, setDetail] = useState<CaseDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -37,10 +41,10 @@ export function useCaseDetail(id: string | undefined) {
   // 지금 detail/error가 어느 caseId에 대한 결과인지 -> caseId가 바뀌면 아직 그 caseId로 fetch가 안 끝났다는 뜻이라
   // isLoading을 effect 안에서 동기적으로 setState하지 않고 렌더링 시점에 비교로 도출(react-hooks/set-state-in-effect 회피)
   const [loadedId, setLoadedId] = useState<number | null>(null);
-  const isLoading = caseId !== null && caseId !== loadedId;
+  const isLoading = !isAuthInitialized || (canRequest && caseId !== null && caseId !== loadedId);
 
   useEffect(() => {
-    if (caseId === null) return;
+    if (caseId === null || !canRequest) return;
 
     let cancelled = false;
 
@@ -68,10 +72,14 @@ export function useCaseDetail(id: string | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [caseId]);
+  }, [canRequest, caseId]);
 
   if (id && caseId === null) {
     return { detail: null, isLoading: false, error: "잘못된 사건 ID입니다." };
+  }
+
+  if (isAuthInitialized && !accessToken) {
+    return { detail: null, isLoading: false, error: "인증이 필요합니다." };
   }
 
   return { detail: isLoading ? null : detail, isLoading, error: isLoading ? null : error };

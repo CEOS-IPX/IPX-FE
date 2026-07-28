@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { deleteCase, getCases, updateCase } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { useAuthStore } from "@/store/authStore";
 import { useRecentCasesStore } from "@/store/recentCasesStore";
 import type { CaseStatusGroup, CaseSummary } from "@/types/case.type";
 
@@ -34,6 +35,9 @@ const DELETE_CASE_ERROR_MESSAGES: Record<string, string> = {
 type EditingProject = { id: string; title: string; company: string; manager: string };
 
 export function useMyHistory() {
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const canRequest = isAuthInitialized && Boolean(accessToken);
   const [activeTab, setActiveTab] = useState<TabValue>("전체");
   const [editingProject, setEditingProject] = useState<EditingProject | null>(null);
   const [cases, setCases] = useState<CaseSummary[]>([]);
@@ -45,10 +49,12 @@ export function useMyHistory() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   // activeTab이 바뀌면 아직 그 탭으로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
   const [loadedTab, setLoadedTab] = useState<TabValue | undefined>(undefined);
-  const isLoading = activeTab !== loadedTab;
+  const isLoading = !isAuthInitialized || (canRequest && activeTab !== loadedTab);
 
   //내 활동 기록 -> 사건 목록 조회(프로젝트들)
   useEffect(() => {
+    if (!canRequest) return;
+
     let cancelled = false;
 
     getCases({ statusGroup: STATUS_GROUP_BY_TAB[activeTab], size: 50 })
@@ -79,7 +85,7 @@ export function useMyHistory() {
     return () => {
       cancelled = true;
     };
-  }, [activeTab]);
+  }, [activeTab, canRequest]);
 
   const openEditModal = (project: CaseSummary) => {
     setModifyError(null);
@@ -174,7 +180,7 @@ export function useMyHistory() {
     setActiveTab,
     counts,
     isLoading,
-    error,
+    error: isAuthInitialized && !accessToken ? "인증이 필요합니다." : error,
     cases,
 
     editingProject,

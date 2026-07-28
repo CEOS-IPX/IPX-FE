@@ -54,6 +54,8 @@ export default function ProjectDetailPage() {
     );
   }
 
+  const showReport = detail.reportAvailable;
+
   return (
     <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
       <BackButton />
@@ -132,8 +134,8 @@ export default function ProjectDetailPage() {
         </section>
 
         <div className="flex w-70 shrink-0 flex-col gap-3">
-          <AnalysisMenu caseId={id} title={detail.title} />
-          <AnalysisNotice />
+          <AnalysisMenu caseId={id} title={detail.title} showReport={showReport} />
+          {!showReport && <AnalysisNotice />}
         </div>
       </div>
     </div>
