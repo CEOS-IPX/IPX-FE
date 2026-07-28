@@ -13,7 +13,7 @@ type SelectableItemProps = {
 };
 
 type SelectableItemGroupProps = {
-  currentStep: ProjectStep;
+  completed: Record<ProjectStep, boolean>;
 };
 
 export function SelectableItem({ label, completed, current }: SelectableItemProps) {
@@ -33,17 +33,19 @@ export function SelectableItem({ label, completed, current }: SelectableItemProp
   );
 }
 
-export function SelectableItemGroup({ currentStep }: SelectableItemGroupProps) {
-  const currentStepIndex = PROJECT_STEPS.indexOf(currentStep);
+export function SelectableItemGroup({ completed }: SelectableItemGroupProps) {
+  // 아직 완료되지 않은 첫 단계를 "현재 단계"로 표시(전부 완료됐으면 마지막 단계)
+  const currentStep =
+    PROJECT_STEPS.find((step) => !completed[step]) ?? PROJECT_STEPS[PROJECT_STEPS.length - 1];
 
   return (
     <ol className="flex items-center gap-3" aria-label="활동 기록 진행 단계">
-      {PROJECT_STEPS.map((step, index) => (
+      {PROJECT_STEPS.map((step) => (
         <SelectableItem
           key={step}
           label={step}
-          completed={index <= currentStepIndex}
-          current={index === currentStepIndex}
+          completed={completed[step]}
+          current={step === currentStep}
         />
       ))}
     </ol>

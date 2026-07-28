@@ -10,6 +10,7 @@ export type AnalysisProject = {
   company: string;
   manager: string;
   isAnalysisDone: boolean;
+  updatedAt: string;
 };
 
 // 백엔드에 분석완료 여부를 나타내는 별도 필드가 없어, 진보성 분석까지 끝난 사건(진보성/리포트 완료)만 "분석 완료"로 간주
@@ -21,6 +22,7 @@ function toAnalysisProject(project: CaseSummary): AnalysisProject {
     manager: project.inventorName ?? "",
     isAnalysisDone:
       project.status === "INVENTIVE_COMPLETED" || project.status === "REPORT_COMPLETED",
+    updatedAt: project.updatedAt,
   };
 }
 

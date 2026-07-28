@@ -7,12 +7,14 @@ import { parseCaseId } from "@/lib/parseCaseId";
 import type { ProjectStep } from "@/components/myhistory/SelectableItem";
 import type { CaseDetail } from "@/types/case.type";
 
-// status는 지금까지 완료된 가장 마지막 단계를 나타냄(탐색, 신규성, 진보성, 리포트 순서로!)
-// NOT_STARTED -> 구성요소 분해, SEARCH/NOVELTY/INVENTIVE_COMPLETED -> 기술 분석, REPORT_COMPLETED -> 분석 리포트
-export function deriveCurrentStep(detail: CaseDetail): ProjectStep {
-  if (detail.status === "REPORT_COMPLETED") return "분석 리포트";
-  if (detail.status === "NOT_STARTED") return "구성요소 분해";
-  return "기술 분석";
+// 신규성/진보성 분석은 순서 상관없이 독립적으로 실행 가능하므로, status(단일 값) 대신
+// 각 단계별 완료 시각 필드로 개별 판단 -> "기술 분석"은 신규성+진보성 둘 다 끝났을 때만 완료로 표시
+export function deriveCompletedSteps(detail: CaseDetail): Record<ProjectStep, boolean> {
+  return {
+    "구성요소 분해": detail.status !== "NOT_STARTED",
+    "기술 분석": Boolean(detail.noveltyCompletedAt) && Boolean(detail.inventiveCompletedAt),
+    "분석 리포트": detail.status === "REPORT_COMPLETED",
+  };
 }
 
 // 에러코드별 메시지 정리해놓음
