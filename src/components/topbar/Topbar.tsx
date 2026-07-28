@@ -22,6 +22,8 @@ const PAGE_LABELS: Record<string, string> = {
 const PROJECT_DETAIL_PATTERN = /^\/myhistory\/[^/]+$/;
 // 리포트: /myhistory/{id}/report
 const REPORT_PATH_PATTERN = /^\/myhistory\/[^/]+\/report$/;
+// 기술 분석 상세: /analysis/{id}
+const ANALYSIS_DETAIL_PATTERN = /^\/analysis\/[^/]+$/;
 
 function getBreadcrumbSegments(pathname: string, titleParam: string | null): string[] {
   const title = titleParam?.trim();
@@ -34,6 +36,9 @@ function getBreadcrumbSegments(pathname: string, titleParam: string | null): str
   }
   if (PROJECT_DETAIL_PATTERN.test(pathname)) {
     return ["내 활동 기록", title || MOCK_PROJECT_TITLE];
+  }
+  if (ANALYSIS_DETAIL_PATTERN.test(pathname)) {
+    return ["기술 분석", title || MOCK_PROJECT_TITLE];
   }
   if (PAGE_LABELS[pathname]) {
     return [PAGE_LABELS[pathname]];

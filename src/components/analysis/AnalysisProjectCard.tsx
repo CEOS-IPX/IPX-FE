@@ -45,7 +45,7 @@ export function AnalysisProjectCard({
 
   return (
     <Link
-      href={`/analysis/${id}`}
+      href={`/analysis/${id}?title=${encodeURIComponent(title)}`}
       className="relative flex w-full flex-col gap-6 rounded-lg border border-outline-sub bg-bg-surface p-6 hover:bg-bg-neutral-hover"
     >
       <div className="flex flex-col gap-1">

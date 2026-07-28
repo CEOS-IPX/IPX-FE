@@ -13,12 +13,8 @@ import { Button } from "@/components/ui/Button";
 import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
+import { LEGAL_STATUS_LABEL, formatPeriod } from "@/lib/priorArtFormat";
 import type { PriorArtDetail } from "@/types/search.type";
-
-// 백엔드 legalStatus enum 전체 목록이 확인되지 않아 확인된 값만 매핑, 나머지는 원본 값 그대로 표시
-const LEGAL_STATUS_LABEL: Record<string, string> = {
-  REGISTERED: "등록",
-};
 
 // 선행문헌 상세 조회 api 에러코드별 메시지
 const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
@@ -40,25 +36,6 @@ function getRelevance(rrfScore: number): {
   if (rrfScore >= 0.4) return { label: "보통", variant: "related" };
   if (rrfScore >= 0.2) return { label: "낮음", variant: "bad" };
   return { label: "매우 낮음", variant: "hold" };
-}
-
-function formatPeriod(from?: string | null, to?: string | null): string {
-  if (!from || !to) return "-";
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) return "-";
-
-  let months =
-    (toDate.getFullYear() - fromDate.getFullYear()) * 12 +
-    (toDate.getMonth() - fromDate.getMonth());
-  if (toDate.getDate() < fromDate.getDate()) months -= 1;
-  if (months < 0) return "-";
-
-  const years = Math.floor(months / 12);
-  const remainMonths = months % 12;
-  if (years === 0) return `${remainMonths}개월`;
-  if (remainMonths === 0) return `${years}년`;
-  return `${years}년 ${remainMonths}개월`;
 }
 
 export default function TechDetailPage() {
