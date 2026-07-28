@@ -7,7 +7,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { getPriorArts, getPriorArtDetail, PRIOR_ARTS_ERROR_MESSAGES } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
-import { LEGAL_STATUS_LABEL, formatPeriod } from "@/lib/priorArtFormat";
+import { formatPeriod } from "@/lib/priorArtFormat";
 import { useAnalysisStore } from "@/store/analysisStore";
 import type { PriorArt } from "@/types/search.type";
 
@@ -95,9 +95,7 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
 
     try {
       const detail = await getPriorArtDetail(priorArt.priorArtId);
-      const legalStatusLabel = detail.legalStatus
-        ? (LEGAL_STATUS_LABEL[detail.legalStatus] ?? detail.legalStatus)
-        : "-";
+      const legalStatusLabel = detail.legalStatus ?? "-";
 
       setSelectedPatent({
         id: detail.priorArtId,
@@ -140,7 +138,6 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
 
         {priorArts.map((priorArt) => {
           const highlighted = selectedPatent?.id === priorArt.priorArtId;
-          const legalStatusLabel = LEGAL_STATUS_LABEL[priorArt.legalStatus] ?? priorArt.legalStatus;
 
           const handleClick = () => {
             handleSelect(priorArt);
@@ -157,7 +154,7 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
               organization={priorArt.applicantName}
               year={priorArt.applicationDate.slice(0, 4)}
               tags={priorArt.keywords}
-              status={legalStatusLabel}
+              status={priorArt.legalStatus}
               relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
               relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
               applicationNumber={priorArt.applicationNumber}

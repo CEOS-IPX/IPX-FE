@@ -1,8 +1,4 @@
-// 백엔드 legalStatus enum 전체 목록이 확인되지 않아 확인된 값만 매핑, 나머지는 원본 값 그대로 표시
-export const LEGAL_STATUS_LABEL: Record<string, string> = {
-  REGISTERED: "등록",
-};
-
+// legalStatus는 AI 검색 결과에서 그대로 내려오는 한글 값(등록/공개/소멸/거절/취하/포기/무효)이라 별도 매핑 없이 그대로 표시
 export function formatPeriod(from?: string | null, to?: string | null): string {
   if (!from || !to) return "-";
   const fromDate = new Date(from);

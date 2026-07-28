@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/Button";
 import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
-import { LEGAL_STATUS_LABEL, formatPeriod } from "@/lib/priorArtFormat";
+import { formatPeriod } from "@/lib/priorArtFormat";
 import type { PriorArtDetail } from "@/types/search.type";
 
 // 선행문헌 상세 조회 api 에러코드별 메시지
@@ -26,7 +26,7 @@ const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
-// rrfScore -> 관련도 등급 변환 기준(백엔드 확정 스펙 없음, 우선 프론트에서 추정한 임시 기준)
+// rrfScore -> 관련도 등급 변환 기준(백엔드와 확인 완료, 동일 임계값 사용 중)
 function getRelevance(rrfScore: number): {
   label: string;
   variant: "verygood" | "good" | "related" | "bad" | "hold";
@@ -105,9 +105,7 @@ export default function TechDetailPage() {
     );
   }
 
-  const legalStatusLabel = detail.legalStatus
-    ? (LEGAL_STATUS_LABEL[detail.legalStatus] ?? detail.legalStatus)
-    : "-";
+  const legalStatusLabel = detail.legalStatus ?? "-";
   const relevance = getRelevance(detail.rrfScore);
   const patentNumber = detail.registrationNumber || detail.applicationNumber;
   const mainFeatures = detail.keyFeatures.length > 0 ? detail.keyFeatures.join(", ") : "-";
