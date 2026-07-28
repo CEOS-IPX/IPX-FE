@@ -36,7 +36,11 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
     setSelectedPatent(null);
 
     const clearSelectionOutsideProject = (event: PointerEvent) => {
-      if (event.target instanceof Element && !event.target.closest("[data-analysis-project]")) {
+      if (
+        event.target instanceof Element &&
+        !event.target.closest("[data-analysis-project]") &&
+        !event.target.closest("[data-analysis-right-panel]")
+      ) {
         setSelectedPatent(null);
       }
     };
@@ -99,6 +103,7 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
         id: detail.priorArtId,
         title: detail.title || "-",
         patentNumber: detail.registrationNumber || detail.applicationNumber,
+        applicationNumber: detail.applicationNumber,
         organization: detail.applicantName || "-",
         applicationDate: detail.applicationDate || "-",
         registrationDate: detail.registrationDate || "-",

@@ -13,7 +13,6 @@ import {
   type InventiveStepLogicKey,
 } from "@/constants/analysis/inventiveStep";
 import { Button } from "@/components/ui/Button";
-import { BackButton } from "@/components/ui/BackButton";
 import { CreateReportForm } from "@/components/report/CreateReportForm";
 import { getInventiveStepAnalysis, updateInventiveArgument } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
@@ -150,6 +149,8 @@ export default function AnalysisReportPage({
   } | null>(null);
   const [reloadCount, setReloadCount] = useState(0);
   const [selectedLogics, setSelectedLogics] = useState<Set<InventiveStepLogicKey>>(new Set());
+  // AI가 최초 분석 시 추천한 논리 카테고리(argumentId) 고정 스냅샷 -> 이후 사용자가 선택/해제해도 "AI 추천" 배지는 바뀌면 안 됨
+  const [aiRecommendedArgumentIds, setAiRecommendedArgumentIds] = useState<Set<number>>(new Set());
   const [placeholderArgumentIds, setPlaceholderArgumentIds] = useState<Set<number>>(new Set());
   const [updatingLogics, setUpdatingLogics] = useState<Set<InventiveStepLogicKey>>(new Set());
   const [updateError, setUpdateError] = useState<string | null>(null);
@@ -170,6 +171,11 @@ export default function AnalysisReportPage({
             data.arguments
               .filter((argument) => argument.recommended)
               .map((argument) => ARGUMENT_TYPE_TO_LOGIC_KEY[argument.argumentType])
+          )
+        );
+        setAiRecommendedArgumentIds(
+          new Set(
+            data.arguments.filter((argument) => argument.recommended).map((a) => a.argumentId)
           )
         );
         setPlaceholderArgumentIds(
@@ -334,7 +340,6 @@ export default function AnalysisReportPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <BackButton />
       <h1 className="mb-4 text-headline-emphasis-28 text-title-primary">기술 진보성 분석하기</h1>
 
       <div className="flex flex-col gap-6">
@@ -354,7 +359,9 @@ export default function AnalysisReportPage({
               key={logic.key}
               title={logic.title}
               description={logic.description}
-              aiRecommended={getArgument(analysis, logic.key)?.recommended ?? false}
+              aiRecommended={aiRecommendedArgumentIds.has(
+                getArgument(analysis, logic.key)?.argumentId ?? Number.NaN
+              )}
               selected={selectedLogics.has(logic.key)}
               disabled={updatingLogics.has(logic.key)}
               onClick={() => toggleLogic(logic.key)}
