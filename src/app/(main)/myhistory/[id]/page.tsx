@@ -111,7 +111,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         </section>
 
         <div className="flex w-70 shrink-0 flex-col gap-3">
-          <AnalysisMenu />
+          <AnalysisMenu caseId={id} />
           <AnalysisNotice />
         </div>
       </div>

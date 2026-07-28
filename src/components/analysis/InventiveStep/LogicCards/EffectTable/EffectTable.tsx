@@ -8,13 +8,16 @@ export interface Effect {
   priorArt: string;
   invention: string;
   improvement: string;
+  placeholders?: Partial<Record<EffectField, string>>;
 }
+
+export type EffectField = "category" | "unit" | "priorArt" | "invention" | "improvement";
 
 interface EffectTableProps {
   effects: Effect[];
   isEditing: boolean;
   onAdd: () => void;
-  onChange: (id: string, field: keyof Omit<Effect, "id">, value: string) => void;
+  onChange: (id: string, field: EffectField, value: string) => void;
 }
 
 export function EffectTable({ effects, isEditing, onAdd, onChange }: EffectTableProps) {
@@ -36,6 +39,7 @@ export function EffectTable({ effects, isEditing, onAdd, onChange }: EffectTable
           priorArt={effect.priorArt}
           invention={effect.invention}
           improvement={effect.improvement}
+          placeholders={effect.placeholders}
           isEditing={isEditing}
           onChangeCategory={(value) => onChange(effect.id, "category", value)}
           onChangeUnit={(value) => onChange(effect.id, "unit", value)}

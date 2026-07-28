@@ -8,6 +8,7 @@ interface InventiveStepCardProps {
   description: string;
   aiRecommended: boolean;
   selected?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
@@ -16,15 +17,18 @@ export function InventiveStepCard({
   description,
   aiRecommended,
   selected = false,
+  disabled = false,
   onClick,
 }: InventiveStepCardProps) {
   return (
     <div className="group relative min-w-0 flex-1">
       <button
         type="button"
+        disabled={disabled}
+        aria-busy={disabled}
         onClick={onClick}
         className={cn(
-          "flex h-full w-full flex-col gap-0.5 rounded-md border px-4 py-3 text-left transition-colors bg-bg-surface",
+          "flex h-full w-full flex-col gap-0.5 rounded-md border px-4 py-3 text-left transition-colors bg-bg-surface disabled:cursor-wait disabled:opacity-60",
           selected ? "border-stroke-primary" : "border-outline-sub hover:bg-bg-neutral-hover"
         )}
       >

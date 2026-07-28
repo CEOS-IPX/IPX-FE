@@ -10,11 +10,13 @@ export type User = {
 };
 
 type AuthState = {
+  isInitialized: boolean;
   accessToken: string | null;
   user: User | null;
   setAuth: (accessToken: string, user: User) => void;
   setAccessToken: (accessToken: string) => void;
   setUser: (user: User) => void;
+  setInitialized: () => void;
   clearAuth: () => void;
 };
 
@@ -34,10 +36,13 @@ function normalizeUser(user: User): User {
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
+  isInitialized: false,
   accessToken: null,
   user: null,
-  setAuth: (accessToken, user) => set({ accessToken, user: normalizeUser(user) }),
+  setAuth: (accessToken, user) =>
+    set({ isInitialized: true, accessToken, user: normalizeUser(user) }),
   setAccessToken: (accessToken) => set({ accessToken }),
   setUser: (user) => set({ user: normalizeUser(user) }),
+  setInitialized: () => set({ isInitialized: true }),
   clearAuth: () => set({ accessToken: null, user: null }),
 }));

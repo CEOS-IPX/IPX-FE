@@ -1,9 +1,12 @@
+import type { EffectField } from "./EffectTable";
+
 interface EffectRowProps {
   category: string;
   unit: string;
   priorArt: string;
   invention: string;
   improvement: string;
+  placeholders?: Partial<Record<EffectField, string>>;
   isEditing: boolean;
   onChangeCategory: (value: string) => void;
   onChangeUnit: (value: string) => void;
@@ -18,6 +21,7 @@ export function EffectRow({
   priorArt,
   invention,
   improvement,
+  placeholders,
   isEditing,
   onChangeCategory,
   onChangeUnit,
@@ -31,11 +35,13 @@ export function EffectRow({
         <input
           value={category}
           onChange={(e) => onChangeCategory(e.target.value)}
-          placeholder="EX) VOC 배출량"
+          placeholder={placeholders?.category ?? "EX) VOC 배출량"}
           className="px-2.5 text-left w-full bg-transparent text-label-13 text-caption-label placeholder:text-caption-label focus:outline-none"
         />
       ) : (
-        <p className="px-2.5 text-left text-label-13 text-body-secondary">{category}</p>
+        <p className="px-2.5 text-left text-label-13 text-body-secondary">
+          {category || placeholders?.category}
+        </p>
       )}
 
       {/* 단위 */}
@@ -43,11 +49,13 @@ export function EffectRow({
         <input
           value={unit}
           onChange={(e) => onChangeUnit(e.target.value)}
-          placeholder="g/L"
+          placeholder={placeholders?.unit ?? "g/L"}
           className="px-2.5 w-full bg-transparent text-center text-label-13 text-caption-label placeholder:text-caption-label focus:outline-none"
         />
       ) : (
-        <p className="px-2.5 text-center text-label-13 text-body-secondary">{unit}</p>
+        <p className="px-2.5 text-center text-label-13 text-body-secondary">
+          {unit || placeholders?.unit}
+        </p>
       )}
 
       {/* 종래기술 */}
@@ -55,11 +63,13 @@ export function EffectRow({
         <input
           value={priorArt}
           onChange={(e) => onChangePriorArt(e.target.value)}
-          placeholder="0"
+          placeholder={placeholders?.priorArt ?? "0"}
           className="px-2.5 w-full bg-transparent text-center text-label-13 text-caption-label placeholder:text-caption-label focus:outline-none"
         />
       ) : (
-        <p className="px-2.5 text-center text-label-13 text-body-secondary">{priorArt}</p>
+        <p className="px-2.5 text-center text-label-13 text-body-secondary">
+          {priorArt || placeholders?.priorArt}
+        </p>
       )}
 
       {/* 본발명 */}
@@ -67,11 +77,13 @@ export function EffectRow({
         <input
           value={invention}
           onChange={(e) => onChangeInvention(e.target.value)}
-          placeholder="0"
+          placeholder={placeholders?.invention ?? "0"}
           className="px-2.5 w-full bg-transparent text-center text-label-13 text-caption-label placeholder:text-caption-label focus:outline-none"
         />
       ) : (
-        <p className="px-2.5 text-center text-label-13 text-primary-default">{invention}</p>
+        <p className="px-2.5 text-center text-label-13 text-primary-default">
+          {invention || placeholders?.invention}
+        </p>
       )}
 
       {/* 개선폭 */}
@@ -79,11 +91,13 @@ export function EffectRow({
         <input
           value={improvement}
           onChange={(e) => onChangeImprovement(e.target.value)}
-          placeholder="0%"
+          placeholder={placeholders?.improvement ?? "0%"}
           className="px-2.5 w-full bg-transparent text-center text-label-13 text-caption-label placeholder:text-caption-label focus:outline-none"
         />
       ) : (
-        <p className="px-2.5 text-center text-label-13 text-caption-semantic-1">{improvement}</p>
+        <p className="px-2.5 text-center text-label-13 text-caption-semantic-1">
+          {improvement || placeholders?.improvement}
+        </p>
       )}
     </div>
   );
