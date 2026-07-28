@@ -35,6 +35,8 @@ function sortPriorArts(priorArts: PriorArt[], sortOption: SortOption): PriorArt[
 function SearchResultContent() {
   const searchParams = useSearchParams();
   const caseId = searchParams.get("caseId");
+  const title = searchParams.get("title");
+  const techLinkQuery = title ? `?title=${encodeURIComponent(title)}` : "";
 
   const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -154,7 +156,7 @@ function SearchResultContent() {
             {sortedPriorArts.map((priorArt) => (
               <Link
                 key={priorArt.priorArtId}
-                href={`/tech/${priorArt.priorArtId}`}
+                href={`/tech/${priorArt.priorArtId}${techLinkQuery}`}
                 className="block w-full"
               >
                 <ProjectList

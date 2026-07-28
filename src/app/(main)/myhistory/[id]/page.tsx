@@ -85,7 +85,7 @@ export default function ProjectDetailPage() {
             {priorArts.map((priorArt) => (
               <Link
                 key={priorArt.priorArtId}
-                href={`/tech/${priorArt.priorArtId}`}
+                href={`/tech/${priorArt.priorArtId}?title=${encodeURIComponent(detail.title)}`}
                 className="block w-full"
               >
                 <ProjectList

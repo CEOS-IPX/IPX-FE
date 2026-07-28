@@ -14,6 +14,7 @@ import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import { formatPeriod } from "@/lib/priorArtFormat";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT, scoreToRelevance } from "@/lib/priorArtRelevance";
 import type { PriorArtDetail } from "@/types/search.type";
 
 // 선행문헌 상세 조회 api 에러코드별 메시지
@@ -25,18 +26,6 @@ const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
   O001: "특허 검색 서버와 통신 중 오류가 발생했습니다.",
   C002: "서버 내부 오류가 발생했습니다.",
 };
-
-// rrfScore -> 관련도 등급 변환 기준(백엔드와 확인 완료, 동일 임계값 사용 중)
-function getRelevance(rrfScore: number): {
-  label: string;
-  variant: "verygood" | "good" | "related" | "bad" | "hold";
-} {
-  if (rrfScore >= 0.8) return { label: "매우 높음", variant: "verygood" };
-  if (rrfScore >= 0.6) return { label: "높음", variant: "good" };
-  if (rrfScore >= 0.4) return { label: "보통", variant: "related" };
-  if (rrfScore >= 0.2) return { label: "낮음", variant: "bad" };
-  return { label: "매우 낮음", variant: "hold" };
-}
 
 export default function TechDetailPage() {
   const params = useParams<{ id: string }>();
@@ -106,7 +95,7 @@ export default function TechDetailPage() {
   }
 
   const legalStatusLabel = detail.legalStatus ?? "-";
-  const relevance = getRelevance(detail.rrfScore);
+  const relevance = scoreToRelevance(detail.rrfScore);
   const patentNumber = detail.registrationNumber || detail.applicationNumber;
   const mainFeatures = detail.keyFeatures.length > 0 ? detail.keyFeatures.join(", ") : "-";
 
@@ -195,7 +184,9 @@ export default function TechDetailPage() {
           >
             <section className="flex w-full flex-col items-start justify-center gap-2 self-stretch">
               <h2 className="self-stretch text-title-18 text-title-primary">관련도</h2>
-              <StatusBadge variant={relevance.variant}>{relevance.label}</StatusBadge>
+              <StatusBadge variant={RELEVANCE_VARIANT[relevance]}>
+                {RELEVANCE_LABEL[relevance]}
+              </StatusBadge>
             </section>
 
             <section className="flex w-full flex-col items-start gap-3 self-stretch">
