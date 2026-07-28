@@ -9,7 +9,7 @@ export type ComparisonReference = {
 
 interface ComparisionPatentBoxProps {
   primaryReference: ComparisonReference;
-  secondaryReference: ComparisonReference;
+  secondaryReference: ComparisonReference | null;
 }
 
 export default function ComparisionPatentBox({
@@ -35,15 +35,19 @@ export default function ComparisionPatentBox({
       <div className="flex w-full flex-row items-start gap-4 rounded-sm border border-outline-sub bg-bg-neutral-hover p-4">
         <ReferenceChip variant="secondary">부인용</ReferenceChip>
 
-        <div className="flex min-w-0 flex-col gap-1">
-          <p className="line-clamp-1 text-label-17 text-body-primary">
-            {secondaryReference.patentNumber} {secondaryReference.title}
-          </p>
+        {secondaryReference ? (
+          <div className="flex min-w-0 flex-col gap-1">
+            <p className="line-clamp-1 text-label-17 text-body-primary">
+              {secondaryReference.patentNumber} {secondaryReference.title}
+            </p>
 
-          <p className="text-body-15 text-body-disabled">
-            {secondaryReference.organization} · {secondaryReference.year}
-          </p>
-        </div>
+            <p className="text-body-15 text-body-disabled">
+              {secondaryReference.organization} · {secondaryReference.year}
+            </p>
+          </div>
+        ) : (
+          <p className="text-body-15 text-body-disabled">선정된 부인용 특허가 없습니다.</p>
+        )}
       </div>
     </div>
   );

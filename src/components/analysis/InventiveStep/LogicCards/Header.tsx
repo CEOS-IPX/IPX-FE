@@ -7,6 +7,7 @@ type ArgumentHeaderProps = {
   subtitle: string;
   description?: string;
   isEditing?: boolean;
+  isSaving?: boolean;
   onToggleEdit?: () => void;
 };
 
@@ -15,6 +16,7 @@ export default function ArgumentFormHeader({
   subtitle,
   description,
   isEditing,
+  isSaving,
   onToggleEdit,
 }: ArgumentHeaderProps) {
   return (
@@ -28,6 +30,8 @@ export default function ArgumentFormHeader({
       <Button
         variant={isEditing ? "secondary" : "primary"}
         className="h-10 w-fit py-2.5 pl-3 pr-4"
+        disabled={isSaving}
+        aria-busy={isSaving}
         onClick={onToggleEdit}
       >
         {isEditing ? (
@@ -35,7 +39,7 @@ export default function ArgumentFormHeader({
         ) : (
           <Edit className="h-5 w-5 text-icon-neutral-inverse [&_path]:fill-current" />
         )}
-        {isEditing ? "수정 완료" : "직접 수정"}
+        {isSaving ? "저장 중..." : isEditing ? "수정 완료" : "직접 수정"}
       </Button>
     </div>
   );

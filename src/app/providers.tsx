@@ -7,6 +7,7 @@ import { useAuthStore } from "@/store/authStore";
 export function Providers({ children }: { children: React.ReactNode }) {
   const setAccessToken = useAuthStore((s) => s.setAccessToken);
   const setUser = useAuthStore((s) => s.setUser);
+  const setInitialized = useAuthStore((s) => s.setInitialized);
   const clearAuth = useAuthStore((s) => s.clearAuth);
 
   useEffect(() => {
@@ -22,8 +23,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         });
       })
       .then((user) => setUser(user))
-      .catch(() => {});
-  }, [setAccessToken, setUser, clearAuth]);
+      .catch(() => {})
+      .finally(setInitialized);
+  }, [setAccessToken, setUser, setInitialized, clearAuth]);
 
   return <>{children}</>;
 }
