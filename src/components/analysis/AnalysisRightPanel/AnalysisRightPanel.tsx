@@ -71,7 +71,7 @@ function PatentDetailPanel({
       return;
     }
 
-    const primaryApplicationNumber = patent.patentNumber.replace(/^KR\s*/i, "").replace(/\s/g, "");
+    const primaryApplicationNumber = patent.applicationNumber.replace(/\s/g, "");
 
     if (!APPLICATION_NUMBER_PATTERN.test(primaryApplicationNumber)) {
       setAnalysisError("주인용 특허의 출원번호 형식을 확인해주세요.");
@@ -83,8 +83,11 @@ function PatentDetailPanel({
 
     try {
       await runInventiveStepAnalysis(caseId, { primaryApplicationNumber });
+
+      const title = new URLSearchParams(window.location.search).get("title");
+      const query = title ? `?title=${encodeURIComponent(title)}` : "";
       router.push(
-        `/analysis/${encodeURIComponent(caseId)}/${encodeURIComponent(String(patent.id))}`
+        `/analysis/${encodeURIComponent(caseId)}/${encodeURIComponent(String(patent.id))}${query}`
       );
     } catch (error) {
       setAnalysisError(
@@ -98,7 +101,7 @@ function PatentDetailPanel({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div data-analysis-right-panel className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto p-9 scrollbar-hide">
         <div className="flex w-full flex-col items-start gap-9 self-stretch">
           <div className="flex w-full flex-col items-start gap-1 self-stretch">

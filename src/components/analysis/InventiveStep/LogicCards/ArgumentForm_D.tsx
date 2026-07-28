@@ -59,7 +59,7 @@ export default function ArgumentFormD({
   };
 
   return (
-    <div className="w-full p-6 flex flex-col gap-5 bg-bg-surface border border-outline-sub rounded-lg">
+    <div className="w-full pt-7 px-9 pb-9 flex flex-col gap-5 bg-bg-surface border border-outline-sub rounded-lg">
       <ArgumentFormHeader
         title="단순설계변경"
         subtitle="비-자명성 논리"
