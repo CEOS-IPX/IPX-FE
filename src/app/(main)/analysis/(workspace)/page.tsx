@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import Header from "@/components/analysis/Header";
 import { AnalysisProjectCard } from "@/components/analysis/AnalysisProjectCard";
 import { useAnalysisProjects } from "@/hooks/useAnalysisProjects";
+import { useTitleFilter } from "@/hooks/useTitleFilter";
 
 export default function AnalysisPage() {
-  const [query, setQuery] = useState("");
   const { projects, isLoading, error } = useAnalysisProjects();
+  const {
+    query,
+    setQuery,
+    filtered: matchedProjects,
+  } = useTitleFilter(projects, (project) => project.title);
 
-  const filtered = [...projects]
-    .filter((p) => p.title.toLowerCase().includes(query.toLowerCase()))
-    .sort((a, b) => {
-      if (a.isAnalysisDone !== b.isAnalysisDone) return a.isAnalysisDone ? 1 : -1;
-      return a.title.localeCompare(b.title, "ko");
-    });
+  const filtered = [...matchedProjects].sort((a, b) => {
+    if (a.isAnalysisDone !== b.isAnalysisDone) return a.isAnalysisDone ? 1 : -1;
+    return a.title.localeCompare(b.title, "ko");
+  });
 
   return (
     <div className="flex flex-col gap-6">

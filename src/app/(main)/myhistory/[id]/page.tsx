@@ -13,6 +13,7 @@ import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
 import { useCaseDetail, deriveCurrentStep } from "@/hooks/useCaseDetail";
 import { usePriorArtsList } from "@/hooks/usePriorArtsList";
+import { useTitleFilter } from "@/hooks/useTitleFilter";
 import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
 
 export default function ProjectDetailPage() {
@@ -21,6 +22,11 @@ export default function ProjectDetailPage() {
 
   const { detail, isLoading, error } = useCaseDetail(id);
   const { priorArts, isLoading: isPriorArtsLoading, error: priorArtsError } = usePriorArtsList(id);
+  const {
+    query,
+    setQuery,
+    filtered: filteredPriorArts,
+  } = useTitleFilter(priorArts, (priorArt) => priorArt.title);
 
   if (isLoading) {
     return (
@@ -71,7 +77,12 @@ export default function ProjectDetailPage() {
         <section className="flex min-h-120 min-w-0 flex-1 flex-col items-start gap-3 self-stretch rounded-lg border border-outline-sub bg-bg-surface p-4">
           <div className="flex w-full items-start justify-between">
             <SortingTag label="적합도 순" className="rounded-md" />
-            <ListSearchField aria-label="프로젝트 내 검색" placeholder="프로젝트 내 검색" />
+            <ListSearchField
+              aria-label="프로젝트 내 검색"
+              placeholder="프로젝트 내 검색"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
           </div>
 
           <div className="flex w-full flex-col gap-4">
@@ -82,7 +93,7 @@ export default function ProjectDetailPage() {
               <p className="text-body-15 text-caption-label">불러오는 중...</p>
             )}
 
-            {priorArts.map((priorArt) => (
+            {filteredPriorArts.map((priorArt) => (
               <Link
                 key={priorArt.priorArtId}
                 href={`/tech/${priorArt.priorArtId}?title=${encodeURIComponent(detail.title)}`}
