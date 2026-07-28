@@ -9,7 +9,7 @@ export type ComparisonReference = {
 
 interface ComparisionPatentBoxProps {
   primaryReference: ComparisonReference;
-  secondaryReference: ComparisonReference;
+  secondaryReference: ComparisonReference | null;
 }
 
 export default function ComparisionPatentBox({
@@ -35,19 +35,25 @@ export default function ComparisionPatentBox({
           </div>
         </div>
 
-        <div className="flex w-full flex-row items-start gap-4 rounded-sm border border-outline-sub bg-bg-neutral-hover p-3">
-          <ReferenceChip variant="secondary">부인용</ReferenceChip>
+        {secondaryReference ? (
+          <div className="flex w-full flex-row items-start gap-4 rounded-sm border border-outline-sub bg-bg-neutral-hover p-3">
+            <ReferenceChip variant="secondary">부인용</ReferenceChip>
 
-          <div className="flex min-w-0 flex-col gap-1">
-            <p className="line-clamp-1 text-label-15 text-body-primary">
-              {secondaryReference.patentNumber} {secondaryReference.title}
-            </p>
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="line-clamp-1 text-label-15 text-body-primary">
+                {secondaryReference.patentNumber} {secondaryReference.title}
+              </p>
 
-            <p className="text-label-13 text-body-disabled">
-              {secondaryReference.organization} · {secondaryReference.year}
-            </p>
+              <p className="text-label-13 text-body-disabled">
+                {secondaryReference.organization} · {secondaryReference.year}
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <p className="rounded-sm border border-outline-sub bg-bg-neutral-hover p-3 text-label-13 text-caption-label">
+            선정된 부인용 선행문헌이 없습니다.
+          </p>
+        )}
       </div>
     </div>
   );

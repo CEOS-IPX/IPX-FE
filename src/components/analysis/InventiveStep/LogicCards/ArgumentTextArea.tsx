@@ -46,7 +46,11 @@ export function ArgumentTextArea({
           )}
         />
       ) : (
-        <p className="w-full text-body-17 text-body-primary">{value}</p>
+        <p
+          className={cn("w-full text-body-17", value ? "text-body-primary" : "text-caption-label")}
+        >
+          {value || placeholder}
+        </p>
       )}
     </div>
   );

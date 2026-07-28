@@ -4,13 +4,55 @@ import { useState } from "react";
 import ArgumentFormHeader from "./Header";
 import { ArgumentTextArea } from "./ArgumentTextArea";
 
-// 추후 api 연동 시 교체 (AI 추천이 아닌 항목은 api가 이 안내 문구를 내려줌)
-const MOCK_PLACEHOLDER_CONTENT = "직접 입력해주세요";
+interface ArgumentFormCProps {
+  initialTarget: string;
+  initialRebuttal: string;
+  recommended: boolean;
+  onSave: (content: {
+    target_label: string;
+    target_name: string;
+    rebuttal: string;
+  }) => Promise<void>;
+}
 
-export default function ArgumentFormC() {
+export default function ArgumentFormC({
+  initialTarget,
+  initialRebuttal,
+  recommended,
+  onSave,
+}: ArgumentFormCProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [rejectionReason, setRejectionReason] = useState(MOCK_PLACEHOLDER_CONTENT);
-  const [counterArgument, setCounterArgument] = useState(MOCK_PLACEHOLDER_CONTENT);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState(recommended ? initialTarget : "");
+  const [counterArgument, setCounterArgument] = useState(recommended ? initialRebuttal : "");
+
+  const handleToggleEdit = async () => {
+    if (!isEditing) {
+      setSaveError(null);
+      setIsEditing(true);
+      return;
+    }
+
+    const [targetLabel, ...targetNameParts] = rejectionReason.split(". ");
+
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      await onSave({
+        target_label: targetNameParts.length > 0 ? targetLabel.trim() : "",
+        target_name:
+          targetNameParts.length > 0 ? targetNameParts.join(". ").trim() : rejectionReason.trim(),
+        rebuttal: counterArgument,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "수정 내용을 저장하지 못했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="w-full p-6 flex flex-col gap-5 bg-bg-surface border border-outline-sub rounded-lg">
@@ -18,7 +60,8 @@ export default function ArgumentFormC() {
         title="주지관용기술"
         subtitle="주지관용기술 반박 논리"
         isEditing={isEditing}
-        onToggleEdit={() => setIsEditing((prev) => !prev)}
+        isSaving={isSaving}
+        onToggleEdit={handleToggleEdit}
       />
 
       <div className="flex flex-col gap-10">
@@ -26,7 +69,7 @@ export default function ArgumentFormC() {
           label="거절 또는 예상 거절 사유 (주지관용기술 주장 대상)"
           value={rejectionReason}
           onChange={setRejectionReason}
-          placeholder="EX) 구성요소 B(표면개질 나노 충진제)를 단순 주지관용기술로 봄."
+          placeholder={initialTarget || "반박 대상 구성요소를 입력해주세요."}
           isEditing={isEditing}
         />
 
@@ -34,10 +77,16 @@ export default function ArgumentFormC() {
           label="주지관용기술이 아님을 입증하는 반박 논리"
           value={counterArgument}
           onChange={setCounterArgument}
-          placeholder="해당 구성이 관용적으로 채택되는 것이 아님을 입증하는 반박 논리를 작성합니다."
+          placeholder={initialRebuttal}
           isEditing={isEditing}
         />
       </div>
+
+      {saveError && (
+        <p role="alert" className="text-body-13 text-error-default">
+          {saveError}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,88 +1,176 @@
+"use client";
+
+import { use, useEffect, useState } from "react";
+import { Button } from "@/components/ui/Button";
 import { BackButton } from "@/components/ui/BackButton";
 import Header from "@/components/myhistory/novelty/Header";
 import Similarity from "@/components/myhistory/novelty/Similarity";
-import NoveltyTable, { type NoveltyComparison } from "@/components/myhistory/novelty/NoveltyTable";
+import NoveltyTable from "@/components/myhistory/novelty/NoveltyTable";
+import { getNoveltyAnalysis, updateNoveltyComparison } from "@/lib/api/analysis";
+import { ApiError } from "@/lib/api/error";
+import { useAuthStore } from "@/store/authStore";
+import type {
+  NoveltyAnalysisResponse,
+  NoveltyOverallSimilarity,
+  UpdateNoveltyComparisonRequest,
+} from "@/types/novelty.type";
 
-// 추후 api 연동 시 교체
-const MOCK_PATENT = {
-  title: "저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-  status: "등록",
-  patentNumber: "KR 10-2023-0145XXX",
-  organization: "한국지질자원연구원",
+const SIMILARITY_LABELS: Record<NoveltyOverallSimilarity, string> = {
+  VERY_HIGH: "매우 높음",
+  HIGH: "높음",
+  MEDIUM: "보통",
+  LOW: "낮음",
+  VERY_LOW: "매우 낮음",
 };
 
-// 추후 api 연동 시 교체
-const MOCK_NOVELTY = {
-  similarity: "매우 높음",
-  reason:
-    "구성요소 C·D(무용제 수계 분산 공정, UV 경화 가교)는 주인용발명에 개시되어 있지 않은 차이점입니다. 본 발명은 단일 선행문헌과 실질적으로 동일하지 않으므로, 특허법 제29조 제1항의 신규성을 충족합니다.",
+const NOVELTY_ANALYSIS_ERROR_MESSAGES: Record<string, string> = {
+  C001: "수정할 내용을 확인해주세요.",
+  SC001: "로그인이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  N001: "신규성 분석 결과가 존재하지 않습니다.",
+  N002: "수정할 신규성 비교 결과를 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 };
 
-// 추후 api 연동 시 교체 (comparisons[])
-const MOCK_COMPARISONS: NoveltyComparison[] = [
-  {
-    comparisonId: 1,
-    componentId: 1,
-    componentLabel: "A",
-    componentName: "생분해성 베이스 수지",
-    priorArtId: 1,
-    dLabel: "D1",
-    applicationNumber: "10-2023-0001234",
-    matchStatus: "identical",
-    priorArtExcerpt: "생분해성 폴리에스터 수지를 베이스로 하는 코팅 조성물을 동일하게 게시함",
-  },
-  {
-    comparisonId: 2,
-    componentId: 2,
-    componentLabel: "B",
-    componentName: "표면개질 나노 충전제",
-    priorArtId: 1,
-    dLabel: "D1",
-    applicationNumber: "10-2023-0001234",
-    matchStatus: "similar",
-    priorArtExcerpt: "생분해성 폴리에스터 수지를 베이스로 하는 코팅 조성물을 동일하게 게시함",
-  },
-  {
-    comparisonId: 3,
-    componentId: 3,
-    componentLabel: "C",
-    componentName: "무용제 수계 분산 공정",
-    priorArtId: 1,
-    dLabel: "D1",
-    applicationNumber: "10-2023-0001234",
-    matchStatus: "novel",
-    priorArtExcerpt: "생분해성 폴리에스터 수지를 베이스로 하는 코팅 조성물을 동일하게 게시함",
-  },
-  {
-    comparisonId: 4,
-    componentId: 4,
-    componentLabel: "D",
-    componentName: "UV 경화 기교",
-    priorArtId: 1,
-    dLabel: "D1",
-    applicationNumber: "10-2023-0001234",
-    matchStatus: "novel",
-    priorArtExcerpt: "생분해성 폴리에스터 수지를 베이스로 하는 코팅 조성물을 동일하게 게시함",
-  },
-];
+export default function NoveltyPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const [result, setResult] = useState<{
+    caseId: string;
+    analysis: NoveltyAnalysisResponse;
+  } | null>(null);
+  const [requestError, setRequestError] = useState<{
+    caseId: string;
+    message: string;
+  } | null>(null);
+  const [reloadCount, setReloadCount] = useState(0);
 
-export default async function NoveltyPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+  useEffect(() => {
+    if (!isAuthInitialized || !accessToken) return;
+
+    let canceled = false;
+
+    getNoveltyAnalysis(id)
+      .then((data) => {
+        if (canceled) return;
+        setRequestError(null);
+        setResult({ caseId: id, analysis: data });
+      })
+      .catch((error) => {
+        if (canceled) return;
+
+        setResult(null);
+        setRequestError({
+          caseId: id,
+          message:
+            error instanceof ApiError
+              ? (NOVELTY_ANALYSIS_ERROR_MESSAGES[error.errorCode] ?? error.message)
+              : "신규성 분석 결과를 불러오는 중 네트워크 오류가 발생했습니다.",
+        });
+      });
+
+    return () => {
+      canceled = true;
+    };
+  }, [accessToken, id, isAuthInitialized, reloadCount]);
+
+  const analysis = result?.caseId === id ? result.analysis : null;
+  const errorMessage =
+    !isAuthInitialized || accessToken
+      ? requestError?.caseId === id
+        ? requestError.message
+        : null
+      : NOVELTY_ANALYSIS_ERROR_MESSAGES.SC001;
+
+  const handleComparisonSave = async (
+    comparisonId: number,
+    body: UpdateNoveltyComparisonRequest
+  ) => {
+    try {
+      const updated = await updateNoveltyComparison(comparisonId, body);
+
+      setResult((previous) => {
+        if (!previous || previous.caseId !== id) return previous;
+
+        return {
+          ...previous,
+          analysis: {
+            ...previous.analysis,
+            comparisons: previous.analysis.comparisons.map((comparison) =>
+              comparison.comparisonId === updated.comparisonId
+                ? {
+                    ...comparison,
+                    comparisonResult: updated.comparisonResult,
+                    citation: updated.citation !== undefined ? updated.citation : body.citation,
+                  }
+                : comparison
+            ),
+          },
+        };
+      });
+    } catch (error) {
+      const message =
+        error instanceof ApiError
+          ? (NOVELTY_ANALYSIS_ERROR_MESSAGES[error.errorCode] ?? error.message)
+          : "신규성 비교 결과 수정 중 네트워크 오류가 발생했습니다.";
+      throw new Error(message);
+    }
+  };
+
+  if (!isAuthInitialized || (accessToken && !analysis && !errorMessage)) {
+    return (
+      <div className="flex min-h-80 items-center justify-center">
+        <p className="text-body-15 text-caption-label">신규성 분석 결과를 불러오고 있습니다...</p>
+      </div>
+    );
+  }
+
+  if (errorMessage || !analysis) {
+    return (
+      <div className="flex flex-col gap-6">
+        <BackButton />
+        <div
+          role="alert"
+          className="flex min-h-64 flex-col items-center justify-center gap-4 rounded-lg bg-bg-neutral-hover"
+        >
+          <p className="text-body-17 text-body-secondary">
+            {errorMessage ?? "신규성 분석 결과를 불러오지 못했습니다."}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setResult(null);
+              setRequestError(null);
+              setReloadCount((count) => count + 1);
+            }}
+          >
+            다시 조회
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
       <BackButton />
 
       <Header
-        title={MOCK_PATENT.title}
-        status={MOCK_PATENT.status}
-        patentNumber={MOCK_PATENT.patentNumber}
-        organization={MOCK_PATENT.organization}
+        title={analysis.primaryArt.title}
+        status={analysis.primaryArt.legalStatus}
+        patentNumber={analysis.primaryArt.applicationNumber}
+        organization={analysis.primaryArt.applicantName}
       />
 
-      <Similarity similarity={MOCK_NOVELTY.similarity} reason={MOCK_NOVELTY.reason} />
+      <Similarity
+        similarity={SIMILARITY_LABELS[analysis.overallSimilarity]}
+        reason={analysis.conclusionText}
+      />
 
-      <NoveltyTable comparisons={MOCK_COMPARISONS} />
+      <NoveltyTable comparisons={analysis.comparisons} onSave={handleComparisonSave} />
     </div>
   );
 }
