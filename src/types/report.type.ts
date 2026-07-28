@@ -5,6 +5,23 @@ export type CreateReportRequest = {
   overallConclusion: string;
 };
 
+export type UpdateReportRequest = Partial<{
+  authorName: string;
+  noveltySatisfied: boolean;
+  inventiveSatisfied: boolean;
+  overallConclusion: string;
+}>;
+
+export type UpdateReportResponse = {
+  reportId: number;
+  caseId: number;
+  authorName: string;
+  noveltySatisfied: boolean;
+  inventiveSatisfied: boolean;
+  overallConclusion: string;
+  updatedAt: string;
+};
+
 export type ReportSummaryResponse = {
   reportId: number;
   caseId: number;

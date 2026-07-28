@@ -14,6 +14,8 @@ import type {
   CreateReportRequest,
   ReportDetailResponse,
   ReportSummaryResponse,
+  UpdateReportRequest,
+  UpdateReportResponse,
 } from "@/types/report.type";
 
 export function runNoveltyAnalysis(caseId: string | number) {
@@ -85,4 +87,11 @@ export function createReport(caseId: string | number, body: CreateReportRequest)
 
 export function getReport(caseId: string | number) {
   return apiRequest<ReportDetailResponse>(`/cases/${encodeURIComponent(String(caseId))}/report`);
+}
+
+export function updateReport(caseId: string | number, body: UpdateReportRequest) {
+  return apiRequest<UpdateReportResponse>(`/cases/${encodeURIComponent(String(caseId))}/report`, {
+    method: "PATCH",
+    body,
+  });
 }
