@@ -6,6 +6,7 @@ import { Recommendation } from "@/components/searchlist/Recommendation";
 import { TagChip } from "@/components/searchlist/TagChip";
 import { StatusBadge, type StatusBadgeProps } from "@/components/searchlist/StatusBadge";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
+import { HighlightedText } from "@/components/ui/HighlightedText";
 import { cn } from "@/lib/cn";
 
 export type ProjectListProps = HTMLAttributes<HTMLElement> & {
@@ -23,6 +24,7 @@ export type ProjectListProps = HTMLAttributes<HTMLElement> & {
   showCheckbox?: boolean;
   selected?: boolean;
   highlighted?: boolean;
+  highlight?: string;
   onSelectedChange?: (selected: boolean) => void;
 };
 
@@ -41,6 +43,7 @@ export function ProjectList({
   showCheckbox = true,
   selected,
   highlighted = false,
+  highlight,
   onSelectedChange,
   className,
   ...props
@@ -86,7 +89,9 @@ export function ProjectList({
             />
 
             <div className="flex min-w-0 flex-1 flex-col items-start">
-              <h3 className="w-full line-clamp-1 text-title-20 text-title-primary">{title}</h3>
+              <h3 className="w-full line-clamp-1 text-title-20 text-title-primary">
+                <HighlightedText text={title} highlight={highlight} />
+              </h3>
 
               <div className="mt-1 flex items-center gap-1.5 text-body-15 text-caption-label">
                 <span className="truncate">{organization}</span>
