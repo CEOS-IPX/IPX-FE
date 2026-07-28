@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useCaseThumbnails } from "@/hooks/useCaseThumbnails";
 import { Thumbnail, type Patent } from "@/components/myhistory/Thumbnail";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
 
@@ -9,7 +10,7 @@ interface AnalysisProjectCardProps {
   title: string;
   company: string;
   manager: string;
-  patents: Patent[];
+  patents?: Patent[];
   isAnalysisDone?: boolean;
   highlight?: string;
 }
@@ -38,6 +39,10 @@ export function AnalysisProjectCard({
   isAnalysisDone = false,
   highlight,
 }: AnalysisProjectCardProps) {
+  const fetchedThumbnails = useCaseThumbnails(patents ? undefined : id);
+  const resolvedPatents = patents ?? fetchedThumbnails.patents;
+  const totalCount = patents ? patents.length : fetchedThumbnails.totalCount;
+
   return (
     <Link
       href={`/analysis/${id}`}
@@ -60,7 +65,7 @@ export function AnalysisProjectCard({
         </div>
       </div>
 
-      <Thumbnail patents={patents} />
+      <Thumbnail patents={resolvedPatents} totalCount={totalCount} />
     </Link>
   );
 }
