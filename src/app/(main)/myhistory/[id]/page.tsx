@@ -54,7 +54,8 @@ export default function ProjectDetailPage() {
     );
   }
 
-  const showReport = detail.reportAvailable;
+  const completedSteps = deriveCompletedSteps(detail);
+  const showReport = completedSteps["기술 분석"];
 
   return (
     <div data-project-id={id} className="flex min-h-full w-full flex-col gap-6">
@@ -78,7 +79,7 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        <SelectableItemGroup completed={deriveCompletedSteps(detail)} />
+        <SelectableItemGroup completed={completedSteps} />
       </header>
 
       <div className="flex w-full items-start gap-4 self-stretch">
