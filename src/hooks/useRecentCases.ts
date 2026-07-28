@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getRecentCases } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { useRecentCasesStore } from "@/store/recentCasesStore";
 import type { RecentCase } from "@/types/case.type";
 
 // 에러코드별 메시지
@@ -15,6 +16,7 @@ const RECENT_CASES_ERROR_MESSAGES: Record<string, string> = {
 
 // 사이드바 "최근 탐색" 영역 - 최근 사건 목록 조회
 export function useRecentCases(limit = 5) {
+  const version = useRecentCasesStore((s) => s.version);
   const [cases, setCases] = useState<RecentCase[]>([]);
   const [error, setError] = useState<string | null>(null);
   // limit이 바뀌면 아직 그 limit으로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
@@ -51,7 +53,7 @@ export function useRecentCases(limit = 5) {
     return () => {
       cancelled = true;
     };
-  }, [limit]);
+  }, [limit, version]);
 
   return { cases, isLoading, error };
 }

@@ -1,32 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useCaseThumbnails } from "@/hooks/useCaseThumbnails";
 import { Thumbnail, type Patent } from "@/components/myhistory/Thumbnail";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
+import { HighlightedText } from "@/components/ui/HighlightedText";
 
 interface AnalysisProjectCardProps {
   id: string;
   title: string;
   company: string;
   manager: string;
-  patents: Patent[];
+  patents?: Patent[];
   isAnalysisDone?: boolean;
   highlight?: string;
-}
-
-function HighlightedTitle({ title, highlight }: { title: string; highlight?: string }) {
-  if (!highlight) return <>{title}</>;
-
-  const index = title.toLowerCase().indexOf(highlight.toLowerCase());
-  if (index === -1) return <>{title}</>;
-
-  return (
-    <>
-      {title.slice(0, index)}
-      <span className="text-primary-default">{title.slice(index, index + highlight.length)}</span>
-      {title.slice(index + highlight.length)}
-    </>
-  );
 }
 
 export function AnalysisProjectCard({
@@ -38,15 +25,19 @@ export function AnalysisProjectCard({
   isAnalysisDone = false,
   highlight,
 }: AnalysisProjectCardProps) {
+  const fetchedThumbnails = useCaseThumbnails(patents ? undefined : id);
+  const resolvedPatents = patents ?? fetchedThumbnails.patents;
+  const totalCount = patents ? patents.length : fetchedThumbnails.totalCount;
+
   return (
     <Link
-      href={`/analysis/${id}`}
+      href={`/analysis/${id}?title=${encodeURIComponent(title)}`}
       className="relative flex w-full flex-col gap-6 rounded-lg border border-outline-sub bg-bg-surface p-6 hover:bg-bg-neutral-hover"
     >
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-1">
           <p className="line-clamp-1 min-w-0 flex-1 text-title-emphasis-20 text-title-primary">
-            <HighlightedTitle title={title} highlight={highlight} />
+            <HighlightedText text={title} highlight={highlight} />
           </p>
           <Chip variant="primary" className={isAnalysisDone ? "" : "invisible"}>
             분석 완료
@@ -60,7 +51,7 @@ export function AnalysisProjectCard({
         </div>
       </div>
 
-      <Thumbnail patents={patents} />
+      <Thumbnail patents={resolvedPatents} totalCount={totalCount} />
     </Link>
   );
 }

@@ -1,51 +1,46 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { BackButton } from "@/components/ui/BackButton";
+import { getPriorArts, getPriorArtDetail, PRIOR_ARTS_ERROR_MESSAGES } from "@/lib/api/search";
+import { ApiError } from "@/lib/api/error";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
+import { formatPeriod } from "@/lib/priorArtFormat";
 import { useAnalysisStore } from "@/store/analysisStore";
-import type { SelectedPatent } from "@/types/analysis.type";
+import type { PriorArt } from "@/types/search.type";
 
-type MockPatent = SelectedPatent & {
-  listTitle: string;
-  year: number;
-  tags: string[];
-  status: string;
+// 선행문헌 상세 조회 api 에러코드별 메시지(주인용 선택 시 상세 조회에 사용)
+const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  P001: "해당 선행기술을 찾을 수 없습니다.",
+  P003: "선행기술 문서를 찾을 수 없습니다.",
+  O001: "특허 검색 서버와 통신 중 오류가 발생했습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
 };
-
-const MOCK_PATENTS: MockPatent[] = Array.from({ length: 3 }, (_, index) => ({
-  id: index + 1,
-  title: "저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-  listTitle: "KR 10-2023-0145XXX 저온 황산침출 기반 니켈·코발트 동시 회수 공정",
-  patentNumber: `KR 10-2023-0145XX${index + 1}`,
-  organization: "한국지질자원연구원",
-  year: 2024,
-  tags: ["저온 침출", "습식제련", "Ni·Co 회수"],
-  status: "등록",
-  applicationDate: "2023.01.15",
-  registrationDate: "2024.03.21",
-  applicationPeriod: "1년 2개월",
-  currentStatus: "등록",
-  expirationDate: "2038.05.18",
-  summary:
-    "50–60°C의 저온에서 H₂SO₄ 1.0–1.5 M과 환원제 H₂O₂를 단계적으로 투입하여 폐리튬이온전지 양극재로부터 니켈과 코발트를 동시에 침출하는 단계를 포함하는 습식제련 방법.",
-  purpose:
-    "폐리튬이온전지 양극재에서 니켈과 코발트를 고회수율로 선택적 회수하여 배터리 원료로 재활용하는 친환경 습식제련 공정 개발",
-  mainFeatures:
-    "저온(50–60°C) 공정으로 에너지 소비 최소화, H₂SO₄와 H₂O₂ 단계적 투입으로 침출 선택성 향상, 니켈·코발트 동시 침출로 공정 단계 단축, 기존 고온 건식 공정 대비 설비 비용 및 탄소 배출 절감",
-}));
 
 export default function AnalysisDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const selectedPatent = useAnalysisStore((state) => state.selectedPatent);
   const setSelectedPatent = useAnalysisStore((state) => state.setSelectedPatent);
 
+  const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectingId, setSelectingId] = useState<number | null>(null);
+  const [selectError, setSelectError] = useState<string | null>(null);
+
   useEffect(() => {
     setSelectedPatent(null);
 
     const clearSelectionOutsideProject = (event: PointerEvent) => {
-      if (event.target instanceof Element && !event.target.closest("[data-analysis-project]")) {
+      if (
+        event.target instanceof Element &&
+        !event.target.closest("[data-analysis-project]") &&
+        !event.target.closest("[data-analysis-right-panel]")
+      ) {
         setSelectedPatent(null);
       }
     };
@@ -58,41 +53,121 @@ export default function AnalysisDetailPage({ params }: { params: Promise<{ id: s
     };
   }, [setSelectedPatent]);
 
+  //사건별 선행문헌 목록 조회
+  useEffect(() => {
+    const caseId = Number(id);
+    if (!id || Number.isNaN(caseId)) return;
+
+    let cancelled = false;
+
+    getPriorArts(caseId)
+      .then((result) => {
+        if (cancelled) return;
+        setPriorArts(result.priorArts);
+        setError(null);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (err instanceof ApiError) {
+          setError(
+            PRIOR_ARTS_ERROR_MESSAGES[err.errorCode] ||
+              err.message ||
+              "선행문헌 목록을 불러오는 중 오류가 발생했습니다."
+          );
+        } else {
+          setError("선행문헌 목록을 불러오는 중 오류가 발생했습니다.");
+        }
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  //주인용으로 선택 -> 선행문헌 상세 조회 후 우측 패널에 표시
+  const handleSelect = async (priorArt: PriorArt) => {
+    setSelectError(null);
+    setSelectingId(priorArt.priorArtId);
+
+    try {
+      const detail = await getPriorArtDetail(priorArt.priorArtId);
+      const legalStatusLabel = detail.legalStatus ?? "-";
+
+      setSelectedPatent({
+        id: detail.priorArtId,
+        title: detail.title || "-",
+        patentNumber: detail.registrationNumber || detail.applicationNumber,
+        applicationNumber: detail.applicationNumber,
+        organization: detail.applicantName || "-",
+        applicationDate: detail.applicationDate || "-",
+        registrationDate: detail.registrationDate || "-",
+        applicationPeriod: formatPeriod(detail.applicationDate, detail.registrationDate),
+        currentStatus: legalStatusLabel,
+        summary: detail.summary || "-",
+        purpose: detail.techPurpose || "-",
+        mainFeatures: detail.keyFeatures.length > 0 ? detail.keyFeatures.join(", ") : "-",
+      });
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setSelectError(
+          PRIOR_ART_DETAIL_ERROR_MESSAGES[err.errorCode] ||
+            err.message ||
+            "선행문헌 상세를 불러오는 중 오류가 발생했습니다."
+        );
+      } else {
+        setSelectError("선행문헌 상세를 불러오는 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setSelectingId(null);
+    }
+  };
+
   return (
     <div data-analysis-id={id} className="flex w-full flex-col items-start gap-4 self-stretch">
       <BackButton />
       <div className="flex w-full flex-col gap-4 self-stretch">
         <ResultListHeader variant="readonly" className="w-full border-t-0" />
-        {MOCK_PATENTS.map((patent) => {
-          const highlighted = selectedPatent?.id === patent.id;
 
-          const handleSelect = () => {
-            setSelectedPatent(patent);
+        {error && <p className="text-body-15 text-error-default">{error}</p>}
+        {selectError && <p className="text-body-15 text-error-default">{selectError}</p>}
+        {isLoading && <p className="text-body-15 text-caption-label">불러오는 중...</p>}
+
+        {priorArts.map((priorArt) => {
+          const highlighted = selectedPatent?.id === priorArt.priorArtId;
+
+          const handleClick = () => {
+            handleSelect(priorArt);
           };
 
           return (
             <ProjectList
-              key={patent.id}
+              key={priorArt.priorArtId}
               data-analysis-project
               showCheckbox={false}
               highlighted={highlighted}
               className="w-full cursor-pointer"
-              title={patent.listTitle}
-              organization={patent.organization}
-              year={patent.year}
-              tags={patent.tags}
-              status={patent.status}
-              relevanceLabel="매우 높음"
-              relevanceVariant="verygood"
-              thumbnailAlt={`${patent.title} 대표 이미지`}
+              title={priorArt.title}
+              organization={priorArt.applicantName}
+              year={priorArt.applicationDate.slice(0, 4)}
+              tags={priorArt.keywords}
+              status={priorArt.legalStatus}
+              relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
+              relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
+              applicationNumber={priorArt.applicationNumber}
+              thumbnailAlt={`${priorArt.title} 대표 이미지`}
               role="button"
               tabIndex={0}
               aria-pressed={highlighted}
-              onClick={handleSelect}
+              aria-busy={selectingId === priorArt.priorArtId}
+              onClick={handleClick}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  handleSelect();
+                  handleClick();
                 }
               }}
             />

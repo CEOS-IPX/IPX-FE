@@ -39,10 +39,11 @@ const NOVELTY_ANALYSIS_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
 };
 
-export function AnalysisMenu({ caseId }: { caseId: string }) {
+export function AnalysisMenu({ caseId, title }: { caseId: string; title: string }) {
   const router = useRouter();
   const [isNoveltyAnalyzing, setIsNoveltyAnalyzing] = useState(false);
   const [noveltyAnalysisError, setNoveltyAnalysisError] = useState<string | null>(null);
+  const titleQuery = `?title=${encodeURIComponent(title)}`;
 
   const handleNoveltyAnalysis = async () => {
     if (isNoveltyAnalyzing) return;
@@ -52,7 +53,7 @@ export function AnalysisMenu({ caseId }: { caseId: string }) {
 
     try {
       await runNoveltyAnalysis(caseId);
-      router.push(`/myhistory/${encodeURIComponent(caseId)}/novelty`);
+      router.push(`/myhistory/${encodeURIComponent(caseId)}/novelty${titleQuery}`);
     } catch (error) {
       setNoveltyAnalysisError(
         error instanceof ApiError
@@ -71,6 +72,7 @@ export function AnalysisMenu({ caseId }: { caseId: string }) {
         aria-label="활동 기록 분석 메뉴"
       >
         {ANALYSIS_MENU_ITEMS.map((item) => {
+          const isResearchItem = item.key === "research";
           const isNoveltyItem = item.key === "novelty";
           const isInventiveStepItem = item.key === "inventive-step";
           const isLoading = isNoveltyItem && isNoveltyAnalyzing;
@@ -82,11 +84,13 @@ export function AnalysisMenu({ caseId }: { caseId: string }) {
               disabled={isLoading}
               aria-busy={isLoading}
               onClick={
-                isNoveltyItem
-                  ? handleNoveltyAnalysis
-                  : isInventiveStepItem
-                    ? () => router.push(`/analysis/${encodeURIComponent(caseId)}`)
-                    : undefined
+                isResearchItem
+                  ? () => router.push(`/search?caseId=${encodeURIComponent(caseId)}`)
+                  : isNoveltyItem
+                    ? handleNoveltyAnalysis
+                    : isInventiveStepItem
+                      ? () => router.push(`/analysis/${encodeURIComponent(caseId)}${titleQuery}`)
+                      : undefined
               }
               className="flex w-full cursor-pointer items-center justify-between border-b border-outline-sub py-4 pr-3 pl-3.5 text-left last:border-b-0 hover:bg-bg-neutral-hover disabled:cursor-wait disabled:bg-bg-neutral-hover"
             >

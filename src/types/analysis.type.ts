@@ -2,6 +2,7 @@ export type SelectedPatent = {
   id: number;
   title: string;
   patentNumber: string;
+  applicationNumber: string;
   organization: string;
   applicationDate: string;
   registrationDate: string;

@@ -13,12 +13,9 @@ import { Button } from "@/components/ui/Button";
 import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
+import { formatPeriod } from "@/lib/priorArtFormat";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT, scoreToRelevance } from "@/lib/priorArtRelevance";
 import type { PriorArtDetail } from "@/types/search.type";
-
-// 백엔드 legalStatus enum 전체 목록이 확인되지 않아 확인된 값만 매핑, 나머지는 원본 값 그대로 표시
-const LEGAL_STATUS_LABEL: Record<string, string> = {
-  REGISTERED: "등록",
-};
 
 // 선행문헌 상세 조회 api 에러코드별 메시지
 const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
@@ -29,37 +26,6 @@ const PRIOR_ART_DETAIL_ERROR_MESSAGES: Record<string, string> = {
   O001: "특허 검색 서버와 통신 중 오류가 발생했습니다.",
   C002: "서버 내부 오류가 발생했습니다.",
 };
-
-// rrfScore -> 관련도 등급 변환 기준(백엔드 확정 스펙 없음, 우선 프론트에서 추정한 임시 기준)
-function getRelevance(rrfScore: number): {
-  label: string;
-  variant: "verygood" | "good" | "related" | "bad" | "hold";
-} {
-  if (rrfScore >= 0.8) return { label: "매우 높음", variant: "verygood" };
-  if (rrfScore >= 0.6) return { label: "높음", variant: "good" };
-  if (rrfScore >= 0.4) return { label: "보통", variant: "related" };
-  if (rrfScore >= 0.2) return { label: "낮음", variant: "bad" };
-  return { label: "매우 낮음", variant: "hold" };
-}
-
-function formatPeriod(from?: string | null, to?: string | null): string {
-  if (!from || !to) return "-";
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) return "-";
-
-  let months =
-    (toDate.getFullYear() - fromDate.getFullYear()) * 12 +
-    (toDate.getMonth() - fromDate.getMonth());
-  if (toDate.getDate() < fromDate.getDate()) months -= 1;
-  if (months < 0) return "-";
-
-  const years = Math.floor(months / 12);
-  const remainMonths = months % 12;
-  if (years === 0) return `${remainMonths}개월`;
-  if (remainMonths === 0) return `${years}년`;
-  return `${years}년 ${remainMonths}개월`;
-}
 
 export default function TechDetailPage() {
   const params = useParams<{ id: string }>();
@@ -128,10 +94,8 @@ export default function TechDetailPage() {
     );
   }
 
-  const legalStatusLabel = detail.legalStatus
-    ? (LEGAL_STATUS_LABEL[detail.legalStatus] ?? detail.legalStatus)
-    : "-";
-  const relevance = getRelevance(detail.rrfScore);
+  const legalStatusLabel = detail.legalStatus ?? "-";
+  const relevance = scoreToRelevance(detail.rrfScore);
   const patentNumber = detail.registrationNumber || detail.applicationNumber;
   const mainFeatures = detail.keyFeatures.length > 0 ? detail.keyFeatures.join(", ") : "-";
 
@@ -220,7 +184,9 @@ export default function TechDetailPage() {
           >
             <section className="flex w-full flex-col items-start justify-center gap-2 self-stretch">
               <h2 className="self-stretch text-title-18 text-title-primary">관련도</h2>
-              <StatusBadge variant={relevance.variant}>{relevance.label}</StatusBadge>
+              <StatusBadge variant={RELEVANCE_VARIANT[relevance]}>
+                {RELEVANCE_LABEL[relevance]}
+              </StatusBadge>
             </section>
 
             <section className="flex w-full flex-col items-start gap-3 self-stretch">
