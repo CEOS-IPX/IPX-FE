@@ -10,7 +10,11 @@ import type {
   UpdateNoveltyComparisonRequest,
   UpdateNoveltyComparisonResponse,
 } from "@/types/novelty.type";
-import type { CreateReportRequest, ReportSummaryResponse } from "@/types/report.type";
+import type {
+  CreateReportRequest,
+  ReportDetailResponse,
+  ReportSummaryResponse,
+} from "@/types/report.type";
 
 export function runNoveltyAnalysis(caseId: string | number) {
   return apiRequest<NoveltyAnalysisResponse>(
@@ -77,4 +81,8 @@ export function createReport(caseId: string | number, body: CreateReportRequest)
     method: "POST",
     body,
   });
+}
+
+export function getReport(caseId: string | number) {
+  return apiRequest<ReportDetailResponse>(`/cases/${encodeURIComponent(String(caseId))}/report`);
 }

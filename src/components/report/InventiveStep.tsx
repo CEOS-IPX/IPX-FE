@@ -11,7 +11,7 @@ import type { Effect } from "@/components/analysis/InventiveStep/LogicCards/Effe
 type InventiveStepProps = {
   satisfied: boolean;
   primaryReference: ComparisonReference;
-  secondaryReference: ComparisonReference;
+  secondaryReference: ComparisonReference | null;
   numericalLimits: Effect[];
   backgroundLimit: string;
   motivationAbsence: string;
