@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getInventiveStepAnalysis, getNoveltyAnalysis } from "@/lib/api/analysis";
 import { deleteCase, getCases, updateCase } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
@@ -34,6 +35,26 @@ const DELETE_CASE_ERROR_MESSAGES: Record<string, string> = {
 
 type EditingProject = { id: string; title: string; company: string; manager: string };
 
+async function resolveAnalysisState(project: CaseSummary): Promise<CaseSummary> {
+  if (project.status === "NOVELTY_COMPLETED") {
+    const inventiveAnalysisExists = await getInventiveStepAnalysis(project.caseId).then(
+      () => true,
+      () => false
+    );
+    return { ...project, noveltyAnalysisExists: true, inventiveAnalysisExists };
+  }
+
+  if (project.status === "INVENTIVE_COMPLETED") {
+    const noveltyAnalysisExists = await getNoveltyAnalysis(project.caseId).then(
+      () => true,
+      () => false
+    );
+    return { ...project, noveltyAnalysisExists, inventiveAnalysisExists: true };
+  }
+
+  return project;
+}
+
 export function useMyHistory() {
   const isAuthInitialized = useAuthStore((state) => state.isInitialized);
   const accessToken = useAuthStore((state) => state.accessToken);
@@ -58,10 +79,11 @@ export function useMyHistory() {
     let cancelled = false;
 
     getCases({ statusGroup: STATUS_GROUP_BY_TAB[activeTab], size: 50 })
-      .then((result) => {
+      .then(async (result) => {
+        const casesWithAnalysisState = await Promise.all(result.cases.map(resolveAnalysisState));
         if (cancelled) return;
 
-        setCases(result.cases);
+        setCases(casesWithAnalysisState);
 
         setCounts({
           전체: result.totalCount,

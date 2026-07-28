@@ -4,6 +4,7 @@ import { Tab } from "@/components/myhistory/Tab";
 import { ProjectCard } from "@/components/myhistory/ProjectCard";
 import { ModifyModal } from "@/components/myhistory/ModifyModal";
 import { useMyHistory } from "@/hooks/useMyHistory";
+import { deriveCaseSummaryStatusBadge } from "@/lib/caseStatus";
 
 export default function MyHistoryPage() {
   const {
@@ -38,19 +39,23 @@ export default function MyHistoryPage() {
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {cases.map((project) => (
-            <ProjectCard
-              key={project.caseId}
-              id={String(project.caseId)}
-              status={project.statusLabel}
-              statusVariant={project.status === "REPORT_COMPLETED" ? "secondary" : "primary"}
-              title={project.title}
-              company={project.applicantName ?? ""}
-              manager={project.inventorName ?? ""}
-              onEdit={() => openEditModal(project)}
-              onDelete={() => handleDelete(project)}
-            />
-          ))}
+          {cases.map((project) => {
+            const statusBadge = deriveCaseSummaryStatusBadge(project);
+
+            return (
+              <ProjectCard
+                key={project.caseId}
+                id={String(project.caseId)}
+                status={statusBadge.label}
+                statusVariant={statusBadge.variant}
+                title={project.title}
+                company={project.applicantName ?? ""}
+                manager={project.inventorName ?? ""}
+                onEdit={() => openEditModal(project)}
+                onDelete={() => handleDelete(project)}
+              />
+            );
+          })}
         </div>
       )}
 

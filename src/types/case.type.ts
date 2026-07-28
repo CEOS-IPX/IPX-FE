@@ -30,6 +30,8 @@ export type CaseSummary = {
   statusLabel: string;
   priorArtCount: number;
   reportAvailable: boolean;
+  noveltyAnalysisExists?: boolean;
+  inventiveAnalysisExists?: boolean;
   createdAt: string;
   updatedAt: string;
 };
