@@ -108,7 +108,7 @@ export default function ProjectDetailPage() {
         </section>
 
         <div className="flex w-70 shrink-0 flex-col gap-3">
-          <AnalysisMenu caseId={id} />
+          <AnalysisMenu caseId={id} title={detail.title} />
           <AnalysisNotice />
         </div>
       </div>

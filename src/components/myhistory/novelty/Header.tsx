@@ -1,6 +1,9 @@
+"use client";
+
 import { Button } from "@/components/ui/Button";
 import ExternalIcon from "@/components/icons/icon-external.svg";
 import { Chip } from "@/components/myhistory/ProjectCardChip";
+import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 
 interface HeaderProps {
   title: string;
@@ -10,10 +13,17 @@ interface HeaderProps {
 }
 
 export default function Header({ title, status, patentNumber, organization }: HeaderProps) {
+  const thumbnailUrl = useKiprisThumbnail(patentNumber);
+
   return (
     <div className="flex flex-row items-end justify-between">
       <div className="flex flex-row gap-5.25">
-        <div className="h-25 w-25 shrink-0 rounded-sm border border-outline-sub"></div>
+        <div
+          role={thumbnailUrl ? "img" : undefined}
+          aria-label={thumbnailUrl ? `${title} 대표 이미지` : undefined}
+          className="h-25 w-25 shrink-0 rounded-sm border border-outline-sub bg-cover bg-center bg-no-repeat"
+          style={thumbnailUrl ? { backgroundImage: `url("${thumbnailUrl}")` } : undefined}
+        />
 
         <div className="flex flex-col gap-2">
           <div className="flex flex-row items-center gap-2">
