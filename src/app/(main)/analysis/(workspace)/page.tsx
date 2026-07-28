@@ -1,9 +1,27 @@
 "use client";
 
+import { useState } from "react";
 import Header from "@/components/analysis/Header";
 import { AnalysisProjectCard } from "@/components/analysis/AnalysisProjectCard";
-import { useAnalysisProjects } from "@/hooks/useAnalysisProjects";
+import { SortingTag } from "@/components/searchlist/SortingTag";
+import { useAnalysisProjects, type AnalysisProject } from "@/hooks/useAnalysisProjects";
 import { useTitleFilter } from "@/hooks/useTitleFilter";
+
+const SORT_OPTIONS = ["미완료 우선", "최신순"] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
+function sortProjects(projects: AnalysisProject[], sortOption: SortOption): AnalysisProject[] {
+  const sorted = [...projects];
+  if (sortOption === "최신순") {
+    sorted.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+  } else {
+    sorted.sort((a, b) => {
+      if (a.isAnalysisDone !== b.isAnalysisDone) return a.isAnalysisDone ? 1 : -1;
+      return a.title.localeCompare(b.title, "ko");
+    });
+  }
+  return sorted;
+}
 
 export default function AnalysisPage() {
   const { projects, isLoading, error } = useAnalysisProjects();
@@ -12,15 +30,19 @@ export default function AnalysisPage() {
     setQuery,
     filtered: matchedProjects,
   } = useTitleFilter(projects, (project) => project.title);
+  const [sortOption, setSortOption] = useState<SortOption>("미완료 우선");
 
-  const filtered = [...matchedProjects].sort((a, b) => {
-    if (a.isAnalysisDone !== b.isAnalysisDone) return a.isAnalysisDone ? 1 : -1;
-    return a.title.localeCompare(b.title, "ko");
-  });
+  const filtered = sortProjects(matchedProjects, sortOption);
 
   return (
     <div className="flex flex-col gap-6">
       <Header query={query} onQueryChange={setQuery} />
+
+      <SortingTag
+        label="미완료 우선"
+        options={[...SORT_OPTIONS]}
+        onChange={(value) => setSortOption(value as SortOption)}
+      />
 
       {error && <p className="text-body-15 text-error-default">{error}</p>}
 
