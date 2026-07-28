@@ -41,11 +41,19 @@ export function cancelSearch(caseId: number) {
   });
 }
 
-// 선행기술 탐색 결과 페이지
-// 사건별 선행문헌 목록 조회
+// 선행기술 탐색 결과 페이지 + 내 활동 기록(개별 프로젝트) 저장된 특허 목록
+// 사건별 선행문헌 목록 조회 (같은 api를 두 화면에서 공용으로 사용)
 export function getPriorArts(caseId: number) {
   return apiRequest<GetPriorArtsResponse>(`/cases/${caseId}/prior-arts`);
 }
+
+// 에러코드별 메시지 (두 화면에서 동일하게 사용 -> 페이지가 아니라 ts에 저장)
+export const PRIOR_ARTS_ERROR_MESSAGES: Record<string, string> = {
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
 
 // 선행기술 탐색 결과 페이지
 // 출원번호로 선행문헌 추가 api
@@ -55,6 +63,19 @@ export function addPriorArtsManual(caseId: number, body: AddPriorArtsManualReque
     body,
   });
 }
+
+// 에러코드별 메시지(수동으로 특허 추가 api)
+export const ADD_PRIOR_ARTS_MANUAL_ERROR_MESSAGES: Record<string, string> = {
+  C001: "잘못된 입력값입니다.",
+  P002: "모든 특허가 이미 추가되어 있습니다.",
+  SC001: "인증이 필요합니다.",
+  CA002: "해당 사건에 접근할 권한이 없습니다.",
+  CA001: "사건을 찾을 수 없습니다.",
+  RQ002: "요청 횟수 제한을 초과했습니다. 잠시 후 다시 시도해주세요.",
+  PY001: "AI 검색 서버와 통신 중 오류가 발생했습니다.",
+  PY002: "AI 서버 응답 시간이 초과되었습니다.",
+  C002: "서버 내부 오류가 발생했습니다.",
+};
 
 // 선행기술 탐색 결과 상세 페이지
 // 선행문헌 상세 조회 api(특허 개별 페이지)
