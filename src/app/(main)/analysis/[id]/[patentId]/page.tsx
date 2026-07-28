@@ -13,7 +13,6 @@ import {
   type InventiveStepLogicKey,
 } from "@/constants/analysis/inventiveStep";
 import { Button } from "@/components/ui/Button";
-import { CreateReportForm } from "@/components/report/CreateReportForm";
 import { getInventiveStepAnalysis, updateInventiveArgument } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
