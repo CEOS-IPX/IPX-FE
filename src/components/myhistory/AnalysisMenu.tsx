@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import BackIcon from "@/components/icons/icon-back.svg";
-import { runNoveltyAnalysis } from "@/lib/api/analysis";
+import { getNoveltyAnalysis, runNoveltyAnalysis } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 
 const ANALYSIS_MENU_ITEMS = [
@@ -65,7 +65,16 @@ export function AnalysisMenu({
     setNoveltyAnalysisError(null);
 
     try {
-      await runNoveltyAnalysis(caseId);
+      try {
+        await getNoveltyAnalysis(caseId);
+      } catch (error) {
+        if (!(error instanceof ApiError) || error.errorCode !== "N001") {
+          throw error;
+        }
+
+        await runNoveltyAnalysis(caseId);
+      }
+
       router.push(`/myhistory/${encodeURIComponent(caseId)}/novelty${titleQuery}`);
     } catch (error) {
       setNoveltyAnalysisError(
