@@ -399,9 +399,7 @@ export default function AnalysisReportPage({
         </div>
       </div>
 
-      <CreateReportForm caseId={id} />
-
-      <Button variant="secondary" onClick={() => router.push("/analysis")}>
+      <Button variant="secondary" className="mt-4" onClick={() => router.push("/analysis")}>
         목록으로
       </Button>
     </div>
