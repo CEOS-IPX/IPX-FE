@@ -22,6 +22,14 @@ const PAGE_LABELS: Record<string, string> = {
 const PROJECT_DETAIL_PATTERN = /^\/myhistory\/[^/]+$/;
 // 리포트: /myhistory/{id}/report
 const REPORT_PATH_PATTERN = /^\/myhistory\/[^/]+\/report$/;
+// 신규성 분석 결과: /myhistory/{id}/novelty
+const NOVELTY_PATH_PATTERN = /^\/myhistory\/[^/]+\/novelty$/;
+// 기술 분석 상세(선행기술 선택): /analysis/{id}
+const ANALYSIS_DETAIL_PATTERN = /^\/analysis\/[^/]+$/;
+// 진보성 분석 결과: /analysis/{id}/{patentId}
+const ANALYSIS_LOGIC_PATTERN = /^\/analysis\/[^/]+\/[^/]+$/;
+// 개별 특허 상세(내 활동기록 -> 프로젝트 -> 특허): /tech/{id}
+const TECH_DETAIL_PATTERN = /^\/tech\/[^/]+$/;
 
 function getBreadcrumbSegments(pathname: string, titleParam: string | null): string[] {
   const title = titleParam?.trim();
@@ -32,8 +40,17 @@ function getBreadcrumbSegments(pathname: string, titleParam: string | null): str
   if (REPORT_PATH_PATTERN.test(pathname)) {
     return [title || MOCK_PROJECT_TITLE, "분석 리포트"];
   }
-  if (PROJECT_DETAIL_PATTERN.test(pathname)) {
+  if (NOVELTY_PATH_PATTERN.test(pathname)) {
+    return [title || MOCK_PROJECT_TITLE, "신규성 분석"];
+  }
+  if (ANALYSIS_LOGIC_PATTERN.test(pathname)) {
+    return [title || MOCK_PROJECT_TITLE, "진보성 분석"];
+  }
+  if (PROJECT_DETAIL_PATTERN.test(pathname) || TECH_DETAIL_PATTERN.test(pathname)) {
     return ["내 활동 기록", title || MOCK_PROJECT_TITLE];
+  }
+  if (ANALYSIS_DETAIL_PATTERN.test(pathname)) {
+    return ["기술 분석", title || MOCK_PROJECT_TITLE];
   }
   if (PAGE_LABELS[pathname]) {
     return [PAGE_LABELS[pathname]];
@@ -107,7 +124,6 @@ export function Topbar() {
               email={user.email}
               company={user.company}
               onClose={() => setIsAccountModalOpen(false)}
-              // 추후 api 연동 시 실제 저장 요청으로 교체
               onSaveName={(name) => console.log("save name:", name)}
               onSaveCompany={(company) => console.log("save company:", company)}
             />

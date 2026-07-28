@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { deleteCase, getCases, updateCase } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { useRecentCasesStore } from "@/store/recentCasesStore";
 import type { CaseStatusGroup, CaseSummary } from "@/types/case.type";
 
 export type TabValue = "전체" | "대기 중" | "완료";
@@ -119,6 +120,7 @@ export function useMyHistory() {
         )
       );
       setEditingProject(null);
+      useRecentCasesStore.getState().invalidate();
     } catch (err) {
       if (err instanceof ApiError) {
         setModifyError(
@@ -153,6 +155,7 @@ export function useMyHistory() {
         "대기 중": wasCompleted ? prev["대기 중"] : Math.max(0, prev["대기 중"] - 1),
         완료: wasCompleted ? Math.max(0, prev.완료 - 1) : prev.완료,
       }));
+      useRecentCasesStore.getState().invalidate();
     } catch (err) {
       if (err instanceof ApiError) {
         setDeleteError(

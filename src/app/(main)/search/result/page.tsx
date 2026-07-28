@@ -16,25 +16,19 @@ import {
   ADD_PRIOR_ARTS_MANUAL_ERROR_MESSAGES,
 } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
-import { RELEVANCE_LABEL, RELEVANCE_VARIANT, RELEVANCE_RANK } from "@/lib/priorArtRelevance";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
+import {
+  PRIOR_ART_SORT_OPTIONS,
+  usePriorArtSort,
+  type PriorArtSortOption,
+} from "@/hooks/usePriorArtSort";
 import type { PriorArt } from "@/types/search.type";
-
-const SORT_OPTIONS = ["관련도 순", "최신순"] as const;
-type SortOption = (typeof SORT_OPTIONS)[number];
-
-function sortPriorArts(priorArts: PriorArt[], sortOption: SortOption): PriorArt[] {
-  const sorted = [...priorArts];
-  if (sortOption === "최신순") {
-    sorted.sort((a, b) => b.applicationDate.localeCompare(a.applicationDate));
-  } else {
-    sorted.sort((a, b) => RELEVANCE_RANK[b.relevance] - RELEVANCE_RANK[a.relevance]);
-  }
-  return sorted;
-}
 
 function SearchResultContent() {
   const searchParams = useSearchParams();
   const caseId = searchParams.get("caseId");
+  const title = searchParams.get("title");
+  const techLinkQuery = title ? `?title=${encodeURIComponent(title)}` : "";
 
   const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -43,9 +37,7 @@ function SearchResultContent() {
   const [isPatentImportModalOpen, setIsPatentImportModalOpen] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
-  const [sortOption, setSortOption] = useState<SortOption>("관련도 순");
-
-  const sortedPriorArts = sortPriorArts(priorArts, sortOption);
+  const { setSortOption, sorted: sortedPriorArts } = usePriorArtSort(priorArts);
 
   //선행기술 목록 불러오는 api
   useEffect(() => {
@@ -128,8 +120,8 @@ function SearchResultContent() {
         <div className="flex w-full items-end justify-between self-stretch">
           <SortingTag
             label="관련도 순"
-            options={[...SORT_OPTIONS]}
-            onChange={(value) => setSortOption(value as SortOption)}
+            options={[...PRIOR_ART_SORT_OPTIONS]}
+            onChange={(value) => setSortOption(value as PriorArtSortOption)}
           />
           <Button
             size="sm"
@@ -154,7 +146,7 @@ function SearchResultContent() {
             {sortedPriorArts.map((priorArt) => (
               <Link
                 key={priorArt.priorArtId}
-                href={`/tech/${priorArt.priorArtId}`}
+                href={`/tech/${priorArt.priorArtId}${techLinkQuery}`}
                 className="block w-full"
               >
                 <ProjectList
