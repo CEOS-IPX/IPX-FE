@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getInventiveStepAnalysis, getNoveltyAnalysis } from "@/lib/api/analysis";
 import { getCaseDetail } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
 import { parseCaseId } from "@/lib/parseCaseId";
@@ -8,14 +9,63 @@ import { useAuthStore } from "@/store/authStore";
 import type { ProjectStep } from "@/components/myhistory/SelectableItem";
 import type { CaseDetail } from "@/types/case.type";
 
+type CaseDetailWithAnalysisState = CaseDetail & {
+  noveltyAnalysisExists?: boolean;
+  inventiveAnalysisExists?: boolean;
+};
+
+export function deriveAnalysisCompletion(detail: CaseDetailWithAnalysisState) {
+  const noveltyCompleted =
+    detail.noveltyAnalysisExists === true ||
+    Boolean(detail.noveltyCompletedAt) ||
+    detail.status === "NOVELTY_COMPLETED" ||
+    detail.status === "REPORT_COMPLETED";
+  const inventiveCompleted =
+    detail.inventiveAnalysisExists === true ||
+    Boolean(detail.inventiveCompletedAt) ||
+    detail.status === "INVENTIVE_COMPLETED" ||
+    detail.status === "REPORT_COMPLETED";
+
+  return {
+    noveltyCompleted,
+    inventiveCompleted,
+    technicalAnalysisCompleted:
+      (noveltyCompleted && inventiveCompleted) ||
+      detail.status === "REPORT_COMPLETED" ||
+      detail.reportAvailable,
+  };
+}
+
+export function deriveStatusBadge(detail: CaseDetailWithAnalysisState): {
+  label: string;
+  variant: "primary" | "secondary";
+} {
+  if (detail.status === "REPORT_COMPLETED") {
+    return { label: "완료", variant: "secondary" };
+  }
+
+  const { noveltyCompleted, inventiveCompleted, technicalAnalysisCompleted } =
+    deriveAnalysisCompletion(detail);
+
+  if (technicalAnalysisCompleted) {
+    return { label: "기술 분석 완료", variant: "primary" };
+  }
+  if (noveltyCompleted) {
+    return { label: "신규성 분석 완료", variant: "primary" };
+  }
+  if (inventiveCompleted) {
+    return { label: "진보성 분석 완료", variant: "primary" };
+  }
+
+  return { label: detail.statusLabel, variant: "primary" };
+}
+
 // 신규성/진보성 분석은 순서 상관없이 독립적으로 실행 가능하므로, status(단일 값) 대신
 // 각 단계별 완료 시각 필드로 개별 판단 -> "기술 분석"은 신규성+진보성 둘 다 끝났을 때만 완료로 표시
-export function deriveCompletedSteps(detail: CaseDetail): Record<ProjectStep, boolean> {
-  const technicalAnalysisCompleted =
-    (Boolean(detail.noveltyCompletedAt) && Boolean(detail.inventiveCompletedAt)) ||
-    detail.status === "INVENTIVE_COMPLETED" ||
-    detail.status === "REPORT_COMPLETED" ||
-    detail.reportAvailable;
+export function deriveCompletedSteps(
+  detail: CaseDetailWithAnalysisState
+): Record<ProjectStep, boolean> {
+  const { technicalAnalysisCompleted } = deriveAnalysisCompletion(detail);
 
   return {
     "구성요소 분해": detail.status !== "NOT_STARTED",
@@ -41,7 +91,7 @@ export function useCaseDetail(id: string | undefined) {
   const accessToken = useAuthStore((state) => state.accessToken);
   const canRequest = isAuthInitialized && Boolean(accessToken);
 
-  const [detail, setDetail] = useState<CaseDetail | null>(null);
+  const [detail, setDetail] = useState<CaseDetailWithAnalysisState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // 지금 detail/error가 어느 caseId에 대한 결과인지 -> caseId가 바뀌면 아직 그 caseId로 fetch가 안 끝났다는 뜻이라
@@ -55,9 +105,18 @@ export function useCaseDetail(id: string | undefined) {
     let cancelled = false;
 
     getCaseDetail(caseId)
-      .then((result) => {
+      .then(async (result) => {
+        const [noveltyResult, inventiveResult] = await Promise.allSettled([
+          getNoveltyAnalysis(caseId),
+          getInventiveStepAnalysis(caseId),
+        ]);
+
         if (cancelled) return;
-        setDetail(result);
+        setDetail({
+          ...result,
+          noveltyAnalysisExists: noveltyResult.status === "fulfilled",
+          inventiveAnalysisExists: inventiveResult.status === "fulfilled",
+        });
         setError(null);
         setLoadedId(caseId);
       })

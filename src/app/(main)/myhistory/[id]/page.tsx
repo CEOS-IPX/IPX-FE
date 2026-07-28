@@ -11,7 +11,7 @@ import { ListSearchField } from "@/components/searchlist/ListSearchField";
 import { ProjectList } from "@/components/searchlist/ProjectList";
 import { ResultListHeader } from "@/components/searchlist/ResultListHeader";
 import { SortingTag } from "@/components/searchlist/SortingTag";
-import { useCaseDetail, deriveCompletedSteps } from "@/hooks/useCaseDetail";
+import { useCaseDetail, deriveCompletedSteps, deriveStatusBadge } from "@/hooks/useCaseDetail";
 import { usePriorArtsList } from "@/hooks/usePriorArtsList";
 import { useTitleFilter } from "@/hooks/useTitleFilter";
 import {
@@ -55,6 +55,7 @@ export default function ProjectDetailPage() {
   }
 
   const completedSteps = deriveCompletedSteps(detail);
+  const statusBadge = deriveStatusBadge(detail);
   const showReport = completedSteps["기술 분석"];
 
   return (
@@ -68,8 +69,8 @@ export default function ProjectDetailPage() {
               {detail.title}
             </h1>
 
-            <Chip variant="primary" className="mt-1 flex h-auto shrink-0 py-1">
-              {detail.statusLabel}
+            <Chip variant={statusBadge.variant} className="mt-1 flex h-auto shrink-0 py-1">
+              {statusBadge.label}
             </Chip>
           </div>
           <div className="flex items-center gap-1 text-body-17 text-caption-label">
