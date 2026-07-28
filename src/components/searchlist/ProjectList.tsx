@@ -55,8 +55,8 @@ export function ProjectList({
       className={cn(
         "flex items-start",
         highlighted
-          ? "w-[61.5625rem] gap-6 rounded-[0.5rem] border border-inverse-on-primary-2 bg-bg-primary-tint p-4"
-          : "w-[64rem] py-4",
+          ? "w-246.25 gap-6 rounded-lg border border-inverse-on-primary-2 bg-bg-primary-tint p-4"
+          : "w-5xl py-4",
         !highlighted && (showSelectionCheckbox ? "gap-6 px-3" : "px-4"),
         className
       )}
@@ -77,7 +77,7 @@ export function ProjectList({
             <div
               role={resolvedThumbnailUrl ? "img" : undefined}
               aria-label={resolvedThumbnailUrl ? thumbnailAlt : undefined}
-              className="flex size-20 shrink-0 aspect-square items-center justify-center gap-2.5 rounded-[0.25rem] border border-outline-sub bg-bg-neutral-subtle bg-cover bg-center bg-no-repeat p-2.5"
+              className="flex size-20 shrink-0 aspect-square items-center justify-center gap-2.5 rounded-sm border border-outline-sub bg-bg-neutral-subtle bg-cover bg-center bg-no-repeat p-2.5"
               style={
                 resolvedThumbnailUrl
                   ? { backgroundImage: `url("${resolvedThumbnailUrl}")` }
