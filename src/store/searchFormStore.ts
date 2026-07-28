@@ -53,6 +53,7 @@ type SearchFormActions = {
   setIsStartingSearch: (v: boolean) => void;
   setStartSearchError: (v: string | null) => void;
   setPrefilledCaseId: (v: number) => void;
+  resetForm: () => void;
 };
 
 // /search 페이지 작성 중 탐색 중단하기, 에러나서 탐색 중단 등으로 다시 이전 페이지로언마운트돼도
@@ -104,4 +105,28 @@ export const useSearchFormStore = create<SearchFormState & SearchFormActions>((s
   setIsStartingSearch: (isStartingSearch) => set({ isStartingSearch }),
   setStartSearchError: (startSearchError) => set({ startSearchError }),
   setPrefilledCaseId: (prefilledCaseId) => set({ prefilledCaseId }),
+  resetForm: () =>
+    set({
+      title: "",
+      technicalField: "",
+      description: "",
+      ipcInput: "",
+      applicantName: "",
+      inventorName: "",
+      companyName: "",
+      clientName: "",
+      requiredApplicationNumbers: [],
+      priorArtReference: "",
+      differentiationNotes: "",
+      measurementConditions: "",
+      measurementResults: "",
+      elements: [{ id: crypto.randomUUID(), name: "", description: "" }],
+      resultCount: 10,
+      isModalOpen: false,
+      aiCreateError: null,
+      isLoading: false,
+      isStartingSearch: false,
+      startSearchError: null,
+      prefilledCaseId: null,
+    }),
 }));

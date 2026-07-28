@@ -6,6 +6,9 @@ import StopIcon from "@/components/icons/icon-stop.svg";
 import { Button } from "@/components/ui/Button";
 import { cancelSearch, getSearchStatus } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
+import { useActiveSearchStore } from "@/store/activeSearchStore";
+import { useAuthStore } from "@/store/authStore";
+import { useSearchFormStore } from "@/store/searchFormStore";
 import type { SearchStatusResponse } from "@/types/search.type";
 
 const DEFAULT_RESULT_COUNT = 10;
@@ -94,9 +97,16 @@ function ProgressRing({ percent }: { percent: number }) {
 function LoadingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const resultCount = Number(searchParams.get("count")) || DEFAULT_RESULT_COUNT;
-  const caseId = searchParams.get("caseId");
-  const title = searchParams.get("title");
+  const activeSearch = useActiveSearchStore((state) => state.activeSearch);
+  const setActiveSearch = useActiveSearchStore((state) => state.setActiveSearch);
+  const clearActiveSearch = useActiveSearchStore((state) => state.clearActiveSearch);
+  const resetSearchForm = useSearchFormStore((state) => state.resetForm);
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const caseId = searchParams.get("caseId") ?? activeSearch?.caseId.toString() ?? null;
+  const title = searchParams.get("title") ?? activeSearch?.title ?? null;
+  const resultCount =
+    Number(searchParams.get("count") ?? activeSearch?.resultCount) || DEFAULT_RESULT_COUNT;
 
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
@@ -115,6 +125,7 @@ function LoadingContent() {
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
+      clearActiveSearch();
       router.push("/search");
     } catch (err) {
       if (err instanceof ApiError) {
@@ -132,7 +143,13 @@ function LoadingContent() {
   };
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!caseId || !isAuthInitialized || !accessToken) return;
+
+    setActiveSearch({
+      caseId: Number(caseId),
+      resultCount,
+      title: title ?? "",
+    });
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -149,9 +166,13 @@ function LoadingContent() {
         if (result.status === "in_progress") {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
         } else if (result.status === "completed") {
+          clearActiveSearch();
+          resetSearchForm();
           router.push(
             `/search/result?caseId=${caseId}${title ? `&title=${encodeURIComponent(title)}` : ""}`
           );
+        } else {
+          clearActiveSearch();
         }
       } catch (err) {
         if (cancelled) return;
@@ -179,7 +200,17 @@ function LoadingContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [caseId, router, title]);
+  }, [
+    accessToken,
+    caseId,
+    clearActiveSearch,
+    isAuthInitialized,
+    resultCount,
+    resetSearchForm,
+    router,
+    setActiveSearch,
+    title,
+  ]);
 
   useEffect(() => {
     if (caseId) return;
