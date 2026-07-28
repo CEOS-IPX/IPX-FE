@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import MoreIcon from "@/components/icons/icon-more_vert.svg";
+import { useCaseThumbnails } from "@/hooks/useCaseThumbnails";
 import { Chip } from "./ProjectCardChip";
 import { Menu } from "./Menu";
 import { Thumbnail, type Patent } from "./Thumbnail";
@@ -14,7 +15,7 @@ interface ProjectCardProps {
   title: string;
   company: string;
   manager: string;
-  patents: Patent[];
+  patents?: Patent[];
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -32,6 +33,9 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const fetchedThumbnails = useCaseThumbnails(patents ? undefined : id);
+  const resolvedPatents = patents ?? fetchedThumbnails.patents;
+  const totalCount = patents ? patents.length : fetchedThumbnails.totalCount;
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -91,7 +95,7 @@ export function ProjectCard({
           <p>{manager}</p>
         </div>
       </div>
-      <Thumbnail patents={patents} />
+      <Thumbnail patents={resolvedPatents} totalCount={totalCount} />
     </Link>
   );
 }

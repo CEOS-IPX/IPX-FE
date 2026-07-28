@@ -12,6 +12,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
 import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
+import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import type { PriorArtDetail } from "@/types/search.type";
 
 // 백엔드 legalStatus enum 전체 목록이 확인되지 않아 확인된 값만 매핑, 나머지는 원본 값 그대로 표시
@@ -67,6 +68,7 @@ export default function TechDetailPage() {
   const [detail, setDetail] = useState<PriorArtDetail | null>(null);
   const [isLoading, setIsLoading] = useState(() => Boolean(priorArtId));
   const [error, setError] = useState<string | null>(null);
+  const thumbnailUrl = useKiprisThumbnail(detail?.applicationNumber);
 
   //선행문헌 상세 조회
   useEffect(() => {
@@ -145,9 +147,10 @@ export default function TechDetailPage() {
           <header className="flex w-full items-end gap-9 self-stretch">
             <div className="flex min-w-0 flex-1 items-start gap-5.25">
               <div
-                role="img"
-                aria-label="선행기술 대표 이미지"
+                role={thumbnailUrl ? "img" : undefined}
+                aria-label={thumbnailUrl ? "선행기술 대표 이미지" : undefined}
                 className="flex size-25 shrink-0 aspect-square items-center justify-center gap-2.5 rounded-sm border border-outline-sub bg-bg-neutral-subtle bg-cover bg-center bg-no-repeat p-2.5"
+                style={thumbnailUrl ? { backgroundImage: `url("${thumbnailUrl}")` } : undefined}
               />
 
               <div className="flex min-w-0 flex-1 flex-col items-start gap-2">

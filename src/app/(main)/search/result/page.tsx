@@ -168,6 +168,7 @@ function SearchResultContent() {
                   relevanceLabel={RELEVANCE_LABEL[priorArt.relevance]}
                   relevanceVariant={RELEVANCE_VARIANT[priorArt.relevance]}
                   recommendationReason={priorArt.reason}
+                  applicationNumber={priorArt.applicationNumber}
                   thumbnailAlt={`${priorArt.title} 대표 이미지`}
                 />
               </Link>

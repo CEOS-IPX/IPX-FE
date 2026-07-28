@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/searchlist/Checkbox";
 import { Recommendation } from "@/components/searchlist/Recommendation";
 import { TagChip } from "@/components/searchlist/TagChip";
 import { StatusBadge, type StatusBadgeProps } from "@/components/searchlist/StatusBadge";
+import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import { cn } from "@/lib/cn";
 
 export type ProjectListProps = HTMLAttributes<HTMLElement> & {
@@ -17,6 +18,7 @@ export type ProjectListProps = HTMLAttributes<HTMLElement> & {
   relevanceVariant?: StatusBadgeProps["variant"];
   recommendationReason?: string;
   thumbnailUrl?: string;
+  applicationNumber?: string;
   thumbnailAlt?: string;
   showCheckbox?: boolean;
   selected?: boolean;
@@ -34,6 +36,7 @@ export function ProjectList({
   relevanceVariant = "verygood",
   recommendationReason,
   thumbnailUrl,
+  applicationNumber,
   thumbnailAlt = "",
   showCheckbox = true,
   selected,
@@ -42,6 +45,8 @@ export function ProjectList({
   className,
   ...props
 }: ProjectListProps) {
+  const kiprisThumbnailUrl = useKiprisThumbnail(thumbnailUrl ? undefined : applicationNumber);
+  const resolvedThumbnailUrl = thumbnailUrl ?? kiprisThumbnailUrl;
   const showSelectionCheckbox = showCheckbox && !highlighted;
 
   return (
@@ -70,10 +75,14 @@ export function ProjectList({
         <div className="flex min-w-0 flex-1 items-stretch">
           <div className={cn("flex min-w-0 flex-1 items-start", highlighted ? "gap-6" : "gap-5")}>
             <div
-              role={thumbnailUrl ? "img" : undefined}
-              aria-label={thumbnailUrl ? thumbnailAlt : undefined}
+              role={resolvedThumbnailUrl ? "img" : undefined}
+              aria-label={resolvedThumbnailUrl ? thumbnailAlt : undefined}
               className="flex size-20 shrink-0 aspect-square items-center justify-center gap-2.5 rounded-[0.25rem] border border-outline-sub bg-bg-neutral-subtle bg-cover bg-center bg-no-repeat p-2.5"
-              style={thumbnailUrl ? { backgroundImage: `url("${thumbnailUrl}")` } : undefined}
+              style={
+                resolvedThumbnailUrl
+                  ? { backgroundImage: `url("${resolvedThumbnailUrl}")` }
+                  : undefined
+              }
             />
 
             <div className="flex min-w-0 flex-1 flex-col items-start">

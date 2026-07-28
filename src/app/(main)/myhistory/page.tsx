@@ -47,7 +47,6 @@ export default function MyHistoryPage() {
               title={project.title}
               company={project.applicantName ?? ""}
               manager={project.inventorName ?? ""}
-              patents={[]}
               onEdit={() => openEditModal(project)}
               onDelete={() => handleDelete(project)}
             />
