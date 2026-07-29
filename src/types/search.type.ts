@@ -122,6 +122,7 @@ export type PriorArtDetail = {
   independentClaims?: string | null;
   source: string;
   rrfScore: number;
+  relevance: PriorArtRelevance;
   reason?: string | null;
   summary?: string | null;
   techPurpose?: string | null;
