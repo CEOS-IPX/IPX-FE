@@ -108,7 +108,7 @@ export function useSearchResult() {
     techLinkQuery,
     totalCount,
     isLoading,
-    error,
+    error: caseId ? error : "사건 정보를 찾을 수 없습니다. 다시 탐색을 시작해주세요.",
     sortedPriorArts,
     setSortOption,
     isPatentImportModalOpen,

@@ -22,9 +22,8 @@ export function useAnalysisPriorArts(id: string) {
   const selectedPatent = useAnalysisStore((state) => state.selectedPatent);
   const setSelectedPatent = useAnalysisStore((state) => state.setSelectedPatent);
 
-  const [priorArts, setPriorArts] = useState<PriorArt[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ id: string; priorArts: PriorArt[] } | null>(null);
+  const [requestError, setRequestError] = useState<{ id: string; message: string } | null>(null);
   const [selectingId, setSelectingId] = useState<number | null>(null);
   const [selectError, setSelectError] = useState<string | null>(null);
 
@@ -57,32 +56,38 @@ export function useAnalysisPriorArts(id: string) {
     let cancelled = false;
 
     getPriorArts(caseId)
-      .then((result) => {
+      .then((data) => {
         if (cancelled) return;
-        setPriorArts(result.priorArts);
-        setError(null);
+        setRequestError(null);
+        setResult({ id, priorArts: data.priorArts });
       })
       .catch((err) => {
         if (cancelled) return;
-        if (err instanceof ApiError) {
-          setError(
-            PRIOR_ARTS_ERROR_MESSAGES[err.errorCode] ||
-              err.message ||
-              "선행문헌 목록을 불러오는 중 오류가 발생했습니다."
-          );
-        } else {
-          setError("선행문헌 목록을 불러오는 중 오류가 발생했습니다.");
-        }
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsLoading(false);
+        setResult(null);
+        setRequestError({
+          id,
+          message:
+            err instanceof ApiError
+              ? (PRIOR_ARTS_ERROR_MESSAGES[err.errorCode] ??
+                err.message ??
+                "선행문헌 목록을 불러오는 중 오류가 발생했습니다.")
+              : "선행문헌 목록을 불러오는 중 오류가 발생했습니다.",
+        });
       });
 
     return () => {
       cancelled = true;
     };
   }, [id]);
+
+  const isValidId = Boolean(id) && !Number.isNaN(Number(id));
+  const priorArts = result?.id === id ? result.priorArts : [];
+  const error = !isValidId
+    ? "잘못된 사건 번호입니다."
+    : requestError?.id === id
+      ? requestError.message
+      : null;
+  const isLoading = isValidId && result?.id !== id && !error;
 
   //주인용으로 선택 -> 선행문헌 상세 조회 후 우측 패널에 표시
   const handleSelect = async (priorArt: PriorArt) => {

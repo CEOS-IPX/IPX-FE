@@ -71,7 +71,7 @@ export function useReport(id: string) {
   };
 
   return {
-    accessToken,
+    isAuthenticated: Boolean(accessToken),
     report,
     errorMessage,
     isLoading,

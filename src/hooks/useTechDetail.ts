@@ -22,10 +22,12 @@ export function useTechDetail() {
   const params = useParams<{ id: string }>();
   const priorArtId = params.id;
 
-  const [detail, setDetail] = useState<PriorArtDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(() => Boolean(priorArtId));
-  const [error, setError] = useState<string | null>(null);
-  const thumbnailUrl = useKiprisThumbnail(detail?.applicationNumber);
+  // 조회 결과를 요청 당시의 priorArtId와 함께 저장해서, id가 바뀌면 파생값(detail/error/isLoading)이
+  // 자동으로 "로딩 중" 상태로 돌아가도록 한다 (같은 페이지에서 id만 바뀌는 네비게이션에서 이전 상세가 잠깐 보이는 것 방지).
+  const [result, setResult] = useState<{ priorArtId: string; detail: PriorArtDetail } | null>(null);
+  const [requestError, setRequestError] = useState<{ priorArtId: string; message: string } | null>(
+    null
+  );
 
   //선행문헌 상세 조회
   useEffect(() => {
@@ -34,34 +36,35 @@ export function useTechDetail() {
     let cancelled = false;
 
     getPriorArtDetail(Number(priorArtId))
-      .then((result) => {
+      .then((data) => {
         if (cancelled) return;
-
-        setDetail(result);
-        setError(null);
+        setRequestError(null);
+        setResult({ priorArtId, detail: data });
       })
       .catch((err) => {
         if (cancelled) return;
 
-        if (err instanceof ApiError) {
-          setError(
-            PRIOR_ART_DETAIL_ERROR_MESSAGES[err.errorCode] ||
-              err.message ||
-              "선행문헌 상세를 불러오는 중 오류가 발생했습니다."
-          );
-        } else {
-          setError("선행문헌 상세를 불러오는 중 오류가 발생했습니다.");
-        }
-      })
-      .finally(() => {
-        if (cancelled) return;
-        setIsLoading(false);
+        setResult(null);
+        setRequestError({
+          priorArtId,
+          message:
+            err instanceof ApiError
+              ? (PRIOR_ART_DETAIL_ERROR_MESSAGES[err.errorCode] ??
+                err.message ??
+                "선행문헌 상세를 불러오는 중 오류가 발생했습니다.")
+              : "선행문헌 상세를 불러오는 중 오류가 발생했습니다.",
+        });
       });
 
     return () => {
       cancelled = true;
     };
   }, [priorArtId]);
+
+  const detail = result?.priorArtId === priorArtId ? result.detail : null;
+  const error = requestError?.priorArtId === priorArtId ? requestError.message : null;
+  const isLoading = Boolean(priorArtId) && !detail && !error;
+  const thumbnailUrl = useKiprisThumbnail(detail?.applicationNumber);
 
   return { priorArtId, detail, isLoading, error, thumbnailUrl };
 }

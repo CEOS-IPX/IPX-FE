@@ -59,7 +59,7 @@ function getArgument(report: ReportDetailResponse, argumentType: ReportInventive
 
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { accessToken, report, errorMessage, isLoading, reload } = useReport(id);
+  const { isAuthenticated, report, errorMessage, isLoading, reload } = useReport(id);
 
   if (isLoading) {
     return (
@@ -75,7 +75,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
         <p role="alert" className="text-body-17 text-body-secondary">
           {errorMessage ?? "분석 리포트를 불러오지 못했습니다."}
         </p>
-        {accessToken && (
+        {isAuthenticated && (
           <Button variant="secondary" size="sm" onClick={reload}>
             다시 조회
           </Button>
