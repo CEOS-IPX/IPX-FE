@@ -7,8 +7,10 @@ import { z } from "zod";
 
 import { AgreementItem } from "@/components/auth/AgreementItem";
 import { PasswordField } from "@/components/auth/PasswordField";
+import { TermsModal } from "@/components/auth/TermsModal";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { PRIVACY_POLICY_CONTENT, SERVICE_TERMS_CONTENT } from "@/constants/auth/terms";
 import { signup } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/error";
 import { TERMS_TYPE } from "@/types/auth.type";
@@ -68,6 +70,7 @@ export const ProfileStep = ({ email, verificationToken, onSubmit, onBack }: Prof
   });
 
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [openTerms, setOpenTerms] = useState<"service" | "privacy" | null>(null);
 
   const agreementError = errors.agreedTerms ?? errors.agreedPrivacy;
 
@@ -152,24 +155,48 @@ export const ProfileStep = ({ email, verificationToken, onSubmit, onBack }: Prof
           control={control}
           name="agreedTerms"
           render={({ field: { value, onChange } }) => (
-            <AgreementItem
-              required
-              label="IPX의 이용약관에 동의합니다"
-              checked={value}
-              onToggle={() => onChange(!value)}
-            />
+            <>
+              <AgreementItem
+                required
+                label="IPX의 이용약관에 동의합니다"
+                checked={value}
+                onToggle={() => onChange(!value)}
+                onDetail={() => setOpenTerms("service")}
+              />
+              {openTerms === "service" && (
+                <TermsModal
+                  content={SERVICE_TERMS_CONTENT}
+                  agreementLabel="IPX의 이용약관에 동의합니다"
+                  checked={value}
+                  onToggle={() => onChange(!value)}
+                  onClose={() => setOpenTerms(null)}
+                />
+              )}
+            </>
           )}
         />
         <Controller
           control={control}
           name="agreedPrivacy"
           render={({ field: { value, onChange } }) => (
-            <AgreementItem
-              required
-              label="개인정보처리 방침에 동의합니다"
-              checked={value}
-              onToggle={() => onChange(!value)}
-            />
+            <>
+              <AgreementItem
+                required
+                label="개인정보처리 방침에 동의합니다"
+                checked={value}
+                onToggle={() => onChange(!value)}
+                onDetail={() => setOpenTerms("privacy")}
+              />
+              {openTerms === "privacy" && (
+                <TermsModal
+                  content={PRIVACY_POLICY_CONTENT}
+                  agreementLabel="개인정보처리 방침에 동의합니다"
+                  checked={value}
+                  onToggle={() => onChange(!value)}
+                  onClose={() => setOpenTerms(null)}
+                />
+              )}
+            </>
           )}
         />
       </div>

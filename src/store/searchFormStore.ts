@@ -53,11 +53,11 @@ type SearchFormActions = {
   setIsStartingSearch: (v: boolean) => void;
   setStartSearchError: (v: string | null) => void;
   setPrefilledCaseId: (v: number) => void;
+  resetForm: () => void;
 };
 
-// /search 페이지 작성 중 탐색 중단하기, 에러나서 탐색 중단 등으로 다시 이전 페이지로언마운트돼도
-// 입력 내용이 날아가지 않도록 컴포넌트 바깥에 상태들(내용들)을 둠(zustand 사용) -> 그래서 useSearchForm에서 분리된 내용이 있다!
-export const useSearchFormStore = create<SearchFormState & SearchFormActions>((set) => ({
+// /search 페이지 초기 상태 -> 탐색 중단하기로 되돌아온 게 아니라 다른 곳에서 새로 들어온 경우 resetForm으로 여기로 되돌림
+const INITIAL_SEARCH_FORM_STATE: SearchFormState = {
   title: "",
   technicalField: "",
   description: "",
@@ -79,6 +79,12 @@ export const useSearchFormStore = create<SearchFormState & SearchFormActions>((s
   isStartingSearch: false,
   startSearchError: null,
   prefilledCaseId: null,
+};
+
+// /search 페이지 작성 중 탐색 중단하기, 에러나서 탐색 중단 등으로 다시 이전 페이지로언마운트돼도
+// 입력 내용이 날아가지 않도록 컴포넌트 바깥에 상태들(내용들)을 둠(zustand 사용) -> 그래서 useSearchForm에서 분리된 내용이 있다!
+export const useSearchFormStore = create<SearchFormState & SearchFormActions>((set) => ({
+  ...INITIAL_SEARCH_FORM_STATE,
 
   setTitle: (title) => set({ title }),
   setTechnicalField: (technicalField) => set({ technicalField }),
@@ -104,4 +110,9 @@ export const useSearchFormStore = create<SearchFormState & SearchFormActions>((s
   setIsStartingSearch: (isStartingSearch) => set({ isStartingSearch }),
   setStartSearchError: (startSearchError) => set({ startSearchError }),
   setPrefilledCaseId: (prefilledCaseId) => set({ prefilledCaseId }),
+  resetForm: () =>
+    set({
+      ...INITIAL_SEARCH_FORM_STATE,
+      elements: [{ id: crypto.randomUUID(), name: "", description: "" }],
+    }),
 }));

@@ -14,6 +14,7 @@ import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import { formatPeriod } from "@/lib/priorArtFormat";
+import { buildOriginalDocumentUrl } from "@/lib/patentOriginalDocument";
 import { RELEVANCE_LABEL, RELEVANCE_VARIANT, scoreToRelevance } from "@/lib/priorArtRelevance";
 import type { PriorArtDetail } from "@/types/search.type";
 
@@ -139,6 +140,11 @@ export default function TechDetailPage() {
               size="sm"
               variant="secondary"
               className="h-10.25 shrink-0 gap-1 rounded-md py-2.5 pr-4 pl-3"
+              disabled={!buildOriginalDocumentUrl(detail.applicationNumber)}
+              onClick={() => {
+                const url = buildOriginalDocumentUrl(detail.applicationNumber);
+                if (url) window.open(url, "_blank", "noopener,noreferrer");
+              }}
             >
               <ExternalIcon className="size-5 shrink-0 [&_path]:fill-current" aria-hidden />
               원문보기
