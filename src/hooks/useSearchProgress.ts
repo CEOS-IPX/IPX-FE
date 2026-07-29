@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cancelSearch, getSearchStatus } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
+import { useActiveSearchStore } from "@/store/activeSearchStore";
+import { useAuthStore } from "@/store/authStore";
+import { useSearchFormStore } from "@/store/searchFormStore";
 import type { SearchStatusResponse } from "@/types/search.type";
 
+const DEFAULT_RESULT_COUNT = 10;
 const POLL_INTERVAL_MS = 2000;
 const MAX_POLL_RETRIES = 5;
 
@@ -30,11 +34,21 @@ const TERMINAL_MESSAGE: Record<string, (status: SearchStatusResponse) => string>
 };
 
 // 선행기술 탐색 로딩 페이지: 진행 상태 폴링 + 중단하기
+// activeSearchStore에 진행 중인 검색을 저장해두어, URL 쿼리 없이 이 페이지로 돌아와도 진행 상황을 복구할 수 있게 한다.
 export function useSearchProgress() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const caseId = searchParams.get("caseId");
-  const title = searchParams.get("title");
+  const activeSearch = useActiveSearchStore((state) => state.activeSearch);
+  const setActiveSearch = useActiveSearchStore((state) => state.setActiveSearch);
+  const clearActiveSearch = useActiveSearchStore((state) => state.clearActiveSearch);
+  const resetSearchForm = useSearchFormStore((state) => state.resetForm);
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+
+  const caseId = searchParams.get("caseId") ?? activeSearch?.caseId.toString() ?? null;
+  const title = searchParams.get("title") ?? activeSearch?.title ?? null;
+  const resultCount =
+    Number(searchParams.get("count") ?? activeSearch?.resultCount) || DEFAULT_RESULT_COUNT;
 
   const [status, setStatus] = useState<SearchStatusResponse | null>(null);
   const [pollError, setPollError] = useState<string | null>(null);
@@ -51,6 +65,7 @@ export function useSearchProgress() {
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
+      clearActiveSearch();
       router.push("/search?resume=1");
     } catch (err) {
       if (err instanceof ApiError) {
@@ -72,7 +87,13 @@ export function useSearchProgress() {
       router.push("/search?resume=1");
       return;
     }
-    if (isStopping) return;
+    if (isStopping || !isAuthInitialized || !accessToken) return;
+
+    setActiveSearch({
+      caseId: Number(caseId),
+      resultCount,
+      title: title ?? "",
+    });
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -89,9 +110,13 @@ export function useSearchProgress() {
         if (result.status === "in_progress") {
           timer = setTimeout(poll, POLL_INTERVAL_MS);
         } else if (result.status === "completed") {
+          clearActiveSearch();
+          resetSearchForm();
           router.push(
             `/search/result?caseId=${caseId}${title ? `&title=${encodeURIComponent(title)}` : ""}`
           );
+        } else {
+          clearActiveSearch();
         }
       } catch (err) {
         if (cancelled) return;
@@ -119,7 +144,18 @@ export function useSearchProgress() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [caseId, isStopping, router, title]);
+  }, [
+    accessToken,
+    caseId,
+    clearActiveSearch,
+    isAuthInitialized,
+    isStopping,
+    resultCount,
+    resetSearchForm,
+    router,
+    setActiveSearch,
+    title,
+  ]);
 
   const percent = status?.progress ?? 0;
   const label = status?.step ?? "탐색 준비 중";
