@@ -37,11 +37,13 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </div>
         </div>
       </div>
-      <div className="flex w-1/2 flex-col">
+      <div className="flex min-h-0 w-1/2 flex-col">
         <div className="pt-6 px-8">
           <LogoIpxChar width={64} height={20} />
         </div>
-        <div className="flex flex-1 items-center justify-center px-20 py-15">{children}</div>
+        <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-20 py-15 scrollbar-hide">
+          <div className="flex min-h-215 w-125">{children}</div>
+        </div>
       </div>
     </div>
   );

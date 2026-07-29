@@ -4,8 +4,10 @@ import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AgreementItem } from "@/components/auth/AgreementItem";
+import { TermsModal } from "@/components/auth/TermsModal";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { PRIVACY_POLICY_CONTENT, SERVICE_TERMS_CONTENT } from "@/constants/auth/terms";
 import { signupWithGoogle } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
@@ -33,6 +35,7 @@ function GoogleSignupForm() {
   const [agreedPrivacy, setAgreedPrivacy] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [openTerms, setOpenTerms] = useState<"service" | "privacy" | null>(null);
 
   const canSubmit = agreedTerms && agreedPrivacy && !isSubmitting;
 
@@ -98,14 +101,35 @@ function GoogleSignupForm() {
           label="IPX의 이용약관에 동의합니다"
           checked={agreedTerms}
           onToggle={() => setAgreedTerms((checked) => !checked)}
+          onDetail={() => setOpenTerms("service")}
         />
         <AgreementItem
           required
           label="개인정보처리 방침에 동의합니다"
           checked={agreedPrivacy}
           onToggle={() => setAgreedPrivacy((checked) => !checked)}
+          onDetail={() => setOpenTerms("privacy")}
         />
       </div>
+
+      {openTerms === "service" && (
+        <TermsModal
+          content={SERVICE_TERMS_CONTENT}
+          agreementLabel="IPX의 이용약관에 동의합니다"
+          checked={agreedTerms}
+          onToggle={() => setAgreedTerms((checked) => !checked)}
+          onClose={() => setOpenTerms(null)}
+        />
+      )}
+      {openTerms === "privacy" && (
+        <TermsModal
+          content={PRIVACY_POLICY_CONTENT}
+          agreementLabel="개인정보처리 방침에 동의합니다"
+          checked={agreedPrivacy}
+          onToggle={() => setAgreedPrivacy((checked) => !checked)}
+          onClose={() => setOpenTerms(null)}
+        />
+      )}
 
       {submitError && (
         <p className="text-body-15 text-error-default">
