@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getRecentCases } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
+import { useAuthStore } from "@/store/authStore";
 import { useRecentCasesStore } from "@/store/recentCasesStore";
 import type { RecentCase } from "@/types/case.type";
 
@@ -16,14 +17,19 @@ const RECENT_CASES_ERROR_MESSAGES: Record<string, string> = {
 
 // 사이드바 "최근 탐색" 영역 - 최근 사건 목록 조회
 export function useRecentCases(limit = 5) {
+  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const canRequest = isAuthInitialized && Boolean(accessToken);
   const version = useRecentCasesStore((s) => s.version);
   const [cases, setCases] = useState<RecentCase[]>([]);
   const [error, setError] = useState<string | null>(null);
   // limit이 바뀌면 아직 그 limit으로 fetch가 안 끝났다는 뜻 -> 렌더링 시점 비교로 isLoading 도출
   const [loadedLimit, setLoadedLimit] = useState<number | undefined>(undefined);
-  const isLoading = limit !== loadedLimit;
+  const isLoading = !isAuthInitialized || (canRequest && limit !== loadedLimit);
 
   useEffect(() => {
+    if (!canRequest) return;
+
     let cancelled = false;
 
     getRecentCases(limit)
@@ -53,7 +59,11 @@ export function useRecentCases(limit = 5) {
     return () => {
       cancelled = true;
     };
-  }, [limit, version]);
+  }, [canRequest, limit, version]);
 
-  return { cases, isLoading, error };
+  return {
+    cases,
+    isLoading,
+    error: isAuthInitialized && !accessToken ? "인증이 필요합니다." : error,
+  };
 }
