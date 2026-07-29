@@ -9,13 +9,13 @@ export function Recommendation({ reason, className, ...props }: RecommendationPr
   return (
     <div
       className={cn(
-        "flex self-stretch flex-col items-center justify-center gap-1 rounded-[0.375rem] bg-bg-neutral-hover p-4",
+        "flex self-stretch flex-col items-center justify-center gap-1 rounded-md bg-bg-neutral-hover p-4",
         className
       )}
       {...props}
     >
       <div className="flex w-full items-center gap-3">
-        <strong className="w-[3.4375rem] shrink-0 text-body-emphasis-15 text-title-primary">
+        <strong className="w-13.75 shrink-0 text-body-emphasis-15 text-title-primary">
           추천 이유
         </strong>
         <span className="h-4 w-px shrink-0 bg-icon-neutral-subtle" aria-hidden />

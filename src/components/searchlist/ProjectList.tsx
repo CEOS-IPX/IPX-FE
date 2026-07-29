@@ -1,11 +1,12 @@
 "use client";
 
-import type { HTMLAttributes } from "react";
+import { useState, type HTMLAttributes } from "react";
 import { Checkbox } from "@/components/searchlist/Checkbox";
 import { Recommendation } from "@/components/searchlist/Recommendation";
 import { TagChip } from "@/components/searchlist/TagChip";
 import { StatusBadge, type StatusBadgeProps } from "@/components/searchlist/StatusBadge";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
+import { useLineOverflow } from "@/hooks/useLineOverflow";
 import { HighlightedText } from "@/components/ui/HighlightedText";
 import { cn } from "@/lib/cn";
 
@@ -51,6 +52,11 @@ export function ProjectList({
   const kiprisThumbnailUrl = useKiprisThumbnail(thumbnailUrl ? undefined : applicationNumber);
   const resolvedThumbnailUrl = thumbnailUrl ?? kiprisThumbnailUrl;
   const showSelectionCheckbox = showCheckbox && !highlighted;
+
+  const { measureRef, reserveRef, visibleCount, isOverflowing } = useLineOverflow(tags.length);
+  const [tagsExpanded, setTagsExpanded] = useState(false);
+  const visibleTags = tagsExpanded ? tags : tags.slice(0, visibleCount);
+  const showMoreTags = isOverflowing && !tagsExpanded;
 
   return (
     <article
@@ -102,10 +108,45 @@ export function ProjectList({
                 <span className="shrink-0">{year}</span>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                {tags.map((tag) => (
-                  <TagChip key={tag} label={tag} active={highlighted} />
-                ))}
+              <div className="relative mt-3 w-full">
+                <div
+                  ref={measureRef}
+                  className="invisible absolute inset-x-0 top-0 flex flex-wrap items-center gap-1.5"
+                  aria-hidden
+                >
+                  {tags.map((tag) => (
+                    <TagChip key={tag} label={tag} active={highlighted} />
+                  ))}
+                </div>
+
+                <button
+                  ref={reserveRef}
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden
+                  className="invisible absolute top-0 left-0 ml-2 shrink-0 text-label-15"
+                >
+                  더보기
+                </button>
+
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {visibleTags.map((tag) => (
+                    <TagChip key={tag} label={tag} active={highlighted} />
+                  ))}
+                  {showMoreTags && (
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setTagsExpanded(true);
+                      }}
+                      className="ml-2 shrink-0 text-label-15 text-primary-default hover:underline"
+                    >
+                      더보기
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
