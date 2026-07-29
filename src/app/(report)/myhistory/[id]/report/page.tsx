@@ -9,7 +9,6 @@ import ReportOverview from "@/components/report/Overview";
 import NoveltyComparison from "@/components/report/NoveltyComparision";
 import InventiveStep from "@/components/report/InventiveStep";
 import TotalConclusion from "@/components/report/Conclusion";
-import { UpdateReportForm } from "@/components/report/UpdateReportForm";
 import { getReport } from "@/lib/api/analysis";
 import { ApiError } from "@/lib/api/error";
 import { useAuthStore } from "@/store/authStore";
@@ -165,29 +164,6 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
         <BackButton />
         <PrintButton />
       </div>
-
-      <UpdateReportForm
-        caseId={id}
-        initialValues={{
-          authorName: report.authorName,
-          noveltySatisfied: report.noveltySatisfied,
-          inventiveSatisfied: report.inventiveSatisfied,
-          overallConclusion: report.overallConclusion,
-        }}
-        onUpdated={(updated) => {
-          setResult((previous) =>
-            previous && previous.caseId === id
-              ? {
-                  ...previous,
-                  report: {
-                    ...previous.report,
-                    ...updated,
-                  },
-                }
-              : previous
-          );
-        }}
-      />
 
       <main className="w-full max-w-210 px-10 py-6">
         <article className="flex w-full flex-col gap-16 bg-bg-surface px-17.5 py-15 shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)] print:shadow-none">
