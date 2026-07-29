@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, type HTMLAttributes } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type HTMLAttributes } from "react";
 import { Checkbox } from "@/components/searchlist/Checkbox";
 import { Recommendation } from "@/components/searchlist/Recommendation";
 import { TagChip } from "@/components/searchlist/TagChip";
 import { StatusBadge, type StatusBadgeProps } from "@/components/searchlist/StatusBadge";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
-import { useLineOverflow } from "@/hooks/useLineOverflow";
 import { HighlightedText } from "@/components/ui/HighlightedText";
+import ChevronIcon from "@/components/icons/icon-back.svg";
 import { cn } from "@/lib/cn";
 
 export type ProjectListProps = HTMLAttributes<HTMLElement> & {
@@ -53,10 +53,37 @@ export function ProjectList({
   const resolvedThumbnailUrl = thumbnailUrl ?? kiprisThumbnailUrl;
   const showSelectionCheckbox = showCheckbox && !highlighted;
 
-  const { measureRef, reserveRef, visibleCount, isOverflowing } = useLineOverflow(tags.length);
-  const [tagsExpanded, setTagsExpanded] = useState(false);
-  const visibleTags = tagsExpanded ? tags : tags.slice(0, visibleCount);
-  const showMoreTags = isOverflowing && !tagsExpanded;
+  // 한 줄 고정 + 화살표 버튼으로 옆으로 스크롤
+  const tagScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollMore, setCanScrollMore] = useState(false);
+
+  const checkScrollOverflow = useCallback(() => {
+    const el = tagScrollRef.current;
+    if (!el) return;
+    setCanScrollMore(el.scrollWidth - el.scrollLeft - el.clientWidth > 1);
+  }, []);
+
+  useLayoutEffect(() => {
+    checkScrollOverflow();
+
+    const el = tagScrollRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(checkScrollOverflow);
+    observer.observe(el);
+    el.addEventListener("scroll", checkScrollOverflow);
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener("scroll", checkScrollOverflow);
+    };
+  }, [checkScrollOverflow, tags.length]);
+
+  const handleScrollTags = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    tagScrollRef.current?.scrollBy({ left: 160, behavior: "smooth" });
+  };
 
   return (
     <article
@@ -110,43 +137,30 @@ export function ProjectList({
 
               <div className="relative mt-3 w-full">
                 <div
-                  ref={measureRef}
-                  className="invisible absolute inset-x-0 top-0 flex flex-wrap items-center gap-1.5"
-                  aria-hidden
+                  ref={tagScrollRef}
+                  className={cn(
+                    "scrollbar-hide flex items-center gap-1.5 overflow-x-auto scroll-smooth",
+                    canScrollMore && "pr-9"
+                  )}
                 >
                   {tags.map((tag) => (
                     <TagChip key={tag} label={tag} active={highlighted} />
                   ))}
                 </div>
 
-                <button
-                  ref={reserveRef}
-                  type="button"
-                  tabIndex={-1}
-                  aria-hidden
-                  className="invisible absolute top-0 left-0 ml-3 shrink-0 text-label-15"
-                >
-                  더보기
-                </button>
-
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {visibleTags.map((tag) => (
-                    <TagChip key={tag} label={tag} active={highlighted} />
-                  ))}
-                  {showMoreTags && (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setTagsExpanded(true);
-                      }}
-                      className="ml-3 shrink-0 text-label-15 text-primary-default hover:underline"
-                    >
-                      더보기
-                    </button>
-                  )}
-                </div>
+                {canScrollMore && (
+                  <button
+                    type="button"
+                    aria-label="태그 더 보기"
+                    onClick={handleScrollTags}
+                    className="absolute top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-surface shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)]"
+                  >
+                    <ChevronIcon
+                      className="size-5 text-icon-neutral-emphasize [&_path]:fill-current"
+                      aria-hidden
+                    />
+                  </button>
+                )}
               </div>
             </div>
           </div>
