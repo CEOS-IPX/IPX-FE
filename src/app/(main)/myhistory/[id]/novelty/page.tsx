@@ -161,7 +161,7 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
       <Header
         title={analysis.primaryArt.title}
         status={analysis.primaryArt.legalStatus}
-        patentNumber={analysis.primaryArt.applicationNumber}
+        applicationNumber={analysis.primaryArt.applicationNumber}
         organization={analysis.primaryArt.applicantName}
       />
 

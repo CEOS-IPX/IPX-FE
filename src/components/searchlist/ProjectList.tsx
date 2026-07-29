@@ -1,12 +1,13 @@
 "use client";
 
-import type { HTMLAttributes } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, type HTMLAttributes } from "react";
 import { Checkbox } from "@/components/searchlist/Checkbox";
 import { Recommendation } from "@/components/searchlist/Recommendation";
 import { TagChip } from "@/components/searchlist/TagChip";
 import { StatusBadge, type StatusBadgeProps } from "@/components/searchlist/StatusBadge";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import { HighlightedText } from "@/components/ui/HighlightedText";
+import ChevronIcon from "@/components/icons/icon-back.svg";
 import { cn } from "@/lib/cn";
 
 export type ProjectListProps = HTMLAttributes<HTMLElement> & {
@@ -51,6 +52,38 @@ export function ProjectList({
   const kiprisThumbnailUrl = useKiprisThumbnail(thumbnailUrl ? undefined : applicationNumber);
   const resolvedThumbnailUrl = thumbnailUrl ?? kiprisThumbnailUrl;
   const showSelectionCheckbox = showCheckbox && !highlighted;
+
+  // 한 줄 고정 + 화살표 버튼으로 옆으로 스크롤
+  const tagScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollMore, setCanScrollMore] = useState(false);
+
+  const checkScrollOverflow = useCallback(() => {
+    const el = tagScrollRef.current;
+    if (!el) return;
+    setCanScrollMore(el.scrollWidth - el.scrollLeft - el.clientWidth > 1);
+  }, []);
+
+  useLayoutEffect(() => {
+    checkScrollOverflow();
+
+    const el = tagScrollRef.current;
+    if (!el) return;
+
+    const observer = new ResizeObserver(checkScrollOverflow);
+    observer.observe(el);
+    el.addEventListener("scroll", checkScrollOverflow);
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener("scroll", checkScrollOverflow);
+    };
+  }, [checkScrollOverflow, tags.length]);
+
+  const handleScrollTags = (event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    tagScrollRef.current?.scrollBy({ left: 160, behavior: "smooth" });
+  };
 
   return (
     <article
@@ -102,10 +135,32 @@ export function ProjectList({
                 <span className="shrink-0">{year}</span>
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
-                {tags.map((tag) => (
-                  <TagChip key={tag} label={tag} active={highlighted} />
-                ))}
+              <div className="relative mt-3 w-full">
+                <div
+                  ref={tagScrollRef}
+                  className={cn(
+                    "scrollbar-hide flex items-center gap-1.5 overflow-x-auto scroll-smooth",
+                    canScrollMore && "pr-9"
+                  )}
+                >
+                  {tags.map((tag) => (
+                    <TagChip key={tag} label={tag} active={highlighted} />
+                  ))}
+                </div>
+
+                {canScrollMore && (
+                  <button
+                    type="button"
+                    aria-label="태그 더 보기"
+                    onClick={handleScrollTags}
+                    className="absolute top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-surface shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)]"
+                  >
+                    <ChevronIcon
+                      className="size-5 text-icon-neutral-emphasize [&_path]:fill-current"
+                      aria-hidden
+                    />
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -117,7 +117,7 @@ function LoadingContent() {
 
   const handleStop = async () => {
     if (!caseId) {
-      router.push("/search");
+      router.push("/search?resume=1");
       return;
     }
 
@@ -126,7 +126,7 @@ function LoadingContent() {
     try {
       await cancelSearch(Number(caseId));
       clearActiveSearch();
-      router.push("/search");
+      router.push("/search?resume=1");
     } catch (err) {
       if (err instanceof ApiError) {
         setCancelError(
@@ -143,7 +143,7 @@ function LoadingContent() {
   };
 
   useEffect(() => {
-    if (!caseId || !isAuthInitialized || !accessToken) return;
+    if (!caseId || isStopping || !isAuthInitialized || !accessToken) return;
 
     setActiveSearch({
       caseId: Number(caseId),
@@ -158,7 +158,7 @@ function LoadingContent() {
     const poll = async () => {
       try {
         const result = await getSearchStatus(Number(caseId));
-        if (cancelled) return;
+        if (cancelled || isStopping) return;
         consecutiveErrors = 0;
         setStatus(result);
         setPollError(null);
@@ -205,6 +205,7 @@ function LoadingContent() {
     caseId,
     clearActiveSearch,
     isAuthInitialized,
+    isStopping,
     resultCount,
     resetSearchForm,
     router,

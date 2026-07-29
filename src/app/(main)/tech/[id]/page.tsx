@@ -14,7 +14,8 @@ import { getPriorArtDetail } from "@/lib/api/search";
 import { ApiError } from "@/lib/api/error";
 import { useKiprisThumbnail } from "@/hooks/useKiprisThumbnail";
 import { formatPeriod } from "@/lib/priorArtFormat";
-import { RELEVANCE_LABEL, RELEVANCE_VARIANT, scoreToRelevance } from "@/lib/priorArtRelevance";
+import { buildOriginalDocumentUrl } from "@/lib/patentOriginalDocument";
+import { RELEVANCE_LABEL, RELEVANCE_VARIANT } from "@/lib/priorArtRelevance";
 import type { PriorArtDetail } from "@/types/search.type";
 
 // 선행문헌 상세 조회 api 에러코드별 메시지
@@ -95,7 +96,7 @@ export default function TechDetailPage() {
   }
 
   const legalStatusLabel = detail.legalStatus ?? "-";
-  const relevance = scoreToRelevance(detail.rrfScore);
+  const relevance = detail.relevance;
   const patentNumber = detail.registrationNumber || detail.applicationNumber;
   const mainFeatures = detail.keyFeatures.length > 0 ? detail.keyFeatures.join(", ") : "-";
 
@@ -139,6 +140,11 @@ export default function TechDetailPage() {
               size="sm"
               variant="secondary"
               className="h-10.25 shrink-0 gap-1 rounded-md py-2.5 pr-4 pl-3"
+              disabled={!buildOriginalDocumentUrl(detail.applicationNumber)}
+              onClick={() => {
+                const url = buildOriginalDocumentUrl(detail.applicationNumber);
+                if (url) window.open(url, "_blank", "noopener,noreferrer");
+              }}
             >
               <ExternalIcon className="size-5 shrink-0 [&_path]:fill-current" aria-hidden />
               원문보기
