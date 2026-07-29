@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import InformationA from "@/components/search/items/InformationA";
 import InformationB from "@/components/search/items/InformationB";
 import InformationC from "@/components/search/items/InformationC";
@@ -8,9 +9,29 @@ import InformationD from "@/components/search/items/InformationD";
 import { Footer } from "@/components/search/Footer";
 import { PatentImportModal } from "@/components/search/PatentImportModal";
 import { useSearchForm } from "@/hooks/useSearchForm";
+import { useActiveSearchStore } from "@/store/activeSearchStore";
 
 function SearchPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeSearch = useActiveSearchStore((state) => state.activeSearch);
   const form = useSearchForm();
+
+  useEffect(() => {
+    if (!activeSearch || searchParams.has("caseId")) return;
+
+    router.replace(
+      `/search/loading?count=${activeSearch.resultCount}&caseId=${activeSearch.caseId}&title=${encodeURIComponent(activeSearch.title)}`
+    );
+  }, [activeSearch, router, searchParams]);
+
+  if (activeSearch && !searchParams.has("caseId")) {
+    return (
+      <div className="flex min-h-full items-center justify-center">
+        <p className="text-body-15 text-caption-label">진행 중인 탐색을 불러오고 있습니다...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-15 px-20 py-5">
