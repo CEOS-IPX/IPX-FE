@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use } from "react";
 import { BackButton } from "@/components/ui/BackButton";
 import { Button } from "@/components/ui/Button";
 import { PrintButton } from "@/components/ui/PrintButton";
@@ -9,22 +9,12 @@ import ReportOverview from "@/components/report/Overview";
 import NoveltyComparison from "@/components/report/NoveltyComparision";
 import InventiveStep from "@/components/report/InventiveStep";
 import TotalConclusion from "@/components/report/Conclusion";
-import { getReport } from "@/lib/api/analysis";
-import { ApiError } from "@/lib/api/error";
-import { useAuthStore } from "@/store/authStore";
+import { useReport } from "@/hooks/useReport";
 import type {
   ReportDetailResponse,
   ReportInventiveArgumentType,
   ReportPriorArt,
 } from "@/types/report.type";
-
-const REPORT_ERROR_MESSAGES: Record<string, string> = {
-  SC001: "로그인이 필요합니다.",
-  CA002: "해당 사건에 접근할 권한이 없습니다.",
-  CA001: "사건을 찾을 수 없습니다.",
-  RP002: "분석 리포트를 찾을 수 없습니다.",
-  C002: "서버 내부 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
-};
 
 type EffectItem = {
   metric?: unknown;
@@ -69,53 +59,9 @@ function getArgument(report: ReportDetailResponse, argumentType: ReportInventive
 
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const isAuthInitialized = useAuthStore((state) => state.isInitialized);
-  const accessToken = useAuthStore((state) => state.accessToken);
-  const [result, setResult] = useState<{ caseId: string; report: ReportDetailResponse } | null>(
-    null
-  );
-  const [requestError, setRequestError] = useState<{ caseId: string; message: string } | null>(
-    null
-  );
-  const [reloadCount, setReloadCount] = useState(0);
+  const { accessToken, report, errorMessage, isLoading, reload } = useReport(id);
 
-  useEffect(() => {
-    if (!isAuthInitialized || !accessToken) return;
-
-    let canceled = false;
-
-    getReport(id)
-      .then((data) => {
-        if (canceled) return;
-        setRequestError(null);
-        setResult({ caseId: id, report: data });
-      })
-      .catch((error) => {
-        if (canceled) return;
-        setResult(null);
-        setRequestError({
-          caseId: id,
-          message:
-            error instanceof ApiError
-              ? (REPORT_ERROR_MESSAGES[error.errorCode] ?? error.message)
-              : "분석 리포트를 불러오는 중 네트워크 오류가 발생했습니다.",
-        });
-      });
-
-    return () => {
-      canceled = true;
-    };
-  }, [accessToken, id, isAuthInitialized, reloadCount]);
-
-  const report = result?.caseId === id ? result.report : null;
-  const errorMessage =
-    !isAuthInitialized || accessToken
-      ? requestError?.caseId === id
-        ? requestError.message
-        : null
-      : REPORT_ERROR_MESSAGES.SC001;
-
-  if (!isAuthInitialized || (accessToken && !report && !errorMessage)) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <p className="text-body-15 text-caption-label">분석 리포트를 불러오고 있습니다...</p>
@@ -130,15 +76,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
           {errorMessage ?? "분석 리포트를 불러오지 못했습니다."}
         </p>
         {accessToken && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setResult(null);
-              setRequestError(null);
-              setReloadCount((count) => count + 1);
-            }}
-          >
+          <Button variant="secondary" size="sm" onClick={reload}>
             다시 조회
           </Button>
         )}
