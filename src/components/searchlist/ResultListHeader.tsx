@@ -31,8 +31,8 @@ export const ResultListHeader = forwardRef<HTMLDivElement, ResultListHeaderProps
       <div
         ref={ref}
         className={cn(
-          "flex w-[64rem] items-center gap-9 border-y border-outline-sub px-3 py-0.5",
-          variant === "selected" && "h-[2.8125rem]",
+          "flex w-5xl items-center gap-9 border-y border-outline-sub px-3 py-0.5",
+          variant === "selected" && "h-11.25",
           className
         )}
         {...props}
