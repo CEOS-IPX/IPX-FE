@@ -30,7 +30,7 @@ export const SERVICE_TERMS_CONTENT: TermsContent = {
       ],
     },
     {
-      heading: "제4조 (이용자의 의무)",
+      heading: "제3조 (이용자의 의무)",
       paragraphs: ["이용자는 다음 행위를 해서는 안 됩니다."],
       bullets: [
         "타인의 계정 도용",
@@ -41,27 +41,27 @@ export const SERVICE_TERMS_CONTENT: TermsContent = {
       ],
     },
     {
-      heading: "제5조 (서비스의 변경 및 중단)",
+      heading: "제4조 (서비스의 변경 및 중단)",
       numbered: [
         "IPX는 운영상 또는 기술상의 필요에 따라 서비스 내용을 변경할 수 있습니다.",
         "서비스 점검, 장애, 기타 불가피한 사유 발생 시 서비스 제공이 일시 중단될 수 있습니다.",
       ],
     },
     {
-      heading: "제6조 (지식재산권)",
+      heading: "제5조 (지식재산권)",
       paragraphs: [
         "서비스 내 제공되는 콘텐츠 및 자료에 대한 저작권과 지식재산권은 IPX 또는 원저작권자에게 귀속됩니다.",
       ],
     },
     {
-      heading: "제7조 (책임의 제한)",
+      heading: "제6조 (책임의 제한)",
       numbered: [
         "IPX는 제공되는 정보의 정확성 및 완전성을 보장하지 않습니다.",
         "이용자의 판단 및 활동으로 인해 발생한 손해에 대해 책임지지 않습니다.",
       ],
     },
     {
-      heading: "제8조 (약관의 변경)",
+      heading: "제7조 (약관의 변경)",
       paragraphs: [
         "IPX는 관련 법령을 위반하지 않는 범위에서 본 약관을 변경할 수 있으며, 변경 시 서비스 내 공지합니다.",
       ],

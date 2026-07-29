@@ -132,7 +132,7 @@ function LoadingContent() {
   };
 
   useEffect(() => {
-    if (!caseId) return;
+    if (!caseId || isStopping) return;
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -141,7 +141,7 @@ function LoadingContent() {
     const poll = async () => {
       try {
         const result = await getSearchStatus(Number(caseId));
-        if (cancelled) return;
+        if (cancelled || isStopping) return;
         consecutiveErrors = 0;
         setStatus(result);
         setPollError(null);
@@ -179,7 +179,7 @@ function LoadingContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [caseId, router, title]);
+  }, [caseId, isStopping, router, title]);
 
   useEffect(() => {
     if (caseId) return;

@@ -140,13 +140,11 @@ export default function TechDetailPage() {
               size="sm"
               variant="secondary"
               className="h-10.25 shrink-0 gap-1 rounded-md py-2.5 pr-4 pl-3"
-              onClick={() =>
-                window.open(
-                  buildOriginalDocumentUrl(detail.applicationNumber),
-                  "_blank",
-                  "noopener,noreferrer"
-                )
-              }
+              disabled={!buildOriginalDocumentUrl(detail.applicationNumber)}
+              onClick={() => {
+                const url = buildOriginalDocumentUrl(detail.applicationNumber);
+                if (url) window.open(url, "_blank", "noopener,noreferrer");
+              }}
             >
               <ExternalIcon className="size-5 shrink-0 [&_path]:fill-current" aria-hidden />
               원문보기

@@ -9,12 +9,13 @@ import { buildOriginalDocumentUrl } from "@/lib/patentOriginalDocument";
 interface HeaderProps {
   title: string;
   status: string;
-  patentNumber: string;
+  applicationNumber: string;
   organization: string;
 }
 
-export default function Header({ title, status, patentNumber, organization }: HeaderProps) {
-  const thumbnailUrl = useKiprisThumbnail(patentNumber);
+export default function Header({ title, status, applicationNumber, organization }: HeaderProps) {
+  const thumbnailUrl = useKiprisThumbnail(applicationNumber);
+  const originalDocumentUrl = buildOriginalDocumentUrl(applicationNumber);
 
   return (
     <div className="flex flex-row items-end justify-between">
@@ -33,7 +34,7 @@ export default function Header({ title, status, patentNumber, organization }: He
           </div>
 
           <div className="flex flex-row gap-3 text-title-18 text-body-disabled">
-            <p>{patentNumber}</p>
+            <p>{applicationNumber}</p>
             <p>|</p>
             <p>{organization}</p>
           </div>
@@ -43,9 +44,11 @@ export default function Header({ title, status, patentNumber, organization }: He
       <Button
         variant="secondary"
         className="h-10 w-fit shrink-0 justify-center px-3 py-2.5"
-        onClick={() =>
-          window.open(buildOriginalDocumentUrl(patentNumber), "_blank", "noopener,noreferrer")
-        }
+        disabled={!originalDocumentUrl}
+        onClick={() => {
+          if (originalDocumentUrl)
+            window.open(originalDocumentUrl, "_blank", "noopener,noreferrer");
+        }}
       >
         <ExternalIcon className="h-5 w-5 [&_path]:fill-current" />
         원문보기

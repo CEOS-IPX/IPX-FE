@@ -54,17 +54,31 @@ export default function NoveltyTable({ comparisons, onSave }: NoveltyTableProps)
     setIsSaving(true);
     setSaveError(null);
 
+    const changedComparisons = comparisons.filter((comparison) => {
+      const draft = drafts[comparison.comparisonId];
+      if (!draft) return false;
+      return (
+        draft.comparisonResult !== comparison.comparisonResult ||
+        draft.citation !== (comparison.citation ?? "")
+      );
+    });
+
     try {
-      await Promise.all(
-        comparisons.map((comparison) => {
-          const draft = drafts[comparison.comparisonId];
-          if (!draft) return Promise.resolve();
+      const results = await Promise.allSettled(
+        changedComparisons.map((comparison) => {
+          const draft = drafts[comparison.comparisonId]!;
           return onSave(comparison.comparisonId, {
             comparisonResult: draft.comparisonResult,
             citation: draft.citation.trim() || null,
           });
         })
       );
+
+      const failedCount = results.filter((result) => result.status === "rejected").length;
+      if (failedCount > 0) {
+        throw new Error(`${failedCount}건 저장에 실패했습니다.`);
+      }
+
       setIsEditing(false);
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : "수정 내용을 저장하지 못했습니다.");
