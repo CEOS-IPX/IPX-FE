@@ -107,7 +107,7 @@ function LoadingContent() {
 
   const handleStop = async () => {
     if (!caseId) {
-      router.push("/search");
+      router.push("/search?resume=1");
       return;
     }
 
@@ -115,7 +115,7 @@ function LoadingContent() {
     setIsStopping(true);
     try {
       await cancelSearch(Number(caseId));
-      router.push("/search");
+      router.push("/search?resume=1");
     } catch (err) {
       if (err instanceof ApiError) {
         setCancelError(

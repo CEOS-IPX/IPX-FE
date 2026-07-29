@@ -106,7 +106,16 @@ export function useSearchForm() {
     setIsStartingSearch,
     startSearchError,
     setStartSearchError,
+    resetForm,
   } = useSearchFormStore();
+
+  // 탐색 중단하기로 되돌아온 경우(resume=1)가 아니면, 다른 화면에서 새로 들어온 것 -> 이전에 남아있던 입력 내용을 비움
+  useEffect(() => {
+    if (searchParams.get("resume") !== "1") {
+      resetForm();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isInventionInfoFilled = Boolean(
     title.trim() && technicalField.trim() && description.trim()
