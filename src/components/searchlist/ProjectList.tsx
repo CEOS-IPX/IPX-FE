@@ -149,17 +149,33 @@ export function ProjectList({
                 </div>
 
                 {canScrollMore && (
-                  <button
-                    type="button"
-                    aria-label="태그 더 보기"
-                    onClick={handleScrollTags}
-                    className="absolute top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-surface shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)]"
-                  >
-                    <ChevronIcon
-                      className="size-5 text-icon-neutral-emphasize [&_path]:fill-current"
+                  <>
+                    <div
                       aria-hidden
+                      className={cn(
+                        "pointer-events-none absolute top-0 right-0 h-full w-9",
+                        highlighted ? "bg-bg-primary-tint" : "bg-bg-surface"
+                      )}
                     />
-                  </button>
+                    <div
+                      aria-hidden
+                      className={cn(
+                        "pointer-events-none absolute top-0 right-9 h-full w-12 bg-linear-to-r from-transparent to-80%",
+                        highlighted ? "to-bg-primary-tint" : "to-bg-surface"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      aria-label="태그 더 보기"
+                      onClick={handleScrollTags}
+                      className="absolute top-1/2 right-0 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-bg-surface shadow-[0px_1px_6px_0px_rgba(144,155,165,0.36)]"
+                    >
+                      <ChevronIcon
+                        className="size-5 text-icon-neutral-emphasize [&_path]:fill-current"
+                        aria-hidden
+                      />
+                    </button>
+                  </>
                 )}
               </div>
             </div>
