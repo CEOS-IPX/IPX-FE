@@ -124,7 +124,7 @@ export function ProjectList({
                   type="button"
                   tabIndex={-1}
                   aria-hidden
-                  className="invisible absolute top-0 left-0 ml-2 shrink-0 text-label-15"
+                  className="invisible absolute top-0 left-0 ml-3 shrink-0 text-label-15"
                 >
                   더보기
                 </button>
@@ -141,7 +141,7 @@ export function ProjectList({
                         event.stopPropagation();
                         setTagsExpanded(true);
                       }}
-                      className="ml-2 shrink-0 text-label-15 text-primary-default hover:underline"
+                      className="ml-3 shrink-0 text-label-15 text-primary-default hover:underline"
                     >
                       더보기
                     </button>
