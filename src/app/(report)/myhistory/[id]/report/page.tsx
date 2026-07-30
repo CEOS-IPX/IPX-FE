@@ -58,7 +58,11 @@ function getArgument(report: ReportDetailResponse, argumentType: ReportInventive
 }
 
 function hasContent(content: Record<string, unknown>) {
-  return Object.keys(content).length > 0;
+  return Object.values(content).some((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "string") return value.trim().length > 0;
+    return value !== null && value !== undefined;
+  });
 }
 
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {

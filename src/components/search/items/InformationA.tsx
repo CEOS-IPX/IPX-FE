@@ -79,6 +79,7 @@ export default function InformationA({
           rows={4}
           value={description}
           onChange={(e) => onChangeDescription(e.target.value)}
+          className="scrollbar-hide"
         />
       </div>
     </div>

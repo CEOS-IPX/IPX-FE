@@ -25,7 +25,7 @@ export default function ComparisionPatentBox({
           <ReferenceChip variant="primary">주인용</ReferenceChip>
 
           <div className="flex min-w-0 flex-col gap-1">
-            <p className="text-label-15 text-body-primary">
+            <p className="text-label-15 text-body-primary wrap-break-word">
               {primaryReference.patentNumber} {primaryReference.title}
             </p>
 
@@ -40,7 +40,7 @@ export default function ComparisionPatentBox({
             <ReferenceChip variant="secondary">부인용</ReferenceChip>
 
             <div className="flex min-w-0 flex-col gap-1">
-              <p className="text-label-15 text-body-primary">
+              <p className="text-label-15 text-body-primary wrap-break-word">
                 {secondaryReference.patentNumber} {secondaryReference.title}
               </p>
 

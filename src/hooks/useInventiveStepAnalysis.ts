@@ -102,7 +102,8 @@ export function useInventiveStepAnalysis(id: string) {
   } | null>(null);
   const [reloadCount, setReloadCount] = useState(0);
   const [selectedLogics, setSelectedLogics] = useState<Set<InventiveStepLogicKey>>(new Set());
-  // AI가 최초 분석 시 추천한 논리 카테고리(argumentId) 고정 스냅샷 -> 이후 사용자가 선택/해제해도 "AI 추천" 배지는 바뀌면 안 됨
+  const [selectionAnalysisId, setSelectionAnalysisId] = useState<number | null>(null);
+
   const [aiRecommendedArgumentIds, setAiRecommendedArgumentIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
@@ -129,6 +130,7 @@ export function useInventiveStepAnalysis(id: string) {
             data.arguments.filter((argument) => argument.recommended).map((a) => a.argumentId)
           )
         );
+        setSelectionAnalysisId(data.analysisId);
       })
       .catch((error) => {
         if (canceled) return;
@@ -147,6 +149,12 @@ export function useInventiveStepAnalysis(id: string) {
       canceled = true;
     };
   }, [accessToken, id, isAuthInitialized, reloadCount]);
+
+  // selectedLogics 변경을 localStorage에 반영 -> setState 업데이터 안에서 직접 쓰지 않고 effect로 분리
+  useEffect(() => {
+    if (selectionAnalysisId === null) return;
+    saveStoredSelection(selectionAnalysisId, selectedLogics);
+  }, [selectedLogics, selectionAnalysisId]);
 
   const analysis = result?.caseId === id ? result.analysis : null;
   const errorMessage =
@@ -203,8 +211,6 @@ export function useInventiveStepAnalysis(id: string) {
   const toggleLogic = (key: InventiveStepLogicKey) => {
     if (!analysis || !getArgument(analysis, key)) return;
 
-    const analysisId = analysis.analysisId;
-
     setSelectedLogics((previous) => {
       const next = new Set(previous);
       if (next.has(key)) {
@@ -212,7 +218,6 @@ export function useInventiveStepAnalysis(id: string) {
       } else {
         next.add(key);
       }
-      saveStoredSelection(analysisId, next);
       return next;
     });
   };
@@ -221,6 +226,7 @@ export function useInventiveStepAnalysis(id: string) {
     setResult(null);
     setRequestError(null);
     setSelectedLogics(new Set());
+    setSelectionAnalysisId(null);
     setReloadCount((count) => count + 1);
   };
 
