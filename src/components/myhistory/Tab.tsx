@@ -1,14 +1,14 @@
 "use client";
 
-type TabValue = "전체" | "대기 중" | "완료";
+type TabValue = "전체" | "분석 중" | "완료";
 
 interface TabProps {
   active: TabValue;
-  counts: { 전체: number; "대기 중": number; 완료: number };
+  counts: { 전체: number; "분석 중": number; 완료: number };
   onChange: (tab: TabValue) => void;
 }
 
-const TABS: TabValue[] = ["전체", "대기 중", "완료"];
+const TABS: TabValue[] = ["전체", "분석 중", "완료"];
 
 export function Tab({ active, counts, onChange }: TabProps) {
   return (

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { jsonLd, siteConfig } from "@/constants/common/site";
 import { Providers } from "@/app/providers";
+import { pretendard } from "@/app/fonts";
 
 import "./globals.css";
 
@@ -70,7 +71,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang={siteConfig.lang} className="h-full antialiased">
+    <html lang={siteConfig.lang} className={`h-full antialiased ${pretendard.variable}`}>
       <body className="h-full overflow-hidden">
         <script
           type="application/ld+json"

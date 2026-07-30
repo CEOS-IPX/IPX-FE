@@ -1,4 +1,3 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
 :root {
@@ -9,7 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-pretendard: "Pretendard", sans-serif;
+  --font-pretendard: var(--font-pretendard-loaded), sans-serif;
 
   /* =========================================
      Text Color
