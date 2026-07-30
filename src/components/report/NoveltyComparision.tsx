@@ -55,7 +55,7 @@ export default function NoveltyComparison({
                 <p className="text-label-emphasis-15 text-title-secondary">{item.title}</p>
               </div>
 
-              <span className="text-label-13 text-primary-sub">{item.diff}</span>
+              <span className="text-label-13 leading-5 text-primary-sub">{item.diff}</span>
             </div>
           ))}
       </div>

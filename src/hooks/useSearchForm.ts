@@ -7,6 +7,7 @@ import { getCaseComponents, getCaseDetail, updateCaseComponents } from "@/lib/ap
 import { ApiError } from "@/lib/api/error";
 import { parseCaseId } from "@/lib/parseCaseId";
 import { useActiveSearchStore } from "@/store/activeSearchStore";
+import { useRecentCasesStore } from "@/store/recentCasesStore";
 import { useSearchFormStore } from "@/store/searchFormStore";
 
 // api 에러코드별 메시지(탐색하기)
@@ -61,6 +62,7 @@ export function useSearchForm() {
   const searchParams = useSearchParams();
   const reSearchCaseId = parseCaseId(searchParams.get("caseId") ?? undefined);
   const setActiveSearch = useActiveSearchStore((state) => state.setActiveSearch);
+  const invalidateRecentCases = useRecentCasesStore((state) => state.invalidate);
 
   const [loadComponentsError, setLoadComponentsError] = useState<string | null>(null);
   const [loadCaseDetailError, setLoadCaseDetailError] = useState<string | null>(null);
@@ -327,6 +329,7 @@ export function useSearchForm() {
           : undefined,
       });
 
+      invalidateRecentCases();
       setActiveSearch({ caseId, resultCount, title });
       router.push(
         `/search/loading?count=${resultCount}&caseId=${caseId}&title=${encodeURIComponent(title)}`
