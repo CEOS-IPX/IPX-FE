@@ -57,6 +57,14 @@ function getArgument(report: ReportDetailResponse, argumentType: ReportInventive
   );
 }
 
+function hasContent(content: Record<string, unknown>) {
+  return Object.values(content).some((value) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "string") return value.trim().length > 0;
+    return value !== null && value !== undefined;
+  });
+}
+
 export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { isAuthenticated, report, errorMessage, isLoading, reload } = useReport(id);
@@ -84,14 +92,15 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
     );
   }
 
-  const numericalContent =
-    getArgument(report, "NUMERICAL_LIMIT")?.content ?? ({} as Record<string, unknown>);
-  const combinationContent =
-    getArgument(report, "COMBINATION_MOTIVATION")?.content ?? ({} as Record<string, unknown>);
-  const commonContent =
-    getArgument(report, "COMMON_TECHNIQUE")?.content ?? ({} as Record<string, unknown>);
-  const simpleContent =
-    getArgument(report, "SIMPLE_DESIGN")?.content ?? ({} as Record<string, unknown>);
+  const numericalArgument = getArgument(report, "NUMERICAL_LIMIT");
+  const combinationArgument = getArgument(report, "COMBINATION_MOTIVATION");
+  const commonArgument = getArgument(report, "COMMON_TECHNIQUE");
+  const simpleArgument = getArgument(report, "SIMPLE_DESIGN");
+
+  const numericalContent = numericalArgument?.content ?? ({} as Record<string, unknown>);
+  const combinationContent = combinationArgument?.content ?? ({} as Record<string, unknown>);
+  const commonContent = commonArgument?.content ?? ({} as Record<string, unknown>);
+  const simpleContent = simpleArgument?.content ?? ({} as Record<string, unknown>);
   const effectItems = Array.isArray(numericalContent.effect_items)
     ? (numericalContent.effect_items as EffectItem[])
     : [];
@@ -148,6 +157,10 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
                 ? toReference(report.inventiveStepAnalysis.secondaryPriorArt)
                 : null
             }
+            showNumericalLimits={hasContent(numericalContent)}
+            showCombinationMotivation={hasContent(combinationContent)}
+            showCommonTechnique={hasContent(commonContent)}
+            showSimpleDesign={hasContent(simpleContent)}
             numericalLimits={effectItems.map((effect, index) => ({
               id: String(index + 1),
               category: text(effect.metric),

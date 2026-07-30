@@ -17,7 +17,7 @@ export default function ReportOverview({ overview, components }: ReportOverviewP
         <span>발명의 개요</span>
       </h2>
 
-      <p className="text-body-13 text-body-secondary">{overview}</p>
+      <p className="text-label-13 text-body-secondary">{overview}</p>
 
       <div className="flex flex-col mt-2">
         {components.map((component) => (
@@ -33,7 +33,7 @@ export default function ReportOverview({ overview, components }: ReportOverviewP
               {component.title}
             </span>
 
-            <span className="text-body-15 text-body-disabled">{component.description}</span>
+            <span className="text-label-15 text-body-disabled">{component.description}</span>
           </div>
         ))}
       </div>

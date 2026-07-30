@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { extractComponents, startSearch } from "@/lib/api/search";
-import { getCaseComponents, getCaseDetail, updateCaseComponents } from "@/lib/api/case";
+import { getCaseComponents, getCaseDetail } from "@/lib/api/case";
 import { ApiError } from "@/lib/api/error";
 import { parseCaseId } from "@/lib/parseCaseId";
 import { useActiveSearchStore } from "@/store/activeSearchStore";
+import { useRecentCasesStore } from "@/store/recentCasesStore";
 import { useSearchFormStore } from "@/store/searchFormStore";
 
 // api 에러코드별 메시지(탐색하기)
@@ -47,20 +48,12 @@ const GET_CASE_COMPONENTS_ERROR_MESSAGES: Record<string, string> = {
   C002: "서버 내부 오류가 발생했습니다.",
 };
 
-// api 에러코드별 메시지(재탐색하기 -> 구성요소 저장/수정)
-const UPDATE_CASE_COMPONENTS_ERROR_MESSAGES: Record<string, string> = {
-  C001: "잘못된 입력값입니다.",
-  SC001: "인증이 필요합니다.",
-  CA002: "해당 사건에 접근할 권한이 없습니다.",
-  CA001: "사건을 찾을 수 없습니다.",
-  C002: "서버 내부 오류가 발생했습니다.",
-};
-
 export function useSearchForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reSearchCaseId = parseCaseId(searchParams.get("caseId") ?? undefined);
   const setActiveSearch = useActiveSearchStore((state) => state.setActiveSearch);
+  const invalidateRecentCases = useRecentCasesStore((state) => state.invalidate);
 
   const [loadComponentsError, setLoadComponentsError] = useState<string | null>(null);
   const [loadCaseDetailError, setLoadCaseDetailError] = useState<string | null>(null);
@@ -273,26 +266,6 @@ export function useSearchForm() {
     setStartSearchError(null);
     setIsStartingSearch(true);
     try {
-      // 재탐색(기존 사건)인 경우, 탐색 시작 전에 수정된 구성요소를 먼저 그 사건에 저장하는 부분 api
-      if (reSearchCaseId !== null) {
-        try {
-          await updateCaseComponents(reSearchCaseId, {
-            components: elements.map((el) => ({ name: el.name, description: el.description })),
-          });
-        } catch (err) {
-          if (err instanceof ApiError) {
-            setStartSearchError(
-              UPDATE_CASE_COMPONENTS_ERROR_MESSAGES[err.errorCode] ||
-                err.message ||
-                "구성요소 저장 중 오류가 발생했습니다."
-            );
-          } else {
-            setStartSearchError("구성요소 저장 중 오류가 발생했습니다.");
-          }
-          return;
-        }
-      }
-
       const hasAdditionalInfo =
         priorArtReference.trim() ||
         differentiationNotes.trim() ||
@@ -327,6 +300,7 @@ export function useSearchForm() {
           : undefined,
       });
 
+      invalidateRecentCases();
       setActiveSearch({ caseId, resultCount, title });
       router.push(
         `/search/loading?count=${resultCount}&caseId=${caseId}&title=${encodeURIComponent(title)}`

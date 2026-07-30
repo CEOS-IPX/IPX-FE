@@ -15,6 +15,10 @@ interface SidebarProps {
   onToggle: () => void;
 }
 
+function isActiveTab(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
 export function Sidebar({ open, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { cases: recentCases, error: recentCasesError } = useRecentCases(5);
@@ -46,21 +50,21 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
           icon={<MyHistory width={20} height={20} />}
           label="내 활동 기록"
           open={open}
-          active={pathname === "/myhistory"}
+          active={isActiveTab(pathname, "/myhistory")}
         />
         <SidebarNavItem
           href="/search"
           icon={<Search width={20} height={20} />}
           label="선행기술 탐색"
           open={open}
-          active={pathname === "/search"}
+          active={isActiveTab(pathname, "/search")}
         />
         <SidebarNavItem
           href="/analysis"
           icon={<NewSearch width={20} height={20} />}
           label="기술 분석"
           open={open}
-          active={pathname === "/analysis"}
+          active={isActiveTab(pathname, "/analysis")}
         />
       </nav>
 
@@ -76,7 +80,6 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
                   key={recentCase.caseId}
                   href={`/myhistory/${recentCase.caseId}?title=${encodeURIComponent(recentCase.title)}`}
                   label={recentCase.title}
-                  active={pathname === `/myhistory/${recentCase.caseId}`}
                   open={open}
                 />
               ))}

@@ -8,11 +8,11 @@ import { useAuthStore } from "@/store/authStore";
 import { useRecentCasesStore } from "@/store/recentCasesStore";
 import type { CaseStatusGroup, CaseSummary } from "@/types/case.type";
 
-export type TabValue = "전체" | "대기 중" | "완료";
+export type TabValue = "전체" | "분석 중" | "완료";
 
 const STATUS_GROUP_BY_TAB: Record<TabValue, CaseStatusGroup> = {
   전체: "ALL",
-  "대기 중": "PENDING",
+  "분석 중": "PENDING",
   완료: "COMPLETED",
 };
 
@@ -62,7 +62,7 @@ export function useMyHistory() {
   const [activeTab, setActiveTab] = useState<TabValue>("전체");
   const [editingProject, setEditingProject] = useState<EditingProject | null>(null);
   const [cases, setCases] = useState<CaseSummary[]>([]);
-  const [counts, setCounts] = useState({ 전체: 0, "대기 중": 0, 완료: 0 });
+  const [counts, setCounts] = useState({ 전체: 0, "분석 중": 0, 완료: 0 });
 
   const [error, setError] = useState<string | null>(null);
   const [isModifying, setIsModifying] = useState(false);
@@ -87,7 +87,7 @@ export function useMyHistory() {
 
         setCounts({
           전체: result.totalCount,
-          "대기 중": result.pendingCount,
+          "분석 중": result.pendingCount,
           완료: result.completedCount,
         });
         setError(null);
@@ -180,7 +180,7 @@ export function useMyHistory() {
 
       setCounts((prev) => ({
         전체: Math.max(0, prev.전체 - 1),
-        "대기 중": wasCompleted ? prev["대기 중"] : Math.max(0, prev["대기 중"] - 1),
+        "분석 중": wasCompleted ? prev["분석 중"] : Math.max(0, prev["분석 중"] - 1),
         완료: wasCompleted ? Math.max(0, prev.완료 - 1) : prev.완료,
       }));
       useRecentCasesStore.getState().invalidate();

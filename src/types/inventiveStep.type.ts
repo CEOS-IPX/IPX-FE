@@ -56,7 +56,6 @@ export type InventiveStepArgument =
 export type InventiveStepArgumentContent = InventiveStepArgument["content"];
 
 export type UpdateInventiveArgumentRequest = {
-  recommended?: boolean | null;
   content?: InventiveStepArgumentContent | Record<string, never> | null;
 };
 

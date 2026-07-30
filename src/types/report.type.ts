@@ -1,10 +1,3 @@
-export type CreateReportRequest = {
-  authorName: string;
-  noveltySatisfied: boolean;
-  inventiveSatisfied: boolean;
-  overallConclusion: string;
-};
-
 export type UpdateReportRequest = Partial<{
   authorName: string;
   noveltySatisfied: boolean;

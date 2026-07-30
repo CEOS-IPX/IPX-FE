@@ -9,33 +9,13 @@ type InitialEffect = Omit<Effect, "id">;
 
 export default function ArgumentFormA({
   initialEffects,
-  recommended,
   onSave,
 }: {
   initialEffects: InitialEffect[];
-  recommended: boolean;
   onSave: (effectItems: NumericalLimitEffectItem[]) => Promise<void>;
 }) {
   const [effects, setEffects] = useState<Effect[]>(() =>
-    initialEffects.map((effect, index) =>
-      recommended
-        ? { ...effect, id: `effect-${index}` }
-        : {
-            id: `effect-${index}`,
-            category: "",
-            unit: "",
-            priorArt: "",
-            invention: "",
-            improvement: "",
-            placeholders: {
-              category: effect.category,
-              unit: effect.unit,
-              priorArt: effect.priorArt,
-              invention: effect.invention,
-              improvement: effect.improvement,
-            },
-          }
-    )
+    initialEffects.map((effect, index) => ({ ...effect, id: `effect-${index}` }))
   );
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

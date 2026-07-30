@@ -22,7 +22,6 @@ import type {
 function renderArgumentForm(
   analysis: InventiveStepAnalysisResponse,
   logicKey: InventiveStepLogicKey,
-  contentIsPlaceholder: boolean,
   onSave: (argumentId: number, content: InventiveStepArgumentContent) => Promise<void>
 ) {
   const argument = getArgument(analysis, logicKey);
@@ -32,7 +31,6 @@ function renderArgumentForm(
     case "NUMERICAL_LIMIT":
       return (
         <ArgumentFormA
-          recommended={!contentIsPlaceholder}
           onSave={(effectItems) =>
             onSave(argument.argumentId, {
               effect_items: effectItems,
@@ -52,7 +50,6 @@ function renderArgumentForm(
         <ArgumentFormB
           initialBackgroundLimit={argument.content.background_limit ?? ""}
           initialTeachingAway={argument.content.teaching_away ?? ""}
-          recommended={!contentIsPlaceholder}
           onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
@@ -65,7 +62,6 @@ function renderArgumentForm(
         <ArgumentFormC
           initialTarget={target}
           initialRebuttal={argument.content.rebuttal ?? ""}
-          recommended={!contentIsPlaceholder}
           onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
@@ -82,7 +78,6 @@ function renderArgumentForm(
         <ArgumentFormD
           initialChangedComponent={changedComponent}
           initialNonObviousness={argument.content.non_obviousness ?? ""}
-          recommended={!contentIsPlaceholder}
           onSave={(content) => onSave(argument.argumentId, content)}
         />
       );
@@ -103,9 +98,6 @@ export default function AnalysisReportPage({
     isLoading,
     selectedLogics,
     aiRecommendedArgumentIds,
-    placeholderArgumentIds,
-    updatingLogics,
-    updateError,
     toggleLogic,
     saveArgumentContent,
     reload,
@@ -172,17 +164,10 @@ export default function AnalysisReportPage({
                 getArgument(analysis, logic.key)?.argumentId ?? Number.NaN
               )}
               selected={selectedLogics.has(logic.key)}
-              disabled={updatingLogics.has(logic.key)}
               onClick={() => toggleLogic(logic.key)}
             />
           ))}
         </div>
-
-        {updateError && (
-          <p role="alert" className="text-body-13 text-error-default">
-            {updateError}
-          </p>
-        )}
 
         <div className="mt-3 flex flex-col gap-3">
           {selectedLogics.size === 0 ? (
@@ -193,14 +178,7 @@ export default function AnalysisReportPage({
             INVENTIVE_STEP_LOGIC_TYPES.filter((logic) => selectedLogics.has(logic.key)).map(
               (logic) => (
                 <div key={`${analysis.analysisId}-${logic.key}`}>
-                  {renderArgumentForm(
-                    analysis,
-                    logic.key,
-                    placeholderArgumentIds.has(
-                      getArgument(analysis, logic.key)?.argumentId ?? Number.NaN
-                    ),
-                    saveArgumentContent
-                  )}
+                  {renderArgumentForm(analysis, logic.key, saveArgumentContent)}
                 </div>
               )
             )

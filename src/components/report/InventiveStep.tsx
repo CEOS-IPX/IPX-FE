@@ -12,6 +12,10 @@ type InventiveStepProps = {
   satisfied: boolean;
   primaryReference: ComparisonReference;
   secondaryReference: ComparisonReference | null;
+  showNumericalLimits: boolean;
+  showCombinationMotivation: boolean;
+  showCommonTechnique: boolean;
+  showSimpleDesign: boolean;
   numericalLimits: Effect[];
   backgroundLimit: string;
   motivationAbsence: string;
@@ -25,6 +29,10 @@ export default function InventiveStep({
   satisfied,
   primaryReference,
   secondaryReference,
+  showNumericalLimits,
+  showCombinationMotivation,
+  showCommonTechnique,
+  showSimpleDesign,
   numericalLimits,
   backgroundLimit,
   motivationAbsence,
@@ -49,13 +57,19 @@ export default function InventiveStep({
         secondaryReference={secondaryReference}
       />
 
-      <ArgumentA effects={numericalLimits} />
+      {showNumericalLimits && <ArgumentA effects={numericalLimits} />}
 
-      <ArgumentB backgroundLimit={backgroundLimit} motivationAbsence={motivationAbsence} />
+      {showCombinationMotivation && (
+        <ArgumentB backgroundLimit={backgroundLimit} motivationAbsence={motivationAbsence} />
+      )}
 
-      <ArgumentC rejectionReason={rejectionReason} rebuttalLogic={rebuttalLogic} />
+      {showCommonTechnique && (
+        <ArgumentC rejectionReason={rejectionReason} rebuttalLogic={rebuttalLogic} />
+      )}
 
-      <ArgumentD changedComponent={changedComponent} nonObviousnessLogic={nonObviousnessLogic} />
+      {showSimpleDesign && (
+        <ArgumentD changedComponent={changedComponent} nonObviousnessLogic={nonObviousnessLogic} />
+      )}
     </section>
   );
 }

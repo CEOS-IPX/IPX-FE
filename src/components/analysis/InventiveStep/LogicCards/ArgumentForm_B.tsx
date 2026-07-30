@@ -7,23 +7,19 @@ import { ArgumentTextArea } from "./ArgumentTextArea";
 interface ArgumentFormBProps {
   initialBackgroundLimit: string;
   initialTeachingAway: string;
-  recommended: boolean;
   onSave: (content: { background_limit: string; teaching_away: string }) => Promise<void>;
 }
 
 export default function ArgumentFormB({
   initialBackgroundLimit,
   initialTeachingAway,
-  recommended,
   onSave,
 }: ArgumentFormBProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [backgroundLimitation, setBackgroundLimitation] = useState(
-    recommended ? initialBackgroundLimit : ""
-  );
-  const [teachingAway, setTeachingAway] = useState(recommended ? initialTeachingAway : "");
+  const [backgroundLimitation, setBackgroundLimitation] = useState(initialBackgroundLimit);
+  const [teachingAway, setTeachingAway] = useState(initialTeachingAway);
 
   const handleToggleEdit = async () => {
     if (!isEditing) {
