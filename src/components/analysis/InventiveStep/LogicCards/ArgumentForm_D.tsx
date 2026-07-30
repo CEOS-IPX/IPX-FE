@@ -7,7 +7,6 @@ import { ArgumentTextArea } from "./ArgumentTextArea";
 interface ArgumentFormDProps {
   initialChangedComponent: string;
   initialNonObviousness: string;
-  recommended: boolean;
   onSave: (content: {
     changed_component_label: string;
     changed_component_name: string;
@@ -18,16 +17,13 @@ interface ArgumentFormDProps {
 export default function ArgumentFormD({
   initialChangedComponent,
   initialNonObviousness,
-  recommended,
   onSave,
 }: ArgumentFormDProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [changedComponent, setChangedComponent] = useState(
-    recommended ? initialChangedComponent : ""
-  );
-  const [counterArgument, setCounterArgument] = useState(recommended ? initialNonObviousness : "");
+  const [changedComponent, setChangedComponent] = useState(initialChangedComponent);
+  const [counterArgument, setCounterArgument] = useState(initialNonObviousness);
 
   const handleToggleEdit = async () => {
     if (!isEditing) {

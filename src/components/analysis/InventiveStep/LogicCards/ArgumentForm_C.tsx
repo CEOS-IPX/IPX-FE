@@ -7,7 +7,6 @@ import { ArgumentTextArea } from "./ArgumentTextArea";
 interface ArgumentFormCProps {
   initialTarget: string;
   initialRebuttal: string;
-  recommended: boolean;
   onSave: (content: {
     target_label: string;
     target_name: string;
@@ -18,14 +17,13 @@ interface ArgumentFormCProps {
 export default function ArgumentFormC({
   initialTarget,
   initialRebuttal,
-  recommended,
   onSave,
 }: ArgumentFormCProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [rejectionReason, setRejectionReason] = useState(recommended ? initialTarget : "");
-  const [counterArgument, setCounterArgument] = useState(recommended ? initialRebuttal : "");
+  const [rejectionReason, setRejectionReason] = useState(initialTarget);
+  const [counterArgument, setCounterArgument] = useState(initialRebuttal);
 
   const handleToggleEdit = async () => {
     if (!isEditing) {
