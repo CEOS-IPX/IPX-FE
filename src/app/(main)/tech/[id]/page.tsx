@@ -46,7 +46,7 @@ export default function TechDetailPage() {
   return (
     <div
       data-tech-id={priorArtId}
-      className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch px-10 py-6"
+      className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch px-10 pt-6 pb-16"
     >
       <div className="flex w-full flex-1 flex-col items-start gap-9 self-stretch">
         <div className="flex w-full flex-col items-start gap-6 self-stretch">
@@ -129,7 +129,7 @@ export default function TechDetailPage() {
 
           <aside
             aria-label="선행기술 부가 정보"
-            className="flex w-97.5 shrink-0 flex-col items-start gap-9 rounded-lg border border-outline-sub bg-bg-surface p-8"
+            className="flex w-97.5 shrink-0 flex-col items-start gap-9 rounded-lg border border-outline-sub bg-bg-surface p-8 mb-10"
           >
             <section className="flex w-full flex-col items-start justify-center gap-2 self-stretch">
               <h2 className="self-stretch text-title-18 text-title-primary">관련도</h2>
