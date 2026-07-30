@@ -1,31 +1,19 @@
 import type { Metadata } from "next";
 
-import {
-  OG_DESCRIPTION,
-  OG_IMAGE_ALT,
-  OG_IMAGE_PATH,
-  OG_TITLE,
-  SITE_DESCRIPTION,
-  SITE_KEYWORDS,
-  SITE_NAME,
-  SITE_TITLE,
-  SITE_URL,
-  TWITTER_DESCRIPTION,
-  TWITTER_TITLE,
-} from "@/constants/common/site";
+import { jsonLd, siteConfig } from "@/constants/common/site";
 import { Providers } from "@/app/providers";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  keywords: SITE_KEYWORDS,
-  authors: [{ name: SITE_NAME, url: SITE_URL }],
-  creator: SITE_NAME,
-  publisher: SITE_NAME,
-  applicationName: SITE_NAME,
+  metadataBase: new URL(siteConfig.url),
+  title: siteConfig.title,
+  description: siteConfig.description,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.author, url: siteConfig.url }],
+  creator: siteConfig.author,
+  publisher: siteConfig.author,
+  applicationName: siteConfig.name,
   category: "technology",
   robots: {
     index: true,
@@ -34,30 +22,31 @@ export const metadata: Metadata = {
     "max-image-preview": "large",
   },
   alternates: {
-    canonical: SITE_URL,
+    canonical: siteConfig.url,
   },
   openGraph: {
     type: "website",
-    siteName: SITE_NAME,
-    locale: "ko_KR",
-    url: SITE_URL,
-    title: OG_TITLE,
-    description: OG_DESCRIPTION,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    url: siteConfig.url,
+    title: siteConfig.ogTitle,
+    description: siteConfig.ogDescription,
     images: [
       {
-        url: OG_IMAGE_PATH,
+        url: siteConfig.ogImage,
         width: 1200,
         height: 630,
-        alt: OG_IMAGE_ALT,
+        alt: siteConfig.ogImageAlt,
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: TWITTER_TITLE,
-    description: TWITTER_DESCRIPTION,
-    images: [OG_IMAGE_PATH],
+    site: siteConfig.twitterHandle,
+    title: siteConfig.ogTitle,
+    description: siteConfig.ogDescription,
+    images: [siteConfig.ogImage],
   },
   formatDetection: {
     email: false,
@@ -69,6 +58,10 @@ export const metadata: Metadata = {
     shortcut: "/images/favicon-16x16.png",
     apple: "/images/apple-touch-icon.png",
   },
+  other: {
+    "geo.region": siteConfig.geoRegion,
+    "geo.placename": siteConfig.geoPlacename,
+  },
 };
 
 export default function RootLayout({
@@ -77,8 +70,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="h-full antialiased">
+    <html lang={siteConfig.lang} className="h-full antialiased">
       <body className="h-full overflow-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
