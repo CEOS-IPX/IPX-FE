@@ -36,7 +36,7 @@ export const siteConfig = {
     "Google Patents",
   ],
 
-  ogImage: `${SITE_URL}/images/og-image.png`,
+  ogImage: `${SITE_URL}/og-image.png`,
   ogImageAlt: "IPX 변리사 선행기술조사 자동화 화면",
   ogTitle: "IPX | 변리사 AI 선행기술조사 자동화",
   ogDescription:
