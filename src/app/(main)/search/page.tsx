@@ -27,14 +27,14 @@ function SearchPageContent() {
 
   if (activeSearch && !searchParams.has("caseId")) {
     return (
-      <div className="flex min-h-full items-center justify-center">
+      <div className="flex min-h-full items-center justify-center bg-bg-surface">
         <p className="text-body-15 text-caption-label">진행 중인 탐색을 불러오고 있습니다...</p>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-15 px-20 py-5">
+    <div className="flex flex-col gap-15 bg-bg-surface px-20 py-5">
       <h1 className="text-headline-28 text-title-primary">새로운 선행 기술 탐색하기</h1>
 
       {form.loadCaseDetailError && (

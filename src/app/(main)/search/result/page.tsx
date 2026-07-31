@@ -29,7 +29,10 @@ function SearchResultContent() {
   } = useSearchResult();
 
   return (
-    <div className="flex min-h-full w-full flex-col gap-6" aria-label="선행기술 탐색 결과">
+    <div
+      className="flex min-h-full w-full flex-col gap-6 bg-bg-surface"
+      aria-label="선행기술 탐색 결과"
+    >
       <div className="flex flex-col items-start gap-4">
         <BackButton />
 

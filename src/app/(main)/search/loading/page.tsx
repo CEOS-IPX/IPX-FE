@@ -61,7 +61,7 @@ function LoadingContent() {
     useSearchProgress();
 
   return (
-    <div className="flex h-full min-h-full w-full flex-col items-center justify-center gap-8">
+    <div className="flex h-full min-h-full w-full flex-col items-center justify-center gap-8 bg-bg-surface">
       <ProgressRing percent={percent} />
 
       <div className="flex flex-col items-center gap-2">

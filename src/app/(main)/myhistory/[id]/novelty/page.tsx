@@ -23,7 +23,7 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
 
   if (isLoading) {
     return (
-      <div className="flex min-h-80 items-center justify-center">
+      <div className="flex min-h-80 items-center justify-center bg-bg-surface">
         <p className="text-body-15 text-caption-label">신규성 분석 결과를 불러오고 있습니다...</p>
       </div>
     );
@@ -31,7 +31,7 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
 
   if (errorMessage || !analysis) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 bg-bg-surface">
         <BackButton />
         <div
           role="alert"
@@ -49,7 +49,7 @@ export default function NoveltyPage({ params }: { params: Promise<{ id: string }
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 bg-bg-surface">
       <BackButton />
 
       <Header

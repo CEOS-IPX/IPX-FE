@@ -18,7 +18,7 @@ export default function TechDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch px-10 py-6">
+      <div className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch bg-bg-surface px-10 py-6">
         <p className="text-body-15 text-caption-label">불러오는 중...</p>
       </div>
     );
@@ -28,7 +28,7 @@ export default function TechDetailPage() {
     return (
       <div
         data-tech-id={priorArtId}
-        className="flex min-h-full w-full flex-1 flex-col items-start gap-6 self-stretch px-10 py-6"
+        className="flex min-h-full w-full flex-1 flex-col items-start gap-6 self-stretch bg-bg-surface px-10 py-6"
       >
         <BackButton />
         <p className="text-body-15 text-error-default">
@@ -46,7 +46,7 @@ export default function TechDetailPage() {
   return (
     <div
       data-tech-id={priorArtId}
-      className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch px-10 pt-6 pb-16"
+      className="flex min-h-full w-full flex-1 flex-col items-center gap-6 self-stretch bg-bg-surface px-10 pt-6 pb-16"
     >
       <div className="flex w-full flex-1 flex-col items-start gap-9 self-stretch">
         <div className="flex w-full flex-col items-start gap-6 self-stretch">

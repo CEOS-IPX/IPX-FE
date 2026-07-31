@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-screen w-full bg-bg-surface">
       <div className="relative w-1/2 overflow-hidden rounded-xl my-5 ml-5">
         <Image
           src="/images/img-auth-graphic.png"
