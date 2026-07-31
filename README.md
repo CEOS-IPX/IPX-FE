@@ -87,11 +87,4 @@ feat/* → dev → main
 - `dev` : 통합 및 QA
 - `main` : 배포 브랜치 (Vercel 연동)
 
----
 
-## 환경 변수
-
-```env
-NEXT_PUBLIC_API_BASE_URL=
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=
-```
